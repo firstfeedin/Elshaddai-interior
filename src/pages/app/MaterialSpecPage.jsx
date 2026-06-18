@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { materials as materialsApi } from '../../lib/api'
 
 const sans  = { fontFamily:"'DM Sans',system-ui,sans-serif" }
 const serif = { fontFamily:"'Cormorant Garamond',Georgia,serif" }
@@ -54,6 +55,12 @@ export default function MaterialSpecPage() {
   const nav = useNavigate()
   const [project, setProject] = useState('Nair Residence')
   const [specs, setSpecs]     = useState(SEED)
+
+  useEffect(() => {
+    materialsApi.list()
+      .then(data => { if (Array.isArray(data) && data.length) setSpecs(prev => ({ ...prev, _api: data })) })
+      .catch(() => {})
+  }, [])
   const [areaFilter, setAreaFilter] = useState('All Areas')
   const [statusFilter, setStatusFilter] = useState('All')
   const [sel, setSel]         = useState(null)

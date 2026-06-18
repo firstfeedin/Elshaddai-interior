@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { projects as projectsApi } from '../../lib/api'
 
 const sans  = { fontFamily: "'DM Sans', system-ui, sans-serif" }
 const serif = { fontFamily: "'Cormorant Garamond', Georgia, serif" }
@@ -48,8 +49,19 @@ const PROJECTS = [
 const STATUS_COLOR = { PASS:'#22c55e', FAIL:'#ef4444', NA:'#78716c', '':'#e7e5e4' }
 
 export default function QCChecklistPage() {
+  const [projectList, setProjectList] = useState(PROJECTS)
   const [project,   setProject]   = useState(PROJECTS[0])
   const [phaseKey,  setPhaseKey]  = useState(PROJECTS[0].phase)
+
+  useEffect(() => {
+    projectsApi.list()
+      .then(data => {
+        if (Array.isArray(data) && data.length) {
+          setProjectList(data.map(p => ({ id: p.id, name: p.name, phase: p.status || PROJECTS[0].phase })))
+        }
+      })
+      .catch(() => {})
+  }, [])
   const [checks,    setChecks]    = useState({})
   const [notes,     setNotes]     = useState({})
   const [signOff,   setSignOff]   = useState(false)

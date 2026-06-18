@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { projects as projectsApi } from '../../lib/api'
 
 const sans  = { fontFamily:"'DM Sans',system-ui,sans-serif" }
 const serif = { fontFamily:"'Cormorant Garamond',Georgia,serif" }
@@ -65,12 +66,19 @@ function SparkLine({ data, color, width=120, height=40 }) {
 
 export default function ProjectHealthPage() {
   const nav = useNavigate()
-  const [sel, setSel] = useState(null)
+  const [sel, setSel]           = useState(null)
+  const [projects, setProjects] = useState(PROJECTS)
 
-  const totalBudget = PROJECTS.reduce((a,p)=>a+p.budget,0)
-  const totalSpent  = PROJECTS.reduce((a,p)=>a+p.spent,0)
-  const avgHealth   = Math.round(PROJECTS.reduce((a,p)=>a+p.score,0)/PROJECTS.length)
-  const atRisk      = PROJECTS.filter(p=>p.score<70).length
+  useEffect(() => {
+    projectsApi.list()
+      .then(data => { if (Array.isArray(data) && data.length) setProjects(data) })
+      .catch(() => {})
+  }, [])
+
+  const totalBudget = projects.reduce((a,p)=>a+(p.budget||0),0)
+  const totalSpent  = projects.reduce((a,p)=>a+(p.spent||0),0)
+  const avgHealth   = projects.length ? Math.round(projects.reduce((a,p)=>a+(p.score||75),0)/projects.length) : 0
+  const atRisk      = projects.filter(p=>(p.score||75)<70).length
   const totalRevThisMonth = REVENUE[5]
   const totalProfitThisMonth = REVENUE[5] - EXPENSES[5]
 
@@ -165,13 +173,13 @@ export default function ProjectHealthPage() {
                 <span key={h} style={{ ...sans, fontSize:9, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:stone }}>{h}</span>
               ))}
             </div>
-            {PROJECTS.map((p,i)=>{
+            {projects.map((p,i)=>{
               const budgetPct = Math.round((p.spent/p.budget)*100)
               const timePct   = Math.round((p.elapsed/p.days)*100)
               const active    = sel?.id===p.id
               return (
                 <div key={p.id} onClick={()=>setSel(active?null:p)}
-                  style={{ display:'grid', gridTemplateColumns:'1.4fr 0.8fr 1fr 1fr 1fr 1fr 0.6fr 100px', padding:'12px 20px', borderBottom:i<PROJECTS.length-1?`1px solid ${bdr}`:'none', cursor:'pointer', background: active?`${gold}06`:'transparent', alignItems:'center' }}
+                  style={{ display:'grid', gridTemplateColumns:'1.4fr 0.8fr 1fr 1fr 1fr 1fr 0.6fr 100px', padding:'12px 20px', borderBottom:i<projects.length-1?`1px solid ${bdr}`:'none', cursor:'pointer', background: active?`${gold}06`:'transparent', alignItems:'center' }}
                   onMouseEnter={e=>{ if(!active) e.currentTarget.style.background=`${gold}04` }}
                   onMouseLeave={e=>{ if(!active) e.currentTarget.style.background='transparent' }}>
                   <div>
@@ -210,7 +218,7 @@ export default function ProjectHealthPage() {
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
             <div style={{ background:'#fff', border:`1px solid ${bdr}`, padding:'20px 24px' }}>
               <p style={{ ...sans, fontSize:10, fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', color:stone, margin:'0 0 16px' }}>Budget Utilization</p>
-              {PROJECTS.map(p=>{
+              {projects.map(p=>{
                 const pct = Math.round((p.spent/p.budget)*100)
                 return (
                   <div key={p.id} style={{ marginBottom:12 }}>
@@ -241,8 +249,8 @@ export default function ProjectHealthPage() {
                 })}
               </div>
               <div style={{ marginTop:16, padding:12, background:'#f9f8f6', border:`1px solid ${bdr}` }}>
-                <p style={{ ...sans, fontSize:10, color:stone, margin:0 }}>Average project value: <strong style={{ color:dark }}>{fmt(Math.round(totalBudget/PROJECTS.length))}</strong></p>
-                <p style={{ ...sans, fontSize:10, color:stone, margin:'4px 0 0' }}>Average duration: <strong style={{ color:dark }}>{Math.round(PROJECTS.reduce((a,p)=>a+p.days,0)/PROJECTS.length)} days</strong></p>
+                <p style={{ ...sans, fontSize:10, color:stone, margin:0 }}>Average project value: <strong style={{ color:dark }}>{fmt(Math.round(totalBudget/projects.length))}</strong></p>
+                <p style={{ ...sans, fontSize:10, color:stone, margin:'4px 0 0' }}>Average duration: <strong style={{ color:dark }}>{Math.round(projects.reduce((a,p)=>a+p.days,0)/projects.length)} days</strong></p>
               </div>
             </div>
           </div>

@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { purchaseOrders as poApi } from '../../lib/api'
 
 const sans  = { fontFamily: "'DM Sans', system-ui, sans-serif" }
 const serif = { fontFamily: "'Cormorant Garamond', Georgia, serif" }
@@ -34,6 +35,12 @@ function fmt(n) { return n > 0 ? '₹' + Number(n).toLocaleString('en-IN') : 'No
 export default function ApprovalsPage() {
   const [items,    setItems]    = useState(INIT)
   const [filter,   setFilter]   = useState('PENDING')
+
+  useEffect(() => {
+    poApi.list()
+      .then(data => { if (Array.isArray(data) && data.length) setItems(data) })
+      .catch(() => {})
+  }, [])
   const [typeF,    setTypeF]    = useState('ALL')
   const [selected, setSelected] = useState(null)
   const [comment,  setComment]  = useState('')
