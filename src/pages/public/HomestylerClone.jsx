@@ -1308,7 +1308,7 @@ export default function ElShaddaiHome() {
             ) : (
               <form onSubmit={async e => {
                 e.preventDefault()
-                const w3key = import.meta.env.VITE_WEB3FORMS_KEY
+                const w3key = import.meta.env.VITE_WEB3FORMS_KEY || '20e5a729-9a98-4234-b88a-470634b6d474'
                 // 1. Send email via Web3Forms (works client-side, no backend needed)
                 if (w3key) {
                   try {
