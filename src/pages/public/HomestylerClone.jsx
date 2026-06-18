@@ -1308,20 +1308,18 @@ export default function ElShaddaiHome() {
             ) : (
               <form onSubmit={async e => {
                 e.preventDefault()
-                // Primary: Web3Forms → contactus@divinemercyitsol.com
+                // Formsubmit.co — no account needed, delivers to Gmail
                 try {
-                  await fetch('https://api.web3forms.com/submit', {
+                  await fetch('https://formsubmit.co/ajax/pauljaswanth324@gmail.com', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify({
-                      access_key: '20e5a729-9a98-4234-b88a-470634b6d474',
-                      subject:    `New Enquiry from ${form.name} — El Shaddai`,
-                      from_name:  form.name,
-                      reply_to:   form.email,
-                      name:       form.name,
-                      email:      form.email,
-                      phone:      form.phone || 'Not provided',
-                      message:    form.message,
+                      _subject:  `New Enquiry from ${form.name} — El Shaddai Interior`,
+                      _template: 'table',
+                      name:      form.name,
+                      email:     form.email,
+                      phone:     form.phone || 'Not provided',
+                      message:   form.message,
                     }),
                   })
                 } catch {}
