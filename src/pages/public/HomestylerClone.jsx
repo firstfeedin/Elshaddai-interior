@@ -1308,6 +1308,28 @@ export default function ElShaddaiHome() {
             ) : (
               <form onSubmit={async e => {
                 e.preventDefault()
+                const w3key = import.meta.env.VITE_WEB3FORMS_KEY
+                // 1. Send email via Web3Forms (works client-side, no backend needed)
+                if (w3key) {
+                  try {
+                    await fetch('https://api.web3forms.com/submit', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        access_key: w3key,
+                        subject: `New Enquiry from ${form.name} — El Shaddai`,
+                        from_name: form.name,
+                        reply_to: form.email,
+                        name: form.name,
+                        email: form.email,
+                        phone: form.phone || 'Not provided',
+                        message: form.message,
+                        source: 'homepage-contact',
+                      }),
+                    })
+                  } catch {}
+                }
+                // 2. Also save to backend leads table (fallback, best-effort)
                 const base = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
                 try { await fetch(`${base}/leads`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, source: 'homepage-contact' }) }) } catch {}
                 setSent(true)
