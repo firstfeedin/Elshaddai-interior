@@ -91,7 +91,7 @@ export default function SettingsPage() {
     setSaving(true); setSaveError('')
     try {
       const token = localStorage.getItem('es_token')
-      const res = await fetch('http://localhost:3001/api/auth/profile', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/auth/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ name: profile.name, phone: profile.phone }),

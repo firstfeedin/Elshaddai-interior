@@ -8,7 +8,8 @@ const dark  = '#1c1917'
 const stone = '#57534e'
 const light = '#fafaf9'
 const bdr   = '#e7e5e4'
-const API   = 'http://localhost:3001'
+const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+const API   = _BASE.replace('/api', '')
 
 function api(path, opts = {}) {
   const token = localStorage.getItem('es_token')

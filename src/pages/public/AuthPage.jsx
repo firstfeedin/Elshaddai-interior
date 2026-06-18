@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { GoogleLogin } from '@react-oauth/google'
 
-const API = 'http://localhost:3001'
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+const API  = BASE.replace('/api', '')
 
 const ROLES = [
   { id:'CLIENT',          label:'Client / Homeowner',  desc:'Track your home project & approvals',   icon:'🏠', fields:['name','phone','city','password'] },

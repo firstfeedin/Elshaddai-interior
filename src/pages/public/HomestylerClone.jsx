@@ -1308,7 +1308,8 @@ export default function ElShaddaiHome() {
             ) : (
               <form onSubmit={async e => {
                 e.preventDefault()
-                try { await fetch('http://localhost:3001/leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, source: 'homepage-contact' }) }) } catch {}
+                const base = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+                try { await fetch(`${base}/leads`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, source: 'homepage-contact' }) }) } catch {}
                 setSent(true)
               }} style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>

@@ -385,7 +385,7 @@ export default function BabylonDesigner({ onSave, onSwitch2D, floorPlanData }) {
       setSaveStatus('saving')
       try {
         const token = localStorage.getItem('es_token')
-        await fetch(`http://localhost:3001/api/projects/${projectId}`, {
+        await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/projects/${projectId}`, {
           method:'PATCH', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
           body: JSON.stringify({ scene_data: sceneData })
         })
