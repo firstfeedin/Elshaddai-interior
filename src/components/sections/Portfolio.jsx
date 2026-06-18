@@ -1,10 +1,10 @@
 import { useState } from 'react'
 
-const filters = ['All', 'Modern', 'Luxury', 'Minimal', 'Scandinavian']
+const filters = ['All', 'Modern', 'Luxury', 'Minimal', 'Contemporary']
 
 const projects = [
   {
-    title: 'Skyline Apartment, Jubilee Hills',
+    title: 'Reddy Residence, Jubilee Hills',
     category: 'Modern',
     room: 'Living Rooms',
     area: '1800 sq ft',
@@ -13,45 +13,45 @@ const projects = [
     tags: ['Living Room', 'False Ceiling', 'TV Unit'],
   },
   {
-    title: 'Villa Meridian, Banjara Hills',
+    title: 'Sharma Villa, Banjara Hills',
     category: 'Luxury',
     room: 'Villas',
     area: '3200 sq ft',
     cost: '₹48 L',
     img: 'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=700&q=80',
-    tags: ['Full Home', 'Marble Finish', 'Smart Lighting'],
+    tags: ['Full Home', 'Indian Marble', 'Smart Lighting'],
     featured: true,
   },
   {
-    title: 'Zen Kitchen, Gachibowli',
+    title: 'Rao Kitchen, Gachibowli',
     category: 'Minimal',
     room: 'Kitchens',
     area: '220 sq ft',
     cost: '₹6.8 L',
     img: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=700&q=80',
-    tags: ['Modular Kitchen', 'Handleless', 'Quartz'],
+    tags: ['Modular Kitchen', 'Handleless', 'Granite Top'],
   },
   {
-    title: 'Nordic Bedroom, Hyderabad',
-    category: 'Scandinavian',
+    title: 'Mehta Master Bedroom, Kondapur',
+    category: 'Contemporary',
     room: 'Bedrooms',
     area: '320 sq ft',
     cost: '₹4.2 L',
     img: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=700&q=80',
-    tags: ['Bedroom', 'Wardrobe', 'Study Nook'],
+    tags: ['Bedroom', 'Wardrobe', 'Pooja Corner'],
   },
   {
-    title: 'Prestige Penthouse, Mumbai',
+    title: 'Kumar Penthouse, Hitech City',
     category: 'Luxury',
     room: 'Living Rooms',
     area: '4100 sq ft',
     cost: '₹92 L',
     img: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=700&q=80',
-    tags: ['Penthouse', 'Imported Marble', 'Custom Furniture'],
+    tags: ['Full Home', 'Kadappa Stone', 'Teak Wood'],
     featured: true,
   },
   {
-    title: 'Modern Flat, Pune',
+    title: 'Verma Home, Madhapur',
     category: 'Modern',
     room: 'Kitchens',
     area: '950 sq ft',

@@ -8,7 +8,7 @@ const reviews = [
     rating:  5,
     text:    "El Shaddai transformed our apartment beyond imagination. The AI-generated design was spot on in the first iteration, and the engineering team's attention to structural details gave us complete confidence. Every measurement was perfect.",
     img:     'https://i.pravatar.cc/80?img=47',
-    tag:     'Luxury Modern',
+    tag:     'Contemporary Indian',
   },
   {
     name:    'Arun Selvam',
@@ -26,7 +26,7 @@ const reviews = [
     rating:  5,
     text:    "The 3D visualisation was so realistic that when the actual installation was done, it looked exactly like what I approved online. The tracking system kept me informed every single day — no surprises!",
     img:     'https://i.pravatar.cc/80?img=32',
-    tag:     'Minimal Scandinavian',
+    tag:     'Vastu-Friendly Minimal',
   },
   {
     name:    'Suresh Venkataraman',

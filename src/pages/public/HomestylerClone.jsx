@@ -7,14 +7,14 @@ const PROJECTS = [
   {
     id: 1, tag: 'Featured',
     title: 'Sharma Residence — Living & Dining',
-    desc: 'A complete transformation of a 2,400 sq ft apartment in Jubilee Hills. Warm oak tones, Carrara marble surfaces and layered lighting create a space that feels both grand and intimate.',
+    desc: 'A complete transformation of a 2,400 sq ft apartment in Jubilee Hills. Warm teak tones, Rajasthan marble surfaces and layered lighting create a space that feels both grand and intimate.',
     img: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1400&q=85',
     area: '2,400', style: 'Contemporary', location: 'Jubilee Hills, Hyderabad',
   },
   {
     id: 2, tag: 'New',
     title: 'Mehta Villa — Full Home Interior',
-    desc: 'Four-bedroom villa spanning 4,200 sq ft in Banjara Hills. Every room designed with a coherent material palette — brushed gold fixtures, teak panels and deep velvet upholstery throughout.',
+    desc: 'Four-bedroom villa spanning 4,200 sq ft in Banjara Hills. Every room designed with a coherent material palette — antique brass fixtures, sheesham wood panels and rich silk upholstery throughout.',
     img: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1400&q=85',
     area: '4,200', style: 'Modern Luxury', location: 'Banjara Hills, Hyderabad',
   },
@@ -543,7 +543,7 @@ function AIPreview() {
     { role:'ai',    text:'✓  Kitchen — 3.0 × 2.4 m (modular cabinets, island)' },
     { role:'ai',    text:'✓  Bedroom 2 — 3.0 × 2.7 m' },
     { role:'ai',    text:'✓  Bedroom 3 — 2.7 × 2.4 m' },
-    { role:'ai',    text:'Materials: Italian marble floors · Teak veneer panels · ₹17.6L est.' },
+    { role:'ai',    text:'Materials: Rajasthan marble floors · Sheesham wood panels · ₹17.6L est.' },
   ]
 
   useEffect(() => {
@@ -1223,11 +1223,11 @@ export default function ElShaddaiHome() {
             <div style={{ padding: '28px 24px' }}>
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginBottom: 8, letterSpacing: '0.1em' }}>YOUR PROMPT</p>
               <p style={{ fontSize: 13, color: '#a78bfa', lineHeight: 1.6, marginBottom: 20, fontStyle: 'italic' }}>
-                "A cozy Scandinavian living room with warm oak floors, white walls, grey sofa and lots of plants. Budget ₹3 lakhs."
+                "A warm contemporary Indian living room with wooden floors, cream walls, deep blue sofa and brass accents. Budget ₹3 lakhs."
               </p>
               <div style={{ width: '100%', height: 1, background: 'rgba(255,255,255,0.06)', marginBottom: 20 }} />
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginBottom: 12, letterSpacing: '0.1em' }}>AI RESULT · 8.3s</p>
-              <p style={{ fontSize: 14, fontWeight: 600, color: '#fff', marginBottom: 12 }}>Warm Scandinavian Living Room</p>
+              <p style={{ fontSize: 14, fontWeight: 600, color: '#fff', marginBottom: 12 }}>Warm Contemporary Indian Living Room</p>
               <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
                 {['#F5F0E8','#C8A86B','#4A4A40','#2D6A4F','#E8D5B0'].map(c => (
                   <div key={c} style={{ flex: 1, height: 18, background: c, borderRadius: 2 }} />

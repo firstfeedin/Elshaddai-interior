@@ -13,8 +13,8 @@ const GEMINI = import.meta.env.VITE_GEMINI_API_KEY
 // ── City cost multipliers (base: Hyderabad = 1.0) ─────────────────
 const CITY_MULT = {
   Hyderabad: 1.0, Secunderabad: 0.97, Warangal: 0.88,
-  Bangalore: 1.18, Mumbai: 1.45, Kochi: 0.97,
-  Mumbai: 1.45, Delhi: 1.35, Pune: 1.20,
+  Nizamabad: 0.82, Karimnagar: 0.80, Khammam: 0.78,
+  Nalgonda: 0.76, Mahbubnagar: 0.75, Adilabad: 0.73,
 }
 
 // ── Room-type base rates (₹/sqft) ────────────────────────────────
@@ -33,8 +33,8 @@ const ROOM_RATES = {
 const FINISH_LABELS = { basic: 'Standard', premium: 'Premium', luxury: 'Luxury' }
 const FINISH_DESC   = {
   basic:   'Laminate wardrobes, vitrified tiles, standard paint, budget-friendly fittings',
-  premium: 'PU-finish wardrobes, Italian marble options, textured paints, branded fittings',
-  luxury:  'Lacquered glass, imported marble, wallpapers, designer lighting, bespoke furniture',
+  premium: 'PU-finish wardrobes, Rajasthan marble, textured paints, branded fittings',
+  luxury:  'Lacquered glass, Makrana marble, hand-painted wallpapers, designer lighting, teak furniture',
 }
 
 const CITIES = Object.keys(CITY_MULT)
