@@ -10,15 +10,49 @@ const light  = '#fafaf9'
 const border = '#e7e5e4'
 
 const POSTS = [
-  { id:1, tag:'AI & Design', readMin:6, date:'Jun 12, 2025', featured:true, title:'How AI is Changing Interior Design in India in 2025', excerpt:'From text-to-room generation to AI-powered BOQ estimation, artificial intelligence is transforming how Indian designers work. We explore the top 9 AI tools reshaping the industry.', img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80', author:{ name:'Priya Krishnamurthy', role:'Head of AI Product', avatar:'PK' } },
-  { id:2, tag:'Design Tips', readMin:4, date:'Jun 8, 2025', featured:false, title:'10 Vastu-Compliant Interior Design Ideas That Actually Look Good', excerpt:"Modern design and Vastu Shastra don't have to conflict. Here are 10 beautiful design choices that honour both aesthetics and tradition.", img:'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=800&q=80', author:{ name:'Arjun Mehta', role:'Senior Interior Designer', avatar:'AM' } },
-  { id:3, tag:'Design Tips', readMin:5, date:'Jun 5, 2025', featured:false, title:'Small Space, Big Impact: How to Design a Compact Apartment That Feels Spacious', excerpt:'Clever zoning, multi-functional furniture, strategic mirrors and the right colour palette — six design principles that make small apartments look and feel twice their size.', img:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80', author:{ name:'Ananya Rao', role:'Senior Interior Designer', avatar:'AR' } },
-  { id:4, tag:'3D Design', readMin:7, date:'May 30, 2025', featured:false, title:"A Beginner's Guide to 3D Interior Design: From Floor Plan to Render", excerpt:'Never used a 3D design tool before? This step-by-step guide walks you through drawing your first floor plan, adding furniture, and creating a photorealistic render.', img:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80', author:{ name:'Sneha Rao', role:'Design Educator', avatar:'SR' } },
-  { id:5, tag:'Trends 2025', readMin:5, date:'May 24, 2025', featured:false, title:"Top Interior Design Trends in India for 2025: What's In, What's Out", excerpt:'Biophilic design, warm minimalism, japandi aesthetics, and terrazzo are dominating Indian homes. We break down the top trends with real examples.', img:'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=800&q=80', author:{ name:'Priya Krishnamurthy', role:'Head of AI Product', avatar:'PK' } },
-  { id:6, tag:'Business', readMin:8, date:'May 18, 2025', featured:false, title:'How to Price Your Interior Design Services: A Complete Guide for Indian Freelancers', excerpt:'Hourly vs. flat fee vs. percentage of project cost — we break down every pricing model with real numbers, tips for negotiating, and contract templates.', img:'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80', author:{ name:'Raj Sharma', role:'Interior Design Consultant', avatar:'RS' } },
+  { id:1, tag:'Hyderabad', readMin:6, date:'Jun 12, 2025', featured:true,
+    title:'Best Interior Designers in Hyderabad 2025 — Complete Guide',
+    excerpt:'Jubilee Hills, Banjara Hills, Gachibowli, Hitech City — we cover the top neighbourhoods in Hyderabad and what interior design costs in each area, with real project examples and pricing.',
+    img:'https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=800&q=80',
+    author:{ name:'Ganesh Kumar', role:'Founder, El Shaddai', avatar:'GK' } },
+  { id:2, tag:'Vastu', readMin:4, date:'Jun 8, 2025', featured:false,
+    title:'10 Vastu-Compliant Interior Ideas That Actually Look Modern',
+    excerpt:"Pooja room in the north-east, master bedroom in the south-west, kitchen in the south-east — modern design and Vastu Shastra can co-exist beautifully. Here's how we do it.",
+    img:'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=800&q=80',
+    author:{ name:'Arjun Mehta', role:'Senior Interior Designer', avatar:'AM' } },
+  { id:3, tag:'Modular Kitchen', readMin:5, date:'Jun 5, 2025', featured:false,
+    title:'Modular Kitchen Cost in Hyderabad 2025 — Complete Pricing Guide',
+    excerpt:'L-shaped, U-shaped, parallel or island kitchen — full breakdown of modular kitchen costs in Hyderabad across budget (₹1.5L), premium (₹3.5L) and luxury (₹7L+) categories.',
+    img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=800&q=80',
+    author:{ name:'Kavitha Rao', role:'Kitchen Design Specialist', avatar:'KR' } },
+  { id:4, tag:'AI & Design', readMin:7, date:'May 30, 2025', featured:false,
+    title:'How AI Interior Design Works — From Photo to 3D Room in 60 Seconds',
+    excerpt:'Upload a photo of your empty room, describe your style in Telugu or English, and get a fully designed 3D render in under a minute. Here is exactly how our AI design tool works.',
+    img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80',
+    author:{ name:'Priya Krishnamurthy', role:'Head of Product', avatar:'PK' } },
+  { id:5, tag:'Trends 2025', readMin:5, date:'May 24, 2025', featured:false,
+    title:'Interior Design Trends in Hyderabad 2025 — What Telangana Homeowners Are Choosing',
+    excerpt:'Warm terracotta tones, sheesham wood accents, Rajasthan marble, traditional jaali partitions and biophilic elements — the top design trends sweeping Hyderabad homes this year.',
+    img:'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=800&q=80',
+    author:{ name:'Suresh Venkat', role:'Design Director', avatar:'SV' } },
+  { id:6, tag:'Cost Guide', readMin:8, date:'May 18, 2025', featured:false,
+    title:'Full Home Interior Cost in Hyderabad — 2BHK, 3BHK & Villa Pricing',
+    excerpt:'A realistic 2BHK interior in Hyderabad costs ₹8–14L, a 3BHK costs ₹14–22L, and a villa can range from ₹35L–₹1Cr+. Detailed room-by-room breakdown with what is included.',
+    img:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
+    author:{ name:'Meena Chandrasekhar', role:'Project Manager', avatar:'MC' } },
+  { id:7, tag:'Wardrobe', readMin:4, date:'May 10, 2025', featured:false,
+    title:'Sliding vs Swing Wardrobe — Which Is Better for Indian Homes?',
+    excerpt:'Space, budget, maintenance and aesthetics — a complete comparison of sliding and swing wardrobes for Indian homes, with cost estimates and material options for Hyderabad.',
+    img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80',
+    author:{ name:'Arjun Mehta', role:'Senior Interior Designer', avatar:'AM' } },
+  { id:8, tag:'Pooja Room', readMin:3, date:'May 3, 2025', featured:false,
+    title:'Beautiful Pooja Room Designs for Modern Indian Homes — 2025 Ideas',
+    excerpt:'From compact wall-mounted mandirs to dedicated Pooja rooms with marble flooring and teak jaali — 12 stunning pooja room designs from our completed Hyderabad projects.',
+    img:'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=800&q=80',
+    author:{ name:'Kavitha Rao', role:'Kitchen Design Specialist', avatar:'KR' } },
 ]
 
-const TAGS = ['All','AI & Design','Design Tips','3D Design','Trends 2025','Business','Materials']
+const TAGS = ['All','Hyderabad','Vastu','Modular Kitchen','AI & Design','Trends 2025','Cost Guide','Wardrobe','Pooja Room']
 
 function PostCard({ p }) {
   const [hov, setHov] = useState(false)

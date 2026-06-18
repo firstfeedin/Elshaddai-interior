@@ -20,9 +20,27 @@ const cities = ['Hyderabad', 'Secunderabad', 'Warangal', 'Nizamabad', 'Karimnaga
 
 export default function Footer() {
   const year = new Date().getFullYear()
-  const [form, setForm]   = useState({ name: '', email: '', message: '' })
-  const [sent, setSent]   = useState(false)
-  const [busy, setBusy]   = useState(false)
+  const [form, setForm]       = useState({ name: '', email: '', message: '' })
+  const [sent, setSent]       = useState(false)
+  const [busy, setBusy]       = useState(false)
+  const [subEmail, setSubEmail]   = useState('')
+  const [subSent, setSubSent]     = useState(false)
+  const [subBusy, setSubBusy]     = useState(false)
+
+  async function handleSubscribe(e) {
+    e.preventDefault()
+    if (!subEmail) return
+    setSubBusy(true)
+    try {
+      await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: subEmail }),
+      })
+    } catch {}
+    setSubSent(true)
+    setSubBusy(false)
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -62,12 +80,12 @@ export default function Footer() {
             </p>
             <div className="flex gap-3">
               {[
-                { icon: 'f', label: 'Facebook' },
-                { icon: 'in', label: 'LinkedIn' },
-                { icon: '▶', label: 'YouTube' },
-                { icon: '📸', label: 'Instagram' },
+                { icon: 'f',  label: 'Facebook',  href: 'https://www.facebook.com/elshaddaiinteriors' },
+                { icon: 'in', label: 'LinkedIn',  href: 'https://www.linkedin.com/company/elshaddaiinteriors' },
+                { icon: '▶',  label: 'YouTube',   href: 'https://www.youtube.com/@elshaddaiinteriors' },
+                { icon: '📸', label: 'Instagram', href: 'https://www.instagram.com/elshaddaiinteriors' },
               ].map((s, i) => (
-                <a key={i} href="#" aria-label={s.label}
+                <a key={i} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
                   className="w-8 h-8 rounded-sm bg-white/8 hover:bg-gold-500 flex items-center justify-center text-white/60 hover:text-white text-[11px] font-body font-bold transition-all duration-200">
                   {s.icon}
                 </a>
@@ -149,6 +167,31 @@ export default function Footer() {
                 <button type="submit" disabled={busy}
                   className="w-full bg-gold-500 hover:bg-gold-600 disabled:opacity-60 text-white font-body font-semibold text-xs py-3 tracking-widest uppercase transition-colors duration-200">
                   {busy ? 'Sending…' : 'Send Message →'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+
+        {/* Newsletter */}
+        <div className="border-t border-white/8 pt-8 mb-8">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-5">
+            <div>
+              <p className="font-display text-lg text-white font-light">Get Design Inspiration in Your Inbox</p>
+              <p className="font-body text-white/40 text-xs mt-0.5">Monthly Hyderabad project showcases, Vastu tips & exclusive offers.</p>
+            </div>
+            {subSent ? (
+              <p className="font-body text-gold-400 text-sm font-medium">✓ Subscribed! Check your inbox.</p>
+            ) : (
+              <form onSubmit={handleSubscribe} className="flex w-full lg:w-auto gap-0">
+                <input
+                  type="email" placeholder="your@email.com" required value={subEmail}
+                  onChange={e => setSubEmail(e.target.value)}
+                  className="flex-1 lg:w-64 px-4 py-2.5 text-sm font-body bg-white/8 border border-white/15 text-white placeholder-white/30 focus:outline-none focus:border-gold-400"
+                />
+                <button type="submit" disabled={subBusy}
+                  className="bg-gold-500 hover:bg-gold-600 disabled:opacity-60 text-white font-body font-semibold text-xs px-5 py-2.5 transition-colors duration-200 flex-shrink-0">
+                  {subBusy ? '…' : 'Subscribe'}
                 </button>
               </form>
             )}
