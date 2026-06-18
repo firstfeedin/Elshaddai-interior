@@ -1310,7 +1310,7 @@ export default function ElShaddaiHome() {
                 e.preventDefault()
                 // Formsubmit.co — no account needed, delivers to Gmail
                 try {
-                  await fetch('https://formsubmit.co/ajax/pauljaswanth324@gmail.com', {
+                  await fetch('https://formsubmit.co/ajax/ganeshkumarmamidisetti99@gmail.com', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify({
