@@ -31,11 +31,11 @@ const VENDORS = [
   { id:'v1', name:'Wooden Street Furniture',  city:'Jodhpur',     cat:'Furniture',       rating:4.7, orders:38, verified:true  },
   { id:'v2', name:'Stone Palace India',       city:'Rajasthan',   cat:'Natural Stone',   rating:4.9, orders:22, verified:true  },
   { id:'v3', name:'Fos Lighting',             city:'Mumbai',      cat:'Lighting',        rating:4.5, orders:14, verified:true  },
-  { id:'v4', name:'Century Ply Distributors', city:'Chennai',     cat:'Plywood & HW',    rating:4.8, orders:56, verified:true  },
-  { id:'v5', name:'Pergo & Urban Ladder',     city:'Bangalore',   cat:'Flooring & Decor',rating:4.6, orders:31, verified:true  },
+  { id:'v4', name:'Century Ply Distributors', city:'Kukatpally',  cat:'Plywood & HW',    rating:4.8, orders:56, verified:true  },
+  { id:'v5', name:'Pergo & Urban Ladder',     city:'Ameerpet',    cat:'Flooring & Decor',rating:4.6, orders:31, verified:true  },
   { id:'v6', name:'Fabrics India',            city:'Surat',       cat:'Textiles',        rating:4.3, orders:9,  verified:false },
-  { id:'v7', name:'Häfele India Ltd.',        city:'Bangalore',   cat:'Hardware & Kitchens',rating:4.8,orders:17,verified:true },
-  { id:'v8', name:'RAK Ceramics India',       city:'Chennai',     cat:'Tiles',           rating:4.5, orders:28, verified:true  },
+  { id:'v7', name:'Häfele India Ltd.',        city:'Secunderabad',cat:'Hardware & Kitchens',rating:4.8,orders:17,verified:true },
+  { id:'v8', name:'RAK Ceramics India',       city:'Nacharam',   cat:'Tiles',           rating:4.5, orders:28, verified:true  },
   { id:'v9', name:'Asian Paints Ltd.',        city:'PAN India',   cat:'Paints',          rating:4.9, orders:74, verified:true  },
 ]
 

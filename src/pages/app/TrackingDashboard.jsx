@@ -84,11 +84,11 @@ const PROJ_PIPELINE = ['CREATED','DESIGN','QUOTATION_APPROVED','PRODUCTION','MAT
 const FACTORY_STAGES = ['DESIGN_APPROVED','CUTTING','ASSEMBLY','POLISHING','PACKING','DISPATCHED']
 
 const MOCK_PROJECTS = [
-  { id:'p1', name:'Nair Residence - 3BHK',     client_name:'Deepa Nair',    status:'INSTALLATION',       budget:1850000, city:'Chennai',   created_at:'2026-04-02' },
-  { id:'p2', name:'Kapoor Office - Fit-Out',   client_name:'Vinay Kapoor',  status:'QC',                 budget:3200000, city:'Bangalore', created_at:'2026-03-15' },
-  { id:'p3', name:'Sharma Villa - Luxury',     client_name:'Rahul Sharma',  status:'DESIGN',             budget:5600000, city:'Chennai',   created_at:'2026-05-08' },
+  { id:'p1', name:'Nair Residence - 3BHK',     client_name:'Deepa Nair',    status:'INSTALLATION',       budget:1850000, city:'Hyderabad', created_at:'2026-04-02' },
+  { id:'p2', name:'Kapoor Office - Fit-Out',   client_name:'Vinay Kapoor',  status:'QC',                 budget:3200000, city:'Secunderabad', created_at:'2026-03-15' },
+  { id:'p3', name:'Sharma Villa - Luxury',     client_name:'Rahul Sharma',  status:'DESIGN',             budget:5600000, city:'Hyderabad', created_at:'2026-05-08' },
   { id:'p4', name:'Mehta Penthouse - Modern',  client_name:'Anil Mehta',    status:'CREATED',            budget:2800000, city:'Mumbai',    created_at:'2026-06-01' },
-  { id:'p5', name:'Sundar Restaurant - Resto', client_name:'Sundar Rajan',  status:'MATERIALS_PROCURED', budget:1200000, city:'Chennai',   created_at:'2026-04-20' },
+  { id:'p5', name:'Sundar Restaurant - Resto', client_name:'Sundar Rajan',  status:'MATERIALS_PROCURED', budget:1200000, city:'Hyderabad', created_at:'2026-04-20' },
 ]
 const MOCK_ATTENDANCE = [
   { id:'a1', employee_name:'Kiran Sharma',     date:'2026-06-17', login_time:'08:30', logout_time:'18:00', status:'PRESENT', productivity_score:91 },
@@ -857,7 +857,7 @@ function FactoryTab() {
 function GPSTab() {
   const [locs, setLocs] = useState(MOCK_GPS)
 
-  // SVG map — Chennai area, approximate
+  // SVG map — Hyderabad area, approximate
   const MAP_W = 600; const MAP_H = 380
   const LAT_MIN = 13.04; const LAT_MAX = 13.12
   const LNG_MIN = 80.22; const LNG_MAX = 80.32
@@ -877,7 +877,7 @@ function GPSTab() {
       <div style={{ display:'grid', gridTemplateColumns:'1fr 300px', gap:20 }}>
         <Card style={{ padding:0, overflow:'hidden' }}>
           <div style={{ padding:'12px 16px', borderBottom:`1px solid ${bdr}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-            <span style={{ ...sans, fontSize:10, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', color:stone }}>Chennai — Field Tracking</span>
+            <span style={{ ...sans, fontSize:10, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', color:stone }}>Hyderabad — Field Tracking</span>
             <div style={{ display:'flex', gap:12 }}>
               {Object.entries(ACTIVITY_COLOR).map(([k,c]) => (
                 <div key={k} style={{ display:'flex', alignItems:'center', gap:5 }}>

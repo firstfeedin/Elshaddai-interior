@@ -263,7 +263,7 @@ export default function ContractsPage() {
                     'All work shall be executed in accordance with the approved design drawings and specifications.',
                     'Payment milestones are binding and must be cleared before commencement of each phase.',
                     'Warranties: Fabrication — 5 years, Civil & Plumbing — 1 year, Electrical — 1 year.',
-                    'Dispute resolution: Mediation first, then arbitration under Indian Arbitration Act 1996, Chennai jurisdiction.',
+                    'Dispute resolution: Mediation first, then arbitration under Indian Arbitration Act 1996, Hyderabad jurisdiction.',
                     ...sel.clauses,
                   ].map((clause, i)=>(
                     <div key={i} style={{ display:'flex', gap:14, marginBottom:16, alignItems:'flex-start' }}>

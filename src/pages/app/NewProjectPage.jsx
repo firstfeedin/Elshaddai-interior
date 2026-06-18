@@ -15,7 +15,7 @@ const STEPS = ['Client Details','Project Scope','Team Assignment','Budget & Time
 const PROPERTY_TYPES = ['Apartment / Flat','Villa / Bungalow','Independent House','Office / Commercial','Retail Store','Restaurant / Café','Hospital / Clinic','Penthouse']
 const SCOPES = ['Full Interior (all rooms)','Living + Dining','Bedroom(s) only','Kitchen only','Bathrooms only','Full + Exterior','Commercial Fitout']
 const FINISH_LEVELS = ['Standard','Premium','Luxury','Ultra Luxury']
-const CITIES = ['Chennai','Coimbatore','Madurai','Bangalore','Hyderabad','Kochi','Mumbai','Delhi','Pune']
+const CITIES = ['Hyderabad','Secunderabad','Warangal','Nizamabad','Bangalore','Mumbai','Delhi','Kochi','Pune']
 const DESIGNERS = ['Kiran Sharma','Lakshmi Iyer','Deepika Rangaraj']
 const BUILDERS  = ['Mohammed Farook','Ramesh Pillai','Vijay Selvam']
 const PMS       = ['Priya Menon','Aravind Kumar']
@@ -26,7 +26,7 @@ const EMPTY = {
   clientName:'', clientPhone:'', clientEmail:'', clientAddress:'', source:'Referral',
   // Step 2
   propertyType:'Apartment / Flat', scope:'Full Interior (all rooms)', finish:'Premium',
-  city:'Chennai', area:'', rooms:'3', floors:'1', style:'Contemporary Indian', notes:'',
+  city:'Hyderabad', area:'', rooms:'3', floors:'1', style:'Contemporary Indian', notes:'',
   // Step 3
   designer:'', builder:'', pm:'', startDate:'', priorities:[], vastu:false, pet:false, kids:false,
   // Step 4

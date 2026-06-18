@@ -35,10 +35,10 @@ function Btn({ children, onClick, variant = 'primary', disabled, style = {} }) {
 
 // ── Data ──────────────────────────────────────────────────────────
 const PROJECTS = [
-  { id: 'p1', name: 'Mehta Villa — 3BHK Interior',   client: 'Rajesh Mehta',  city: 'Chennai',    budget: 2800000, area: 1800 },
-  { id: 'p2', name: 'Sundar Apartment Renovation',   client: 'Priya Sundar',  city: 'Coimbatore', budget: 1200000, area: 950  },
-  { id: 'p3', name: 'Kapoor Office Space',            client: 'Anil Kapoor',   city: 'Bangalore',  budget: 3500000, area: 2200 },
-  { id: 'p4', name: 'Sharma Residence Premium',       client: 'Deepa Sharma',  city: 'Chennai',    budget: 4200000, area: 2600 },
+  { id: 'p1', name: 'Mehta Villa — 3BHK Interior',   client: 'Rajesh Mehta',  city: 'Hyderabad',    budget: 2800000, area: 1800 },
+  { id: 'p2', name: 'Sundar Apartment Renovation',   client: 'Priya Sundar',  city: 'Secunderabad', budget: 1200000, area: 950  },
+  { id: 'p3', name: 'Kapoor Office Space',            client: 'Anil Kapoor',   city: 'Hyderabad',  budget: 3500000, area: 2200 },
+  { id: 'p4', name: 'Sharma Residence Premium',       client: 'Deepa Sharma',  city: 'Hyderabad',    budget: 4200000, area: 2600 },
 ]
 
 const LINE_CATEGORIES = ['Furniture', 'Flooring', 'Ceiling', 'Wall Finish', 'Lighting', 'Electrical', 'Civil Work', 'Labour', 'Design Fees', 'Miscellaneous']

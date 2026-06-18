@@ -18,7 +18,7 @@ const PHASE_LABEL = {
 
 const PROJECTS = [
   {
-    id:'PRJ-0012', name:'Nair Residence — 4BHK', address:'Boat Club Road, Chennai', sqft:2800,
+    id:'PRJ-0012', name:'Nair Residence — 4BHK', address:'Film Nagar, Jubilee Hills, Hyderabad', sqft:2800,
     phase:'INSTALLATION', pct:72, budget:4200000, spent:3024000,
     designer:'Kiran Sharma', pm:'Priya Menon', startDate:'2026-01-15', expectedEnd:'2026-08-30',
     milestones:[
@@ -56,7 +56,7 @@ const PROJECTS = [
     ],
   },
   {
-    id:'PRJ-0009', name:'Kapoor Office — Commercial', address:'Greams Road, Chennai', sqft:4200,
+    id:'PRJ-0009', name:'Kapoor Office — Commercial', address:'Hitech City, Madhapur, Hyderabad', sqft:4200,
     phase:'QC', pct:90, budget:8500000, spent:7650000,
     designer:'Lakshmi Iyer', pm:'Priya Menon', startDate:'2025-10-01', expectedEnd:'2026-07-15',
     milestones:[

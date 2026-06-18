@@ -10,10 +10,10 @@ const light = '#fafaf9'
 const bdr   = '#e7e5e4'
 const GEMINI = import.meta.env.VITE_GEMINI_API_KEY
 
-// ── City cost multipliers (base: Chennai = 1.0) ───────────────────
+// ── City cost multipliers (base: Hyderabad = 1.0) ─────────────────
 const CITY_MULT = {
-  Chennai: 1.0, Coimbatore: 0.88, Madurai: 0.84,
-  Bangalore: 1.18, Hyderabad: 1.08, Kochi: 0.97,
+  Hyderabad: 1.0, Secunderabad: 0.97, Warangal: 0.88,
+  Bangalore: 1.18, Mumbai: 1.45, Kochi: 0.97,
   Mumbai: 1.45, Delhi: 1.35, Pune: 1.20,
 }
 
@@ -166,7 +166,7 @@ function CostBar({ label, value, total, color }) {
 export default function CostEstimatorPage() {
   const [rooms,   setRooms]   = useState([{ type:'Living Room', area:'300' }, { type:'Master Bedroom', area:'180' }, { type:'Kitchen', area:'120' }])
   const [finish,  setFinish]  = useState('premium')
-  const [city,    setCity]    = useState('Chennai')
+  const [city,    setCity]    = useState('Hyderabad')
   const [extras,  setExtras]  = useState({ falseCeiling:false, ac:false, homeAutomation:false, smartLighting:false })
   const [notes,   setNotes]   = useState('')
   const [result,  setResult]  = useState(null)

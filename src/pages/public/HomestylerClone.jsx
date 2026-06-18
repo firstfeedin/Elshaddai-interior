@@ -133,7 +133,7 @@ const DEMO_TABS = [
     label: 'AI Design',
     icon: '✦',
     headline: 'Ask AI, get a complete layout',
-    desc: 'Describe your dream space in plain language — "3BHK with open kitchen, Chennai, ₹18L budget" — and our Gemini-powered AI generates the full floor plan with material recommendations.',
+    desc: 'Describe your dream space in plain language — "3BHK with open kitchen, Hyderabad, ₹18L budget" — and our Gemini-powered AI generates the full floor plan with material recommendations.',
     features: ['Natural language input', 'Budget-aware layouts', 'Material suggestions', 'Style presets'],
     color: '#10b981',
     preview: <AIPreview />,

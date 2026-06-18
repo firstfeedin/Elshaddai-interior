@@ -27,7 +27,7 @@ const faqs = [
   },
   {
     q: 'Do you work outside Hyderabad?',
-    a: "Currently we operate in Hyderabad, Secunderabad, Warangal, Bengaluru, Mumbai, Pune, Chennai and 9 other cities. We are expanding rapidly. Enter your city in the consultation form and we will confirm availability.",
+    a: "Currently we operate in Hyderabad, Secunderabad, Warangal, Nizamabad, Karimnagar, Bangalore, Mumbai, Pune and more cities. We are expanding rapidly. Enter your city in the consultation form and we will confirm availability.",
   },
   {
     q: 'Is there a cost for the initial AI design brief?',

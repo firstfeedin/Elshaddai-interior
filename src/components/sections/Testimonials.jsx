@@ -3,7 +3,7 @@ import { useState } from 'react'
 const reviews = [
   {
     name:    'Priya Ramakrishnan',
-    city:    'Chennai',
+    city:    'Jubilee Hills, Hyderabad',
     project: 'Full Home — 1800 sq ft',
     rating:  5,
     text:    "El Shaddai transformed our apartment beyond imagination. The AI-generated design was spot on in the first iteration, and the engineering team's attention to structural details gave us complete confidence. Every measurement was perfect.",
@@ -12,16 +12,16 @@ const reviews = [
   },
   {
     name:    'Arun Selvam',
-    city:    'Coimbatore',
+    city:    'Banjara Hills, Hyderabad',
     project: 'Villa — 3200 sq ft',
     rating:  5,
-    text:    'Coming from an engineering background myself, I was amazed at the precision. The BOQ was accurate to within 3% of the final bill. The 50+ years of experience shows in every joint, every finish, every decision.',
+    text:    'Coming from an engineering background myself, I was amazed at the precision. The BOQ was accurate to within 3% of the final bill. Their transparency on costs and timelines gave us total peace of mind.',
     img:     'https://i.pravatar.cc/80?img=12',
     tag:     'Villa Luxury',
   },
   {
     name:    'Kavitha Nair',
-    city:    'Bengaluru',
+    city:    'Gachibowli, Hyderabad',
     project: 'Modular Kitchen + 2 Bedrooms',
     rating:  5,
     text:    "The 3D visualisation was so realistic that when the actual installation was done, it looked exactly like what I approved online. The tracking system kept me informed every single day — no surprises!",
@@ -39,7 +39,7 @@ const reviews = [
   },
   {
     name:    'Meena Chandrasekhar',
-    city:    'Madurai',
+    city:    'Kondapur, Hyderabad',
     project: 'Living Room + Kitchen',
     rating:  5,
     text:    'As a first-time homeowner I was nervous. El Shaddai made the entire process effortless. The Quick Design Wizard took 5 minutes and the result was exactly my dream kitchen. Highly recommend!',

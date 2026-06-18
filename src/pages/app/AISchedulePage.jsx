@@ -21,7 +21,7 @@ const PHASE_COLORS = {
 
 const PROPERTY_TYPES = ['Apartment','Villa / Bungalow','Office / Commercial','Retail Store','Restaurant / Café','Hospital / Clinic']
 const SCOPES = ['Full Interior','Living + Dining Only','Bedroom(s) Only','Kitchen Only','Bathrooms Only','Full + Exterior']
-const CITIES = ['Chennai','Bangalore','Hyderabad','Mumbai','Delhi','Coimbatore','Kochi','Pune']
+const CITIES = ['Hyderabad','Secunderabad','Warangal','Nizamabad','Bangalore','Mumbai','Delhi','Kochi']
 
 // ── Demo schedule generator (no AI key) ──────────────────────────
 function buildDemoSchedule(form) {
@@ -308,7 +308,7 @@ export default function AISchedulePage() {
   const [result,   setResult]   = useState(null)
   const [form,     setForm]     = useState({
     type: 'Apartment', rooms: '3', area: '1200', scope: 'Full Interior',
-    budget: '25', city: 'Chennai', notes: ''
+    budget: '25', city: 'Hyderabad', notes: ''
   })
 
   async function generate() {

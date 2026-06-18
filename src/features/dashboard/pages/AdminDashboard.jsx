@@ -30,8 +30,8 @@ const ROLE_COLOR = {
 }
 
 const LEADS = [
-  { name:'Rajesh Kumar',  phone:'+91 98765 43210', space:'Full Home · 1800 sq ft', budget:'₹15L–20L', city:'Chennai',   status:'NEW',       time:'5 min ago' },
-  { name:'Sunita Sharma', phone:'+91 87654 32109', space:'Villa · Living + Dining', budget:'₹40L–60L', city:'Bangalore', status:'CONTACTED', time:'2 hr ago'  },
+  { name:'Rajesh Kumar',  phone:'+91 98765 43210', space:'Full Home · 1800 sq ft', budget:'₹15L–20L', city:'Hyderabad', status:'NEW',       time:'5 min ago' },
+  { name:'Sunita Sharma', phone:'+91 87654 32109', space:'Villa · Living + Dining', budget:'₹40L–60L', city:'Secunderabad', status:'CONTACTED', time:'2 hr ago'  },
   { name:'Arun Patel',    phone:'+91 76543 21098', space:'Office · 1500 sq ft',     budget:'₹25L–35L', city:'Mumbai',    status:'QUALIFIED', time:'1 day ago'  },
 ]
 
@@ -101,7 +101,7 @@ export default function AdminDashboard({ user, isSuperAdmin = false }) {
           <div style={{ background: '#fff', border: `1px solid ${border}`, padding: '22px 24px' }}>
             <p style={{ ...sans, margin: '0 0 18px', fontSize: 9, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#a8a29e' }}>Recent Activity</p>
             {[
-              { text:'New lead: Rajesh Kumar (Full Home, Chennai)',    time:'5 min ago' },
+              { text:'New lead: Rajesh Kumar (Full Home, Hyderabad)',    time:'5 min ago' },
               { text:'Project ES-2025-0041 moved to EXECUTION',      time:'1 hr ago'  },
               { text:'Designer Priya uploaded floor plan',           time:'2 hr ago'  },
               { text:'Payment received: ₹5,25,000 (Mehta Villa)',   time:'3 hr ago'  },

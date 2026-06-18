@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const cities = ['Chennai', 'Coimbatore', 'Bengaluru', 'Hyderabad', 'Mumbai', 'Pune', 'Delhi NCR', 'Madurai', 'Other']
+const cities = ['Hyderabad', 'Secunderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Mumbai', 'Pune', 'Delhi NCR', 'Other']
 const propertyTypes = ['Apartment', 'Villa', 'Independent House', 'Office', 'Other']
 const budgets = ['₹3–5 Lakhs', '₹5–10 Lakhs', '₹10–20 Lakhs', '₹20–50 Lakhs', '₹50 Lakhs+']
 

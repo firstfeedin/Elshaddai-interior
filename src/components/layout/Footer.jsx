@@ -14,7 +14,7 @@ const legalLinks = [
   { label: 'Careers',         href: '#' },
 ]
 
-const cities = ['Chennai', 'Coimbatore', 'Bengaluru', 'Hyderabad', 'Mumbai', 'Pune', 'Madurai', 'Tiruppur']
+const cities = ['Hyderabad', 'Secunderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Mumbai', 'Pune', 'Delhi NCR']
 
 export default function Footer() {
   const year = new Date().getFullYear()

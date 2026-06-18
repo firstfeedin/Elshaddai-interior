@@ -4,7 +4,7 @@ const filters = ['All', 'Modern', 'Luxury', 'Minimal', 'Scandinavian']
 
 const projects = [
   {
-    title: 'Skyline Apartment, Chennai',
+    title: 'Skyline Apartment, Jubilee Hills',
     category: 'Modern',
     room: 'Living Rooms',
     area: '1800 sq ft',
@@ -13,7 +13,7 @@ const projects = [
     tags: ['Living Room', 'False Ceiling', 'TV Unit'],
   },
   {
-    title: 'Villa Meridian, Coimbatore',
+    title: 'Villa Meridian, Banjara Hills',
     category: 'Luxury',
     room: 'Villas',
     area: '3200 sq ft',
@@ -23,7 +23,7 @@ const projects = [
     featured: true,
   },
   {
-    title: 'Zen Kitchen, Bengaluru',
+    title: 'Zen Kitchen, Gachibowli',
     category: 'Minimal',
     room: 'Kitchens',
     area: '220 sq ft',

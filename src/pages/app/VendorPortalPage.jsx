@@ -21,10 +21,10 @@ const STATUS_COLOR = {
 }
 
 const VENDORS = [
-  { id:'V01', name:'Rajesh Timbers & Ply',     cat:'Wood & Ply',        rating:4.6, contact:'Rajesh Kumar',    phone:'+91 98400 11122', city:'Chennai', joined:'2024-01-15', totalOrders:28, completedOrders:26 },
+  { id:'V01', name:'Rajesh Timbers & Ply',     cat:'Wood & Ply',        rating:4.6, contact:'Rajesh Kumar',    phone:'+91 98400 11122', city:'Kukatpally', joined:'2024-01-15', totalOrders:28, completedOrders:26 },
   { id:'V02', name:'National Paints Depot',    cat:'Paints & Finishes', rating:4.2, contact:'Sunil Mehta',     phone:'+91 98400 33344', city:'Mumbai',  joined:'2024-03-01', totalOrders:42, completedOrders:40 },
   { id:'V03', name:'Polished Stone Imports',   cat:'Stone & Tiles',     rating:4.8, contact:'Anwar Shaikh',    phone:'+91 98400 55566', city:'Jaipur',  joined:'2023-11-20', totalOrders:19, completedOrders:19 },
-  { id:'V04', name:'Electra Wiring Solutions', cat:'Electrical',        rating:4.4, contact:'Geetha Pillai',   phone:'+91 98400 77788', city:'Bangalore',joined:'2024-02-10', totalOrders:34, completedOrders:31 },
+  { id:'V04', name:'Electra Wiring Solutions', cat:'Electrical',        rating:4.4, contact:'Geetha Pillai',   phone:'+91 98400 77788', city:'Ameerpet',joined:'2024-02-10', totalOrders:34, completedOrders:31 },
   { id:'V05', name:'SteelCraft Fabricators',   cat:'Steel & Metal',     rating:4.7, contact:'Vinod Nair',      phone:'+91 98400 99900', city:'Pune',    joined:'2023-09-05', totalOrders:15, completedOrders:14 },
 ]
 

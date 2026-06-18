@@ -27,7 +27,7 @@ function Stat({ label, value, sub }) {
 const MOCK_PROJECT = [{
   id:'1', project_number:'ES-2025-0001', projectNumber:'ES-2025-0001',
   name:'Master Bedroom + Living Room', status:'EXECUTION',
-  property_type:'APARTMENT', city:'Chennai',
+  property_type:'APARTMENT', city:'Hyderabad',
   total_area_sqft:1200, budget:1800000, quoted_amount:1750000,
   start_date:'2025-02-01', end_date:'2025-06-30',
   designer:{ name:'Architect Priya K.' }, progress:68,
