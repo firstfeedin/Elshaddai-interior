@@ -1,5 +1,35 @@
 {
+  "name": "elshaddai-interior",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "dependencies": {
-    "@vercel/speed-insights": "^2.0.0"
+    "@babylonjs/core": "^7.54.3",
+    "@babylonjs/gui": "^7.54.3",
+    "@babylonjs/loaders": "^7.54.3",
+    "@babylonjs/materials": "^7.54.3",
+    "@react-oauth/google": "^0.13.5",
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.17.10",
+    "@react-three/rapier": "^2.2.0",
+    "@supabase/supabase-js": "^2.108.2",
+    "fabric": "^5.5.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-reconciler": "^0.29.0",
+    "react-router-dom": "^7.17.0",
+    "three": "^0.168.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.24",
+    "tailwindcss": "^3.3.2",
+    "vite": "^4.3.9"
   }
 }
