@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd divinemercyitsolutions && npm install && npm run build",
+  "outputDirectory": "divinemercyitsolutions/dist",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
