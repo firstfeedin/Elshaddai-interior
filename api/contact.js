@@ -1,7 +1,3 @@
-import { Resend } from 'resend'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -17,27 +13,42 @@ export default async function handler(req, res) {
   }
 
   try {
-    await resend.emails.send({
-      from:    'El Shaddai Interiors <onboarding@resend.dev>',
-      to:      'contactus@divinemercyitsol.com',
-      replyTo: email,
-      subject: `New Enquiry from ${name} — El Shaddai`,
-      html: `
-        <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-          <h2 style="color:#c9a227">New Contact Form Enquiry</h2>
-          <table style="width:100%;border-collapse:collapse">
-            <tr><td style="padding:8px;font-weight:bold;width:120px">Name</td><td style="padding:8px">${name}</td></tr>
-            <tr style="background:#f9f9f9"><td style="padding:8px;font-weight:bold">Email</td><td style="padding:8px"><a href="mailto:${email}">${email}</a></td></tr>
-            <tr><td style="padding:8px;font-weight:bold">Phone</td><td style="padding:8px">${phone || 'Not provided'}</td></tr>
-            <tr style="background:#f9f9f9"><td style="padding:8px;font-weight:bold;vertical-align:top">Message</td><td style="padding:8px">${message.replace(/\n/g, '<br>')}</td></tr>
-          </table>
-          <p style="color:#888;font-size:12px;margin-top:24px">Sent from elshaddaiinterior.vercel.app</p>
-        </div>
-      `,
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from:     'El Shaddai Interiors <onboarding@resend.dev>',
+        to:       ['contactus@divinemercyitsol.com'],
+        reply_to: email,
+        subject:  `New Enquiry from ${name} — El Shaddai`,
+        html: `
+          <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+            <h2 style="color:#c9a227;margin-bottom:20px">New Contact Enquiry — El Shaddai Interiors</h2>
+            <table style="width:100%;border-collapse:collapse;font-size:15px">
+              <tr><td style="padding:10px;font-weight:bold;background:#f5f5f5;width:120px">Name</td><td style="padding:10px;background:#f5f5f5">${name}</td></tr>
+              <tr><td style="padding:10px;font-weight:bold">Email</td><td style="padding:10px"><a href="mailto:${email}">${email}</a></td></tr>
+              <tr><td style="padding:10px;font-weight:bold;background:#f5f5f5">Phone</td><td style="padding:10px;background:#f5f5f5">${phone || 'Not provided'}</td></tr>
+              <tr><td style="padding:10px;font-weight:bold;vertical-align:top">Message</td><td style="padding:10px">${message.replace(/\n/g, '<br>')}</td></tr>
+            </table>
+            <p style="color:#999;font-size:12px;margin-top:24px">Sent from elshaddaiinterior.vercel.app</p>
+          </div>
+        `,
+      }),
     })
-    return res.status(200).json({ ok: true })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      console.error('Resend error:', data)
+      return res.status(500).json({ error: data.message || 'Failed to send email' })
+    }
+
+    return res.status(200).json({ ok: true, id: data.id })
   } catch (err) {
-    console.error(err)
-    return res.status(500).json({ error: 'Failed to send email' })
+    console.error('Handler error:', err)
+    return res.status(500).json({ error: err.message })
   }
 }
