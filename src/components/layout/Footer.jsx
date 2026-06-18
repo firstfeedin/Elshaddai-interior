@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 const quickLinks = [
   { label: 'About Us',     href: '#about' },
   { label: 'Services',     href: '#services' },
@@ -14,15 +16,30 @@ const legalLinks = [
   { label: 'Careers',         href: '#' },
 ]
 
-const cities = ['Hyderabad', 'Secunderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Mumbai', 'Pune', 'Delhi NCR']
+const cities = ['Hyderabad', 'Secunderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Khammam', 'Nalgonda', 'Karimnagar']
 
 export default function Footer() {
   const year = new Date().getFullYear()
+  const [form, setForm]   = useState({ name: '', email: '', message: '' })
+  const [sent, setSent]   = useState(false)
+  const [busy, setBusy]   = useState(false)
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setBusy(true)
+    try {
+      await fetch('/api/contact', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ name: form.name, email: form.email, message: form.message }),
+      })
+    } catch {}
+    setSent(true)
+    setBusy(false)
+  }
 
   return (
     <footer className="bg-navy-950 text-white">
-
-      {/* Main footer body */}
       <div className="max-w-7xl mx-auto px-6 lg:px-10 pt-16 pb-10">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
 
@@ -41,9 +58,8 @@ export default function Footer() {
               </div>
             </div>
             <p className="font-body text-white/50 text-xs leading-relaxed mb-5">
-              AI-powered interior design platform backed by 50+ years of engineering expertise. Design, manufacture and install — all under one roof.
+              AI-powered interior design platform backed by engineering expertise. Design, manufacture and install — all under one roof.
             </p>
-            {/* Social */}
             <div className="flex gap-3">
               {[
                 { icon: 'f', label: 'Facebook' },
@@ -73,21 +89,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Services */}
-          <div>
-            <p className="font-body text-xs font-semibold tracking-[0.25em] uppercase text-gold-400 mb-5">Our Services</p>
-            <ul className="space-y-2.5">
-              {['Modular Kitchen', 'Wardrobes', 'TV Units', 'False Ceiling', 'Living Room', 'Bedroom', 'Full Home Interiors'].map(s => (
-                <li key={s}>
-                  <a href="#services" className="font-body text-sm text-white/55 hover:text-gold-400 transition-colors duration-200 flex items-center gap-2">
-                    <span className="text-gold-500/40 text-[10px]">→</span> {s}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact + Cities */}
+          {/* Contact info */}
           <div>
             <p className="font-body text-xs font-semibold tracking-[0.25em] uppercase text-gold-400 mb-5">Get In Touch</p>
             <ul className="space-y-3 mb-6">
@@ -113,22 +115,43 @@ export default function Footer() {
               ))}
             </div>
           </div>
-        </div>
 
-        {/* Newsletter */}
-        <div className="border-t border-white/8 pt-8 mb-8">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-5">
-            <div>
-              <p className="font-display text-lg text-white font-light">Get Design Inspiration in Your Inbox</p>
-              <p className="font-body text-white/40 text-xs mt-0.5">Monthly project showcases, design tips and exclusive offers.</p>
-            </div>
-            <div className="flex w-full lg:w-auto gap-0">
-              <input type="email" placeholder="your@email.com"
-                className="flex-1 lg:w-64 px-4 py-2.5 text-sm font-body bg-white/8 border border-white/15 text-white placeholder-white/30 focus:outline-none focus:border-gold-400 rounded-l-sm" />
-              <button className="bg-gold-500 hover:bg-gold-600 text-white font-body font-semibold text-xs px-5 py-2.5 transition-colors duration-200 rounded-r-sm flex-shrink-0">
-                Subscribe
-              </button>
-            </div>
+          {/* Mini contact form */}
+          <div>
+            <p className="font-body text-xs font-semibold tracking-[0.25em] uppercase text-gold-400 mb-5">Send Us a Message</p>
+            {sent ? (
+              <div className="text-center py-6">
+                <div className="text-2xl mb-2">✅</div>
+                <p className="font-body text-white/70 text-sm">Message sent!</p>
+                <p className="font-body text-white/40 text-xs mt-1">We'll get back to you shortly.</p>
+                <button onClick={() => { setSent(false); setForm({ name: '', email: '', message: '' }) }}
+                  className="mt-4 font-body text-[10px] text-gold-400 hover:text-gold-300 tracking-widest uppercase transition-colors">
+                  Send Another
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <input
+                  type="text" placeholder="Your Name" required value={form.name}
+                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  className="w-full px-3 py-2.5 text-xs font-body bg-white/8 border border-white/15 text-white placeholder-white/30 focus:outline-none focus:border-gold-400 transition-colors"
+                />
+                <input
+                  type="email" placeholder="Your Email" required value={form.email}
+                  onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                  className="w-full px-3 py-2.5 text-xs font-body bg-white/8 border border-white/15 text-white placeholder-white/30 focus:outline-none focus:border-gold-400 transition-colors"
+                />
+                <textarea
+                  placeholder="Your Message" required rows={4} value={form.message}
+                  onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+                  className="w-full px-3 py-2.5 text-xs font-body bg-white/8 border border-white/15 text-white placeholder-white/30 focus:outline-none focus:border-gold-400 transition-colors resize-none"
+                />
+                <button type="submit" disabled={busy}
+                  className="w-full bg-gold-500 hover:bg-gold-600 disabled:opacity-60 text-white font-body font-semibold text-xs py-3 tracking-widest uppercase transition-colors duration-200">
+                  {busy ? 'Sending…' : 'Send Message →'}
+                </button>
+              </form>
+            )}
           </div>
         </div>
 
