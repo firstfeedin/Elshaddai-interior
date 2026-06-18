@@ -21,7 +21,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         from:     'El Shaddai Interiors <onboarding@resend.dev>',
-        to:       ['contactus@divinemercyitsol.com'],
+        to:       ['ganeshkumarmamidisetti99@gmail.com', 'contactus@divinemercyitsol.com'],
         reply_to: email,
         subject:  `New Enquiry from ${name} — El Shaddai`,
         html: `
