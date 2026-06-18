@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useState, useEffect } from 'react'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { AuthProvider } from './context/AuthContext'
 import AuthPage        from './pages/public/AuthPage'
@@ -49,6 +49,34 @@ const NotificationsPage  = lazy(() => import('./pages/app/NotificationsPage'))
 const TimesheetPage      = lazy(() => import('./pages/app/TimesheetPage'))
 const ProjectHealthPage  = lazy(() => import('./pages/app/ProjectHealthPage'))
 const MaterialSpecPage   = lazy(() => import('./pages/app/MaterialSpecPage'))
+const NotFoundPage       = lazy(() => import('./pages/public/NotFoundPage'))
+
+function CookieConsent() {
+  const [show, setShow] = useState(false)
+  useEffect(() => {
+    if (!localStorage.getItem('es_cookie_ok')) setShow(true)
+  }, [])
+  if (!show) return null
+  const accept = () => { localStorage.setItem('es_cookie_ok', '1'); setShow(false) }
+  return (
+    <div style={{
+      position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 99999,
+      background: '#1c1917', borderTop: '1px solid #292524',
+      padding: '16px 24px', display: 'flex', alignItems: 'center',
+      justifyContent: 'space-between', flexWrap: 'wrap', gap: 12,
+      fontFamily: "'DM Sans',system-ui,sans-serif",
+    }}>
+      <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.65)', maxWidth: 680, lineHeight: 1.6 }}>
+        We use cookies to enhance your experience and analyse site usage. By continuing, you agree to our{' '}
+        <a href="#" style={{ color: '#c9a227', textDecoration: 'none' }}>Privacy Policy</a>.
+      </p>
+      <div style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
+        <button onClick={() => setShow(false)} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.5)', padding: '8px 20px', fontSize: 11, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', cursor: 'pointer' }}>Decline</button>
+        <button onClick={accept} style={{ background: '#c9a227', border: 'none', color: '#000', padding: '8px 24px', fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', cursor: 'pointer' }}>Accept</button>
+      </div>
+    </div>
+  )
+}
 
 const Spinner = () => (
   <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fafaf9', flexDirection: 'column', gap: 14, fontFamily: "'DM Sans',sans-serif" }}>
@@ -119,10 +147,14 @@ export default function App() {
 
             {/* ── Admin only ── */}
             <Route path="/audit-log" element={<P roles={['ADMIN','SUPER_ADMIN']}><AuditLogPage /></P>} />
+
+            {/* ── 404 ── */}
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>
         <ChatbotAssistant />
         <GlobalSearch />
+        <CookieConsent />
       </AuthProvider>
       </GoogleOAuthProvider>
     </BrowserRouter>

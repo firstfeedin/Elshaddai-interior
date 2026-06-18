@@ -1300,9 +1300,10 @@ export default function ElShaddaiHome() {
               Whether you have a clear vision or are starting from scratch — our team listens, plans and delivers interiors that exceed expectations.
             </p>
             {[
-              { label: 'Office Address', val: 'Hyderabad, Telangana, India', href: null },
-              { label: 'Phone Number',   val: '+91 40 2345 6789',       href: 'tel:+914023456789' },
+              { label: 'Office Address', val: 'Hyderabad, Telangana, India', href: 'https://maps.google.com/?q=Hyderabad,Telangana,India' },
+              { label: 'Phone Number',   val: '+91 98765 43210',       href: 'tel:+919876543210' },
               { label: 'Email',          val: 'contactus@divinemercyitsol.com', href: 'mailto:contactus@divinemercyitsol.com' },
+              { label: 'WhatsApp',       val: 'Chat with us on WhatsApp', href: 'https://wa.me/919876543210?text=Hi%20El%20Shaddai%2C%20I%27m%20interested%20in%20your%20interior%20design%20services.' },
             ].map(row => (
               <div key={row.label} style={{ marginBottom: 36, paddingBottom: 36, borderBottom: `1px solid ${S.border}` }}>
                 <p style={{ ...S.label, color: '#a8a29e', marginBottom: 8 }}>{row.label}</p>
@@ -1313,6 +1314,14 @@ export default function ElShaddaiHome() {
                   : <p style={{ fontSize: 16, color: S.dark }}>{row.val}</p>}
               </div>
             ))}
+
+            {/* Google Maps */}
+            <iframe
+              title="El Shaddai Location — Hyderabad"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d243647.3160051681!2d78.24323295!3d17.41291895!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb99daeaebd2c7%3A0xae93b78392bafbc2!2sHyderabad%2C%20Telangana!5e0!3m2!1sen!2sin!4v1718000000000!5m2!1sen!2sin"
+              width="100%" height="200" style={{ border: 0, display: 'block', marginTop: 8 }}
+              allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
+            />
           </div>
 
           {/* Form */}
