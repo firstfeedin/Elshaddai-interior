@@ -23,6 +23,7 @@
     "react-dom": "^18.2.0",
     "react-reconciler": "^0.29.0",
     "react-router-dom": "^7.17.0",
+    "resend": "^4.0.0",
     "three": "^0.168.0"
   },
   "devDependencies": {

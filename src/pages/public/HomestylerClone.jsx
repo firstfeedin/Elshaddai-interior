@@ -1308,24 +1308,18 @@ export default function ElShaddaiHome() {
             ) : (
               <form onSubmit={async e => {
                 e.preventDefault()
-                // Formsubmit.co — no account needed, delivers to Gmail
                 try {
-                  await fetch('https://formsubmit.co/ajax/ganeshkumarmamidisetti99@gmail.com', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify({
-                      _subject:  `New Enquiry from ${form.name} — El Shaddai Interior`,
-                      _template: 'table',
-                      name:      form.name,
-                      email:     form.email,
-                      phone:     form.phone || 'Not provided',
-                      message:   form.message,
+                  await fetch('/api/contact', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify({
+                      name:    form.name,
+                      email:   form.email,
+                      phone:   form.phone || 'Not provided',
+                      message: form.message,
                     }),
                   })
                 } catch {}
-                // Backup: save to backend leads table
-                const base = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
-                try { await fetch(`${base}/leads`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, source: 'homepage-contact' }) }) } catch {}
                 setSent(true)
               }} style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
