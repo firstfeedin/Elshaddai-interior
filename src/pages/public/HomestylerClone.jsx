@@ -1280,7 +1280,7 @@ export default function ElShaddaiHome() {
               Whether you have a clear vision or are starting from scratch — our team listens, plans and delivers interiors that exceed expectations.
             </p>
             {[
-              { label: 'Office Address', val: 'Jubilee Hills Road No. 36, Hyderabad — 500033, Telangana', href: null },
+              { label: 'Office Address', val: 'Hyderabad, Telangana, India', href: null },
               { label: 'Phone Number',   val: '+91 40 2345 6789',       href: 'tel:+914023456789' },
               { label: 'Email',          val: 'contactus@divinemercyitsol.com', href: 'mailto:contactus@divinemercyitsol.com' },
             ].map(row => (

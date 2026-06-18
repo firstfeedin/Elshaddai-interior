@@ -102,7 +102,7 @@ export default function Footer() {
                 </a>
               </li>
               <li className="font-body text-sm text-white/55 flex items-start gap-2">
-                📍 Plot 42, Jubilee Hills Road No. 36,<br />Hyderabad — 500033, Telangana
+                📍 Hyderabad, Telangana, India
               </li>
               <li className="font-body text-xs text-white/40">Mon–Sat · 9 AM – 7 PM IST</li>
             </ul>
