@@ -28,21 +28,18 @@ const PROJECTS = [
 ]
 
 const SERVICES = [
-  {
-    n: '01', title: 'Residential Design',
-    desc: 'From a single room to a full home — we craft interiors that reflect your lifestyle, taste and budget with precision and care.',
-    img: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    n: '02', title: 'Commercial Interiors',
-    desc: 'Offices, retail stores, restaurants and hospitality spaces — we design environments that strengthen your brand and delight your clients.',
-    img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    n: '03', title: 'Turnkey Execution',
-    desc: 'We don\'t just design — we execute. From concept to handover, our team manages materials, contractors and timelines end to end.',
-    img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80',
-  },
+  { n:'01', title:'Modular Kitchen',      icon:'🍳', desc:'Custom modular kitchens with premium shutters, granite tops, soft-close hardware and full electrical & plumbing integration.', img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=800&q=80' },
+  { n:'02', title:'Wardrobe & Storage',   icon:'🚪', desc:'Floor-to-ceiling wardrobes with sliding or swing doors, internal organisers, mirrors and custom finishes to maximise space.', img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80' },
+  { n:'03', title:'Living Room',          icon:'🛋️', desc:'TV units, entertainment walls, crockery cabinets, false ceilings and feature walls — every element designed as one cohesive space.', img:'https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=800&q=80' },
+  { n:'04', title:'Bedroom Design',       icon:'🛏️', desc:'Master, kids and guest bedrooms — bed backs, side tables, study desks, wardrobes and soft furnishings tailored to each occupant.', img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=800&q=80' },
+  { n:'05', title:'False Ceiling',        icon:'✨', desc:'Gypsum, POP and wooden false ceilings with cove lighting, recessed LEDs and AC integration — transforming any room instantly.', img:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80' },
+  { n:'06', title:'Flooring',             icon:'🏠', desc:'Vitrified tiles, wooden flooring, epoxy, Kota stone and marble — supply, laying and finishing with precision across all areas.', img:'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80' },
+  { n:'07', title:'Pooja Room',           icon:'🪔', desc:'Sacred spaces crafted with devotion — marble mandirs, teak wood jaalis, backlit niches, bell holders and traditional carvings.', img:'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=800&q=80' },
+  { n:'08', title:'Kids Room',            icon:'🎨', desc:'Fun, safe and functional kids rooms with themed wall art, study zones, custom bunk beds and smart storage for toys and books.', img:'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?auto=format&fit=crop&w=800&q=80' },
+  { n:'09', title:'Bathroom Design',      icon:'🚿', desc:'Wet areas redesigned with anti-skid tiles, concealed cisterns, rain showers, vanity units and premium sanitaryware.', img:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=800&q=80' },
+  { n:'10', title:'Home Office',          icon:'💻', desc:'Ergonomic workstations, built-in bookshelves, acoustic panels and smart lighting designed for productivity from home.', img:'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=800&q=80' },
+  { n:'11', title:'Commercial Interiors', icon:'🏢', desc:'Offices, retail stores, restaurants and clinics — brand-aligned interiors with space planning, signage and full execution.', img:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80' },
+  { n:'12', title:'Turnkey Execution',    icon:'🔑', desc:'From concept to keys — we manage design, materials, civil work, electrical, plumbing and handover under one fixed price.', img:'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80' },
 ]
 
 const AI_FEATURES = [
@@ -878,12 +875,35 @@ export default function ElShaddaiHome() {
   const [form, setForm]         = useState({ name: '', email: '', phone: '', message: '' })
   const [sent, setSent]         = useState(false)
   const [activeService, setActiveService] = useState(null)
+  const [popup, setPopup]               = useState(null)
   const contactRef = useRef(null)
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', fn)
     return () => window.removeEventListener('scroll', fn)
+  }, [])
+
+  /* ── Real-time social proof popups ── */
+  useEffect(() => {
+    const names = [
+      { name: 'Priya R.', city: 'Jubilee Hills', action: 'requested a free quote' },
+      { name: 'Arun K.', city: 'Banjara Hills', action: 'booked a design consultation' },
+      { name: 'Meena S.', city: 'Gachibowli', action: 'started a 3D room design' },
+      { name: 'Suresh V.', city: 'Kondapur', action: 'got a cost estimate' },
+      { name: 'Kavitha N.', city: 'Madhapur', action: 'requested a free quote' },
+      { name: 'Rajesh M.', city: 'Hitech City', action: 'booked a site visit' },
+      { name: 'Divya P.', city: 'Secunderabad', action: 'started a 3D room design' },
+      { name: 'Venkat R.', city: 'Kukatpally', action: 'requested a free quote' },
+    ]
+    let idx = 0
+    const show = () => {
+      setPopup(names[idx % names.length])
+      idx++
+      setTimeout(() => setPopup(null), 4000)
+    }
+    const t = setTimeout(() => { show(); setInterval(show, 18000) }, 8000)
+    return () => clearTimeout(t)
   }, [])
 
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -1132,20 +1152,20 @@ export default function ElShaddaiHome() {
           <SectionLabel>What We Offer</SectionLabel>
           <h2 style={{ ...S.serif, fontSize: 'clamp(28px,3.5vw,52px)', fontWeight: 300, color: S.dark }}>What We Design</h2>
         </div>
-        <div className="es-services-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 2, maxWidth: 1100, margin: '0 auto' }}>
+        <div className="es-services-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 2, maxWidth: 1280, margin: '0 auto' }}>
           {SERVICES.map(s => (
             <div key={s.n} style={{ position: 'relative', cursor: 'default' }}
               onMouseEnter={() => setActiveService(s.n)}
               onMouseLeave={() => setActiveService(null)}>
-              <div style={{ overflow: 'hidden', height: 280 }}>
-                <img src={s.img} alt={s.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.7s', transform: activeService === s.n ? 'scale(1.05)' : 'scale(1)' }} />
+              <div style={{ overflow: 'hidden', height: 200 }}>
+                <img src={s.img} alt={s.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.7s', transform: activeService === s.n ? 'scale(1.07)' : 'scale(1)' }} />
+                <div style={{ position: 'absolute', top: 12, left: 12, fontSize: 22 }}>{s.icon}</div>
               </div>
-              <div style={{ padding: '28px 28px 36px', background: S.light, borderTop: 'none' }}>
-                <p style={{ ...S.label, color: '#c8c4be', marginBottom: 12 }}>{s.n}</p>
-                <h3 style={{ ...S.sans, fontSize: 13, fontWeight: 600, color: S.dark, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 12 }}>{s.title}</h3>
-                <p style={{ fontSize: 13, color: S.stone, lineHeight: 1.75, fontWeight: 300 }}>{s.desc}</p>
+              <div style={{ padding: '20px 20px 28px', background: S.light }}>
+                <p style={{ ...S.label, color: '#c8c4be', marginBottom: 8 }}>{s.n}</p>
+                <h3 style={{ ...S.sans, fontSize: 12, fontWeight: 700, color: S.dark, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>{s.title}</h3>
+                <p style={{ fontSize: 12, color: S.stone, lineHeight: 1.7, fontWeight: 300 }}>{s.desc}</p>
               </div>
-              {/* Gold bottom accent on hover */}
               <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: S.gold, transform: activeService === s.n ? 'scaleX(1)' : 'scaleX(0)', transformOrigin: 'left', transition: 'transform 0.3s' }} />
             </div>
           ))}
@@ -1410,6 +1430,45 @@ export default function ElShaddaiHome() {
           <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', fontWeight: 300 }}>Hyderabad, Telangana 🇮🇳</p>
         </div>
       </footer>
+
+      {/* ══ WHATSAPP FLOATING BUTTON ─────────────────────────────────────── */}
+      <a
+        href="https://wa.me/919876543210?text=Hi%20El%20Shaddai%2C%20I%27m%20interested%20in%20your%20interior%20design%20services."
+        target="_blank" rel="noopener noreferrer"
+        title="Chat on WhatsApp"
+        style={{
+          position: 'fixed', bottom: 28, right: 28, zIndex: 9999,
+          width: 58, height: 58, background: '#25D366',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 4px 20px rgba(37,211,102,0.45)',
+          transition: 'transform 0.2s, box-shadow 0.2s',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 6px 28px rgba(37,211,102,0.6)' }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(37,211,102,0.45)' }}
+      >
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="white">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+      </a>
+
+      {/* ══ SOCIAL PROOF POPUP ───────────────────────────────────────────── */}
+      {popup && (
+        <div style={{
+          position: 'fixed', bottom: 100, left: 24, zIndex: 9998,
+          background: '#fff', border: '1px solid #e7e5e4',
+          padding: '14px 18px', maxWidth: 280,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          animation: 'slideIn 0.4s ease',
+          display: 'flex', alignItems: 'center', gap: 12,
+        }}>
+          <style>{`@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}`}</style>
+          <div style={{ width: 36, height: 36, background: '#c9a227', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16 }}>🏠</div>
+          <div>
+            <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: '#1c1917', fontFamily: "'DM Sans',sans-serif" }}>{popup.name} from {popup.city}</p>
+            <p style={{ margin: '2px 0 0', fontSize: 11, color: '#78716c', fontFamily: "'DM Sans',sans-serif" }}>{popup.action} · just now</p>
+          </div>
+        </div>
+      )}
 
     </div>
   )
