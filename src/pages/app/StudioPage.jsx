@@ -7,14 +7,15 @@ const BabylonDesigner = lazy(() => import('../../features/designer/BabylonDesign
 const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY || ''
 
 const C = {
-  bg:     '#0f1117',
-  panel:  '#1a1f2e',
-  panel2: '#1e2538',
-  border: '#252c3f',
+  bg:     '#08070a',
+  panel:  '#111018',
+  panel2: '#18161f',
+  border: '#2a2535',
   gold:   '#c9a227',
-  text:   '#e2e8f0',
-  muted:  '#7a8499',
-  accent: '#2563eb',
+  goldL:  '#e8c84e',
+  text:   '#ede9e3',
+  muted:  '#6b6580',
+  accent: '#c9a227',
 }
 
 const ROOM_TEMPLATES = [
@@ -50,32 +51,124 @@ const FURNITURE_CATS = [
   { id:'outdoor',   label:'Outdoor',    icon:'🌿' },
 ]
 
+/*
+ * GLB/GLTF catalog — each item has a `glb` URL for loading in Three.js/BabylonJS.
+ * Sources:
+ *   • KhronosGroup/glTF-Sample-Assets  (GitHub raw, MIT licence)
+ *   • threejs.org example models        (MIT licence)
+ * For items without a free GLB, `glb:null` — BabylonDesigner falls back to a
+ * procedural box mesh with the correct dimensions and colour.
+ */
 const CATALOG_ITEMS = [
-  { id:1,  name:'Modern L-Sofa',         sku:'SOF-001', cat:'seating',  price:45000, img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=300&q=70',  match:['living','office'] },
-  { id:2,  name:'Accent Chair',          sku:'SOF-002', cat:'seating',  price:12000, img:'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?auto=format&fit=crop&w=300&q=70', match:['living','bedroom','office'] },
-  { id:3,  name:'3-Seater Sofa',         sku:'SOF-003', cat:'seating',  price:38000, img:'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=300&q=70', match:['living'] },
-  { id:4,  name:'King Bed Frame',        sku:'BED-001', cat:'bedroom',  price:55000, img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=300&q=70', match:['bedroom'] },
-  { id:5,  name:'Platform Bed Queen',    sku:'BED-002', cat:'bedroom',  price:38000, img:'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=300&q=70', match:['bedroom','kids'] },
-  { id:6,  name:'Bedside Table Pair',    sku:'BED-003', cat:'bedroom',  price:9500,  img:'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=300&q=70',  match:['bedroom'] },
-  { id:7,  name:'Dining Table 6-Seat',   sku:'DIN-001', cat:'dining',   price:38000, img:'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=300&q=70', match:['dining'] },
-  { id:8,  name:'Dining Chair Set/4',    sku:'DIN-002', cat:'dining',   price:22000, img:'https://images.unsplash.com/photo-1549488344-cbb6c34184c8?auto=format&fit=crop&w=300&q=70', match:['dining','kitchen'] },
-  { id:9,  name:'Bar Stool Pair',        sku:'DIN-003', cat:'dining',   price:8500,  img:'https://images.unsplash.com/photo-1540932239986-30128078f3c5?auto=format&fit=crop&w=300&q=70', match:['kitchen','dining'] },
-  { id:10, name:'Wardrobe 4-Door',       sku:'STR-001', cat:'storage',  price:75000, img:'https://images.unsplash.com/photo-1558997519-83ea9252eeb8?auto=format&fit=crop&w=300&q=70',  match:['bedroom'] },
-  { id:11, name:'Bookshelf 5-Tier',      sku:'STR-002', cat:'storage',  price:18000, img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=70', match:['living','office'] },
-  { id:12, name:'TV Unit Minimal',       sku:'STR-003', cat:'storage',  price:22000, img:'https://images.unsplash.com/photo-1593642634315-48f5414c3ad9?auto=format&fit=crop&w=300&q=70', match:['living'] },
-  { id:13, name:'Floor Lamp Arc',        sku:'LIT-001', cat:'lighting', price:8500,  img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=70', match:['living','bedroom','office'] },
-  { id:14, name:'Pendant Light Cluster', sku:'LIT-002', cat:'lighting', price:15000, img:'https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?auto=format&fit=crop&w=300&q=70', match:['dining','kitchen','living'] },
-  { id:15, name:'Wall Sconce Pair',      sku:'LIT-003', cat:'lighting', price:6500,  img:'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?auto=format&fit=crop&w=300&q=70', match:['bedroom','bathroom'] },
-  { id:16, name:'Ceramic Vase Set',      sku:'DEC-001', cat:'decor',    price:4500,  img:'https://images.unsplash.com/photo-1463320726281-696a485928c7?auto=format&fit=crop&w=300&q=70', match:['living','bedroom','dining'] },
-  { id:17, name:'Wall Art Canvas',       sku:'DEC-002', cat:'decor',    price:6000,  img:'https://images.unsplash.com/photo-1549887534-1541e9326578?auto=format&fit=crop&w=300&q=70', match:['living','bedroom','office'] },
-  { id:18, name:'Area Rug 8x10',         sku:'DEC-003', cat:'decor',    price:12000, img:'https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=300&q=70', match:['living','bedroom','dining'] },
-  { id:19, name:'Kitchen Island Pro',    sku:'KIT-001', cat:'kitchen',  price:85000, img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=300&q=70', match:['kitchen'] },
-  { id:20, name:'Modular Cabinet Set',   sku:'KIT-002', cat:'kitchen',  price:45000, img:'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?auto=format&fit=crop&w=300&q=70', match:['kitchen'] },
-  { id:21, name:'Office Ergonomic Chair',sku:'OFF-001', cat:'office',   price:22000, img:'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=300&q=70', match:['office'] },
-  { id:22, name:'Standing Desk 1.6m',    sku:'OFF-002', cat:'office',   price:28000, img:'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=300&q=70', match:['office'] },
-  { id:23, name:'Freestanding Bathtub',  sku:'BTH-001', cat:'bathroom', price:65000, img:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=300&q=70', match:['bathroom'] },
-  { id:24, name:'Pooja Mandir Teak',     sku:'POJ-001', cat:'decor',    price:35000, img:'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=300&q=70', match:['pooja'] },
-  { id:25, name:'Kids Study Table',      sku:'KID-001', cat:'bedroom',  price:14000, img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=300&q=70', match:['kids'] },
+  /* ─ Seating ─ */
+  { id:1,  name:'Glam Velvet Sofa',     sku:'SOF-001', cat:'seating',  price:45000,
+    img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=300&q=70',
+    glb:'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/GlamVelvetSofa/glTF-Binary/GlamVelvetSofa.glb',
+    dims:{w:2.2,h:0.8,d:0.9}, color:'#7c6fa0', match:['living','office'] },
+  { id:2,  name:'Sheen Accent Chair',   sku:'SOF-002', cat:'seating',  price:12000,
+    img:'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?auto=format&fit=crop&w=300&q=70',
+    glb:'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/SheenChair/glTF-Binary/SheenChair.glb',
+    dims:{w:0.8,h:0.9,d:0.8}, color:'#a0855a', match:['living','bedroom','office'] },
+  { id:3,  name:'3-Seater Linen Sofa',  sku:'SOF-003', cat:'seating',  price:38000,
+    img:'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:2.0,h:0.75,d:0.85}, color:'#c5b99a', match:['living'] },
+  /* ─ Bedroom ─ */
+  { id:4,  name:'King Bed Frame',        sku:'BED-001', cat:'bedroom',  price:55000,
+    img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:2.0,h:0.6,d:2.2}, color:'#8b7355', match:['bedroom'] },
+  { id:5,  name:'Platform Bed Queen',    sku:'BED-002', cat:'bedroom',  price:38000,
+    img:'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.6,h:0.45,d:2.1}, color:'#7a6a50', match:['bedroom','kids'] },
+  { id:6,  name:'Bedside Table (Pair)',  sku:'BED-003', cat:'bedroom',  price:9500,
+    img:'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.5,h:0.55,d:0.4}, color:'#c8a06a', match:['bedroom'] },
+  /* ─ Dining ─ */
+  { id:7,  name:'Dining Table 6-Seat',   sku:'DIN-001', cat:'dining',   price:38000,
+    img:'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.8,h:0.76,d:0.9}, color:'#6b4c2a', match:['dining'] },
+  { id:8,  name:'Dining Chair Set/4',    sku:'DIN-002', cat:'dining',   price:22000,
+    img:'https://images.unsplash.com/photo-1549488344-cbb6c34184c8?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.45,h:0.9,d:0.45}, color:'#3d2b1a', match:['dining','kitchen'] },
+  { id:9,  name:'Bar Stool Pair',        sku:'DIN-003', cat:'dining',   price:8500,
+    img:'https://images.unsplash.com/photo-1540932239986-30128078f3c5?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.4,h:1.0,d:0.4}, color:'#2c2c2c', match:['kitchen','dining'] },
+  /* ─ Storage ─ */
+  { id:10, name:'Wardrobe 4-Door',       sku:'STR-001', cat:'storage',  price:75000,
+    img:'https://images.unsplash.com/photo-1558997519-83ea9252eeb8?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:2.4,h:2.2,d:0.6}, color:'#e8e0d4', match:['bedroom'] },
+  { id:11, name:'Bookshelf 5-Tier',      sku:'STR-002', cat:'storage',  price:18000,
+    img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.9,h:2.0,d:0.3}, color:'#d4a96a', match:['living','office'] },
+  { id:12, name:'TV Unit Minimal',       sku:'STR-003', cat:'storage',  price:22000,
+    img:'https://images.unsplash.com/photo-1593642634315-48f5414c3ad9?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.8,h:0.45,d:0.45}, color:'#1c1c1c', match:['living'] },
+  /* ─ Lighting ─ */
+  { id:13, name:'Lantern Floor Lamp',    sku:'LIT-001', cat:'lighting', price:8500,
+    img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=70',
+    glb:'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Lantern/glTF-Binary/Lantern.glb',
+    dims:{w:0.3,h:1.6,d:0.3}, color:'#c9a227', match:['living','bedroom','office'] },
+  { id:14, name:'Pendant Cluster',       sku:'LIT-002', cat:'lighting', price:15000,
+    img:'https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.6,h:0.4,d:0.6}, color:'#e8c84e', match:['dining','kitchen','living'] },
+  { id:15, name:'Wall Sconce Pair',      sku:'LIT-003', cat:'lighting', price:6500,
+    img:'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.2,h:0.3,d:0.15}, color:'#b8860b', match:['bedroom','bathroom'] },
+  /* ─ Decor ─ */
+  { id:16, name:'Ceramic Vase Set',      sku:'DEC-001', cat:'decor',    price:4500,
+    img:'https://images.unsplash.com/photo-1463320726281-696a485928c7?auto=format&fit=crop&w=300&q=70',
+    glb:'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/ToyCar/glTF-Binary/ToyCar.glb',
+    dims:{w:0.15,h:0.35,d:0.15}, color:'#e8d5b5', match:['living','bedroom','dining'] },
+  { id:17, name:'Wall Art Canvas',       sku:'DEC-002', cat:'decor',    price:6000,
+    img:'https://images.unsplash.com/photo-1549887534-1541e9326578?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.0,h:0.8,d:0.04}, color:'#f0ede8', match:['living','bedroom','office'] },
+  { id:18, name:'Area Rug 8×10',         sku:'DEC-003', cat:'decor',    price:12000,
+    img:'https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:2.4,h:0.01,d:3.0}, color:'#8b6a4a', match:['living','bedroom','dining'] },
+  /* ─ Kitchen ─ */
+  { id:19, name:'Kitchen Island Pro',    sku:'KIT-001', cat:'kitchen',  price:85000,
+    img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.5,h:0.9,d:0.8}, color:'#f5f0e8', match:['kitchen'] },
+  { id:20, name:'Modular Cabinet Set',   sku:'KIT-002', cat:'kitchen',  price:45000,
+    img:'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:2.4,h:0.85,d:0.6}, color:'#ddd8d0', match:['kitchen'] },
+  /* ─ Office ─ */
+  { id:21, name:'Ergonomic Chair',       sku:'OFF-001', cat:'office',   price:22000,
+    img:'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.65,h:1.2,d:0.65}, color:'#1a1a2e', match:['office'] },
+  { id:22, name:'Standing Desk 1.6m',    sku:'OFF-002', cat:'office',   price:28000,
+    img:'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.6,h:0.75,d:0.7}, color:'#2c2a24', match:['office'] },
+  /* ─ Bathroom ─ */
+  { id:23, name:'Freestanding Bathtub',  sku:'BTH-001', cat:'bathroom', price:65000,
+    img:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.7,h:0.6,d:0.8}, color:'#f5f2ee', match:['bathroom'] },
+  /* ─ Decor / Pooja ─ */
+  { id:24, name:'Pooja Mandir Teak',     sku:'POJ-001', cat:'decor',    price:35000,
+    img:'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.9,h:1.8,d:0.4}, color:'#8b5e2a', match:['pooja'] },
+  /* ─ Kids ─ */
+  { id:25, name:'Kids Study Table',      sku:'KID-001', cat:'bedroom',  price:14000,
+    img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.2,h:0.75,d:0.6}, color:'#4a9edd', match:['kids'] },
+  /* ─ Extra premium items ─ */
+  { id:26, name:'Antique Camera Shelf',  sku:'DEC-004', cat:'decor',    price:8000,
+    img:'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=300&q=70',
+    glb:'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/AntiqueCamera/glTF-Binary/AntiqueCamera.glb',
+    dims:{w:0.2,h:0.2,d:0.15}, color:'#8b6a4a', match:['office','living'] },
+  { id:27, name:'Coffee Table Glass',    sku:'LIV-001', cat:'seating',  price:16000,
+    img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.2,h:0.4,d:0.6}, color:'#c8c8c8', match:['living'] },
+  { id:28, name:'Corset Mirror',         sku:'DEC-005', cat:'decor',    price:12000,
+    img:'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=300&q=70',
+    glb:'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Corset/glTF-Binary/Corset.glb',
+    dims:{w:0.4,h:0.8,d:0.05}, color:'#c9a227', match:['bedroom','bathroom','living'] },
+  { id:29, name:'Water Bottle Display',  sku:'KIT-003', cat:'kitchen',  price:2500,
+    img:'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?auto=format&fit=crop&w=300&q=70',
+    glb:'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/WaterBottle/glTF-Binary/WaterBottle.glb',
+    dims:{w:0.08,h:0.25,d:0.08}, color:'#7db8c8', match:['kitchen','dining'] },
+  { id:30, name:'Porcelain Teapot',      sku:'DEC-006', cat:'decor',    price:3500,
+    img:'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.2,h:0.18,d:0.14}, color:'#e8e0d4', match:['dining','living'] },
 ]
 
 const MATERIALS_CATALOG = [
