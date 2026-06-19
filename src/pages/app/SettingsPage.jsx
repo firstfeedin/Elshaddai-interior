@@ -57,14 +57,14 @@ export default function SettingsPage() {
     phone:   '+91 98400 12345',
     role:    storedUser.role  || 'SUPER_ADMIN',
     avatar:  storedUser.name?.split(' ').map(w=>w[0]).join('').slice(0,2) || 'AK',
-    bio:     '50+ years of engineering excellence. Founded El Shaddai Design Studio in 2004.',
+    bio:     '50+ years of engineering excellence. Founded El Shaddai Interiors & Design in 2004.',
     timezone:'Asia/Kolkata (IST +5:30)',
     language:'English (India)',
   })
 
   // Company state
   const [company, setCompany] = useState({
-    name:       'El Shaddai Design Studio',
+    name:       'El Shaddai Interiors & Design',
     tagline:    '50+ Years of Engineering Excellence',
     address:    'Plot 42, Jubilee Hills Road No. 36, Hyderabad — 500033, Telangana',
     phone:      '+91 40 2345 6789',

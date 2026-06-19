@@ -158,7 +158,7 @@ export default function ClientPortalPage() {
         </div>
         <div>
           <p style={{ ...serif, fontSize:16, fontWeight:300, color:'#fff', margin:0 }}>Client <span style={{ color:gold }}>Portal</span></p>
-          <p style={{ ...sans, fontSize:8.5, color:'#57534e', margin:0, letterSpacing:'0.1em', textTransform:'uppercase' }}>El Shaddai Design Studio</p>
+          <p style={{ ...sans, fontSize:8.5, color:'#57534e', margin:0, letterSpacing:'0.1em', textTransform:'uppercase' }}>El Shaddai Interiors & Design</p>
         </div>
         <div style={{ flex:1 }} />
         {/* Project switcher */}

@@ -1308,7 +1308,10 @@ export default function ElShaddaiHome() {
               <div key={row.label} style={{ marginBottom: 36, paddingBottom: 36, borderBottom: `1px solid ${S.border}` }}>
                 <p style={{ ...S.label, color: '#a8a29e', marginBottom: 8 }}>{row.label}</p>
                 {row.href
-                  ? <a href={row.href} style={{ fontSize: 16, color: S.dark, textDecoration: 'none', fontWeight: 400, transition: 'color 0.2s' }}
+                  ? <a href={row.href}
+                      target={row.href.startsWith('http') ? '_blank' : undefined}
+                      rel={row.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      style={{ fontSize: 16, color: S.dark, textDecoration: 'none', fontWeight: 400, transition: 'color 0.2s' }}
                       onMouseEnter={e => e.target.style.color = S.gold}
                       onMouseLeave={e => e.target.style.color = S.dark}>{row.val}</a>
                   : <p style={{ fontSize: 16, color: S.dark }}>{row.val}</p>}
@@ -1362,7 +1365,7 @@ export default function ElShaddaiHome() {
                     </div>
                   ))}
                 </div>
-                {[['Phone Number', 'phone', 'tel', '+91 00000 00000'], ['Message', 'message', 'textarea', 'Tell us about your design vision...']].map(([lbl, name, type, ph]) => (
+                {[['Phone Number', 'phone', 'tel', '+91 98765 43210'], ['Message', 'message', 'textarea', 'Tell us about your design vision...']].map(([lbl, name, type, ph]) => (
                   <div key={name} style={{ marginBottom: 20 }}>
                     <label style={{ ...S.label, display: 'block', marginBottom: 8, color: '#a8a29e' }}>{lbl}</label>
                     {type === 'textarea'

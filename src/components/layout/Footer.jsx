@@ -10,13 +10,19 @@ const quickLinks = [
 ]
 
 const legalLinks = [
-  { label: 'Privacy Policy', href: '#' },
-  { label: 'Terms of Service', href: '#' },
-  { label: 'Refund Policy',   href: '#' },
-  { label: 'Careers',         href: '#' },
+  { label: 'Privacy Policy',   href: '/privacy-policy' },
+  { label: 'Terms of Service', href: '/terms-of-service' },
+  { label: 'Refund Policy',    href: '/refund-policy' },
+  { label: 'Careers',          href: 'mailto:contactus@divinemercyitsol.com?subject=Career Enquiry — El Shaddai' },
 ]
 
-const cities = ['Hyderabad', 'Secunderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Khammam', 'Nalgonda', 'Karimnagar']
+const cities = ['Hyderabad', 'Secunderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Khammam', 'Nalgonda', 'Kukatpally']
+
+const services = [
+  'Modular Kitchen', 'Wardrobe & Storage', 'Living Room', 'Bedroom Design',
+  'False Ceiling', 'Flooring', 'Pooja Room', 'Kids Room',
+  'Bathroom Design', 'Home Office', 'Commercial Interiors', 'Turnkey Execution',
+]
 
 export default function Footer() {
   const year = new Date().getFullYear()
@@ -101,6 +107,16 @@ export default function Footer() {
                 <li key={l.label}>
                   <a href={l.href} className="font-body text-sm text-white/55 hover:text-gold-400 transition-colors duration-200 flex items-center gap-2">
                     <span className="text-gold-500/40 text-[10px]">→</span> {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <p className="font-body text-xs font-semibold tracking-[0.25em] uppercase text-gold-400 mt-8 mb-5">Our Services</p>
+            <ul className="space-y-2">
+              {services.map(s => (
+                <li key={s}>
+                  <a href="/#services" className="font-body text-xs text-white/45 hover:text-gold-400 transition-colors duration-200 flex items-center gap-2">
+                    <span className="text-gold-500/30 text-[9px]">→</span> {s}
                   </a>
                 </li>
               ))}
