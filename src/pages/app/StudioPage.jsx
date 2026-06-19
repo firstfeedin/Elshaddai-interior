@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 const FloorPlanEditor = lazy(() => import('../../features/designer/FloorPlanEditor'))
 const BabylonDesigner = lazy(() => import('../../features/designer/BabylonDesigner'))
+const DualStudio      = lazy(() => import('../../features/studio/DualStudio'))
 
 const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY || ''
 
@@ -703,49 +704,18 @@ function RenderPanel({ settings, setSettings, onRender, rendering, renderProgres
 function MainCanvas({ step, mode, floorPlanData, uploadedPlan, selectedRoom, appliedTemplate }) {
   const navigate = useNavigate()
 
-  if (step === 1) {
+  /* ─── Step 1 & 2: Dual Studio (2D drafting + live 3D extraction) ─── */
+  if (step === 1 || step === 2) {
     return (
-      <div style={{ flex:1, background:C.bg, position:'relative', overflow:'hidden', display:'flex', flexDirection:'column' }}>
-        {/* Embedded floor plan editor */}
-        <div style={{ flex:1, overflow:'hidden' }}>
-          <Suspense fallback={<Loading label="Loading Floor Plan Editor…" />}>
-            <FloorPlanEditor onExportTo3D={(data) => { console.log('Floor plan data:', data) }} />
-          </Suspense>
-        </div>
-        {/* Upload overlay if image uploaded */}
-        {uploadedPlan && (
-          <div style={{ position:'absolute', top:12, right:12, width:200, background:'rgba(26,31,46,0.9)', border:`1px solid ${C.gold}`, borderRadius:8, padding:8 }}>
-            <p style={{ color:C.gold, fontSize:9, fontWeight:700, margin:'0 0 6px', textTransform:'uppercase' }}>📐 Reference Plan</p>
-            <img src={uploadedPlan} alt="reference" style={{ width:'100%', borderRadius:4, opacity:0.8 }} />
-          </div>
-        )}
-      </div>
-    )
-  }
-
-  if (step === 2) {
-    if (mode === '2d') {
-      return (
-        <div style={{ flex:1, background:C.bg, overflow:'hidden' }}>
-          <Suspense fallback={<Loading label="Loading 2D Editor…" />}>
-            <FloorPlanEditor onExportTo3D={(data) => { console.log('data:', data) }} />
-          </Suspense>
-        </div>
-      )
-    }
-    return (
-      <div style={{ flex:1, background:'#1a1f2e', overflow:'hidden', position:'relative' }}>
-        <Suspense fallback={<Loading label="Loading 3D Engine…" sub="Babylon.js · PBR · WebGL 2" />}>
-          <BabylonDesigner
-            floorPlanData={floorPlanData}
-            onSave={() => {}}
-            onSwitch2D={() => {}}
-          />
+      <div style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column', position:'relative' }}>
+        <Suspense fallback={<Loading label="Loading Dual Studio…" sub="2D Drafting Engine · 3D Extraction Engine" />}>
+          <DualStudio />
         </Suspense>
-        {appliedTemplate && (
-          <div style={{ position:'absolute', top:12, left:'50%', transform:'translateX(-50%)', background:'rgba(0,0,0,0.7)', border:`1px solid ${C.gold}`, borderRadius:20, padding:'6px 16px', display:'flex', alignItems:'center', gap:8 }}>
-            <span style={{ fontSize:12 }}>✨</span>
-            <span style={{ color:C.gold, fontSize:11, fontWeight:600 }}>Applied: {appliedTemplate.label}</span>
+        {/* Reference plan overlay if uploaded */}
+        {uploadedPlan && (
+          <div style={{ position:'absolute', bottom:40, right:16, width:180, background:'rgba(8,7,10,0.92)', border:`1px solid ${C.gold}`, padding:8, zIndex:30 }}>
+            <p style={{ color:C.gold, fontSize:9, fontWeight:700, margin:'0 0 6px', textTransform:'uppercase', letterSpacing:'0.2em' }}>📐 Reference Plan</p>
+            <img src={uploadedPlan} alt="reference" style={{ width:'100%', display:'block', opacity:0.8 }} />
           </div>
         )}
       </div>
