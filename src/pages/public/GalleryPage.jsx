@@ -145,7 +145,7 @@ export default function GalleryPage() {
       <div style={{ maxWidth:1300, margin:'0 auto', padding:'0 24px 80px' }}>
         {/* Stats */}
         <div style={{ display:'flex', gap:32, padding:'24px 0', borderBottom:`1px solid ${T.border}`, marginBottom:28, overflowX:'auto' }}>
-          {[['2,400+','Designs Shared'],['18K+','Community Members'],['75+','Furniture Items'],['4.9','Average Rating']].map(([n,l])=>(
+          {[['18+','Design Styles'],['150+','Furniture Items'],['7','Room Types'],['Free','To Use']].map(([n,l])=>(
             <div key={l} style={{ flexShrink:0 }}>
               <p style={{ fontFamily:T.S, fontSize:28, color:T.gold, margin:'0 0 2px', fontWeight:400 }}>{n}</p>
               <p style={{ fontFamily:T.F, fontSize:9, color:T.muted, margin:0, letterSpacing:'0.14em', textTransform:'uppercase' }}>{l}</p>

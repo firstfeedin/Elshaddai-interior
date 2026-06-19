@@ -14,23 +14,23 @@ const CATEGORIES = ['All','Living Room','Bedroom','Kitchen','Office','Commercial
 const PROJECTS = [
   { id:1, title:'Sharma Residence — Full Interior',      cat:'Living Room', style:'Modern Luxury',    sqft:3200, city:'Hyderabad', img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=800&q=80', designer:'Priya K.', year:2024, tag:'Featured' },
   { id:2, title:'Gupta Villa — Master Bedroom Suite',    cat:'Bedroom',     style:'Scandinavian',     sqft:420,  city:'Hitech City', img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=800&q=80', designer:'Arjun M.', year:2024, tag:null },
-  { id:3, title:'Kapoor Kitchen Remodel',                cat:'Kitchen',     style:'Contemporary',     sqft:280,  city:'Mumbai',    img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=800&q=80', designer:'Sneha R.', year:2023, tag:'Award Winner' },
+  { id:3, title:'Kapoor Kitchen Remodel',                cat:'Kitchen',     style:'Contemporary',     sqft:280,  city:'Mumbai',    img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=800&q=80', designer:'Sneha R.', year:2023, tag:'Featured' },
   { id:4, title:'TechPark Co-Working Space',             cat:'Commercial',  style:'Industrial',       sqft:8000, city:'Pune',      img:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80', designer:'Raj S.',  year:2024, tag:null },
   { id:5, title:'Mehta Home Office',                     cat:'Office',      style:'Minimalist',       sqft:160,  city:'Jubilee Hills',   img:'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=800&q=80', designer:'Priya K.', year:2023, tag:null },
   { id:6, title:'Agarwal Penthouse — Living & Dining',   cat:'Living Room', style:'Luxury',           sqft:1800, city:'Delhi',     img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80', designer:'Arjun M.', year:2024, tag:'Featured' },
   { id:7, title:'Reddy Villa — Kids Bedroom',            cat:'Bedroom',     style:'Playful Modern',   sqft:220,  city:'Hyderabad', img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80', designer:'Sneha R.', year:2024, tag:null },
   { id:8, title:'Bose Restaurant Interior',              cat:'Commercial',  style:'Rustic Industrial',sqft:3500, city:'Kolkata',   img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80', designer:'Raj S.',  year:2023, tag:null },
-  { id:9, title:'Joshi Farmhouse — Exterior & Landscape',cat:'Exterior',   style:'Modern Farmhouse', sqft:5000, city:'Lonavala',  img:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80', designer:'Priya K.', year:2024, tag:'Award Winner' },
+  { id:9, title:'Joshi Farmhouse — Exterior & Landscape',cat:'Exterior',   style:'Modern Farmhouse', sqft:5000, city:'Lonavala',  img:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80', designer:'Priya K.', year:2024, tag:'Featured' },
   { id:10,title:'Nair Open Kitchen — Island Design',     cat:'Kitchen',     style:'Contemporary',     sqft:320,  city:'Kochi',     img:'https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=800&q=80', designer:'Arjun M.', year:2023, tag:null },
   { id:11,title:'Shah Corporate Office — 3 Floors',     cat:'Commercial',  style:'Modern Corporate', sqft:12000,city:'Ahmedabad', img:'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=800&q=80', designer:'Raj S.',  year:2024, tag:null },
   { id:12,title:'Iyer Guest Bedroom — Boutique Style',  cat:'Bedroom',     style:'Boutique',         sqft:280,  city:'Mysore',    img:'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80', designer:'Sneha R.', year:2024, tag:null },
 ]
 
 const STATS = [
-  { v:'240+', l:'Projects Completed' },
-  { v:'18',   l:'Cities Across India' },
-  { v:'4',    l:'Design Awards'       },
-  { v:'98%',  l:'Client Satisfaction' },
+  { v:'150+',  l:'Furniture Items' },
+  { v:'7',     l:'Room Categories' },
+  { v:'30+',   l:'Material Finishes' },
+  { v:'Free',  l:'To Get Started'  },
 ]
 
 function ProjectCard({ p, onClick }) {
@@ -67,7 +67,7 @@ export default function PortfolioPage() {
               <p style={{ margin: '0 0 14px', fontSize: 10, fontWeight: 600, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#a8a29e' }}>Our Work</p>
               <h1 style={{ ...serif, margin: 0, fontSize: 52, fontWeight: 300, color: dark, lineHeight: 1 }}>Design Portfolio</h1>
             </div>
-            <p style={{ ...sans, margin: 0, fontSize: 14, color: stone, fontWeight: 300, lineHeight: 1.7, maxWidth: 360, textAlign: 'right' }}>240+ completed projects across India — from cozy apartments to luxury villas and commercial spaces.</p>
+            <p style={{ ...sans, margin: 0, fontSize: 14, color: stone, fontWeight: 300, lineHeight: 1.7, maxWidth: 360, textAlign: 'right' }}>Sample designs created with El Shaddai Studio — from cozy apartments to luxury villas and commercial spaces.</p>
           </div>
 
           {/* Stats */}
@@ -131,7 +131,7 @@ export default function PortfolioPage() {
         <div style={{ background: '#fff', padding: '80px 64px', textAlign: 'center', borderTop: `1px solid ${border}` }}>
           <p style={{ margin: '0 0 12px', fontSize: 10, fontWeight: 600, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#a8a29e' }}>Start Your Project</p>
           <h2 style={{ ...serif, margin: '0 0 20px', fontSize: 44, fontWeight: 300, color: dark }}>Ready to transform your space?</h2>
-          <p style={{ ...sans, margin: '0 0 36px', fontSize: 14, color: stone, fontWeight: 300 }}>Work with El Shaddai's award-winning design team.</p>
+          <p style={{ ...sans, margin: '0 0 36px', fontSize: 14, color: stone, fontWeight: 300 }}>Design your space free — no experience needed, no cost to start.</p>
           <button onClick={() => window.location.href = '/ai-design'}
             style={{ ...sans, padding: '13px 36px', background: gold, border: 'none', color: '#000', cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
             Start AI Design →

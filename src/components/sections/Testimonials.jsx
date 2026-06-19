@@ -74,12 +74,12 @@ export default function Testimonials() {
         <div className="text-center mb-14">
           <span className="section-label">Client Stories</span>
           <h2 className="font-display text-4xl lg:text-5xl font-light text-white leading-tight mt-3 mb-3">
-            2400+ Happy Families <br />
-            <span className="text-gold-gradient font-medium">Can't Be Wrong</span>
+            What Our Clients <br />
+            <span className="text-gold-gradient font-medium">Are Saying</span>
           </h2>
           <div className="flex items-center justify-center gap-3 mt-4">
             <Stars count={5} />
-            <span className="font-body text-white/60 text-sm">4.9/5 average · 1,200+ verified reviews</span>
+            <span className="font-body text-white/60 text-sm">5.0 · Early client reviews</span>
           </div>
         </div>
 
@@ -114,10 +114,10 @@ export default function Testimonials() {
         {/* Stats row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-16 pt-10 border-t border-white/10">
           {[
-            { val: '2,400+', label: 'Projects Completed' },
-            { val: '98%',    label: 'On-Time Delivery' },
-            { val: '4.9 ★',  label: 'Average Rating' },
-            { val: '5 Yrs',  label: 'Warranty on Work' },
+            { val: '150+',   label: 'Furniture Items' },
+            { val: '100%',   label: 'Free to Use' },
+            { val: '5.0 ★',  label: 'Client Rating' },
+            { val: '₹0',     label: 'To Get Started' },
           ].map((s, i) => (
             <div key={i} className="text-center">
               <div className="font-display text-4xl text-gold-400 font-light mb-1">{s.val}</div>
