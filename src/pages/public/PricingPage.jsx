@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import AppShell from '../../components/layout/AppShell'
+import Navbar from '../../components/layout/Navbar'
 
 const serif = { fontFamily: "'Cormorant Garamond', Georgia, serif" }
 const sans  = { fontFamily: "'DM Sans', system-ui, sans-serif" }
@@ -98,8 +98,9 @@ export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState(null)
 
   return (
-    <AppShell title="Pricing">
-      <div style={{ ...sans, minHeight: '100vh', background: light }}>
+    <div style={{ ...sans, background: light, minHeight: '100vh' }}>
+      <Navbar />
+      <div style={{ paddingTop: 96 }}>
 
         {/* Header */}
         <div style={{ padding: '72px 64px 64px', background: '#fff', borderBottom: `1px solid ${border}` }}>
@@ -179,6 +180,6 @@ export default function PricingPage() {
         </div>
 
       </div>
-    </AppShell>
+    </div>
   )
 }

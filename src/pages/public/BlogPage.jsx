@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import AppShell from '../../components/layout/AppShell'
+import Navbar from '../../components/layout/Navbar'
 
 const serif  = { fontFamily: "'Cormorant Garamond', Georgia, serif" }
 const sans   = { fontFamily: "'DM Sans', system-ui, sans-serif" }
@@ -96,8 +96,9 @@ export default function BlogPage() {
   const rest     = filtered.filter(p => !p.featured || activeTag !== 'All' || search)
 
   return (
-    <AppShell title="Blog">
-      <div style={{ ...sans, minHeight: '100vh', background: light }}>
+    <div style={{ ...sans, background: light, minHeight: '100vh' }}>
+      <Navbar />
+      <div style={{ paddingTop: 96 }}>
 
         {/* Header */}
         <div style={{ background: '#fff', padding: '64px 64px 52px', borderBottom: `1px solid ${border}` }}>
@@ -185,6 +186,6 @@ export default function BlogPage() {
           </div>
         </div>
       </div>
-    </AppShell>
+    </div>
   )
 }
