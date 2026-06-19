@@ -991,11 +991,11 @@ export default function ElShaddaiHome() {
                 onMouseLeave={e => e.currentTarget.style.color = scrolled ? S.stone : 'rgba(255,255,255,0.7)'}>
                 Sign In
               </button>
-              <button onClick={() => window.location.href = '/floor-plan-ai'}
+              <button onClick={() => window.location.href = '/studio'}
                 style={{ ...S.sans, background: 'transparent', border: `1px solid ${scrolled ? S.gold : 'rgba(201,162,39,0.7)'}`, color: S.gold, padding: '9px 20px', fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', cursor: 'pointer', transition: 'all 0.2s' }}
                 onMouseEnter={e => { e.currentTarget.style.background=S.gold; e.currentTarget.style.color='#000' }}
                 onMouseLeave={e => { e.currentTarget.style.background='transparent'; e.currentTarget.style.color=S.gold }}>
-                Try Free
+                ✦ Try Studio
               </button>
               <button onClick={() => scrollTo('contact')}
                 style={{ ...S.sans, background: S.gold, border: 'none', color: '#000', padding: '10px 22px', fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', cursor: 'pointer' }}>
@@ -1144,6 +1144,89 @@ export default function ElShaddaiHome() {
             </div>
           </div>
         ))}
+      </section>
+
+      {/* ══ DESIGN STUDIO ───────────────────────────────────────────────────── */}
+      <section id="studio" style={{ padding: '100px 64px', background: '#0f1117' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+            <span style={{ fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 700, color: S.gold, fontFamily: "'DM Sans',sans-serif" }}>AI Design Studio</span>
+            <h2 style={{ ...S.serif, fontSize: 'clamp(28px,3.5vw,52px)', fontWeight: 300, color: '#fff', margin: '12px 0 16px' }}>
+              Design Like a Professional
+            </h2>
+            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 15, color: 'rgba(255,255,255,0.5)', maxWidth: 560, margin: '0 auto 40px' }}>
+              Draw your floor plan, apply AI decor templates, and render photorealistic images — all in one studio. Free to try.
+            </p>
+            <a href="/studio" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: S.gold, color: '#000', padding: '14px 36px', fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', textDecoration: 'none' }}>
+              Open Design Studio →
+            </a>
+          </div>
+
+          {/* 3 Steps */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 2, marginBottom: 64 }}>
+            {[
+              {
+                step: '01', icon: '✏️', title: 'Draw',
+                desc: 'Sketch your floor plan or upload a 2D image. Our AI instantly analyzes rooms, dimensions and layout.',
+                img: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=70',
+                features: ['2D floor plan editor','Upload & AI analyze','Snap-to-grid tools','Auto room detection'],
+              },
+              {
+                step: '02', icon: '🎨', title: 'Decorate',
+                desc: 'Browse 100+ AI room templates, place furniture from our catalog, choose materials and finishes.',
+                img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=600&q=70',
+                features: ['AI decor templates','Furniture library','Material selector','Switch 2D / 3D view'],
+              },
+              {
+                step: '03', icon: '✨', title: 'Render',
+                desc: 'Generate photorealistic renders up to 4K. Export construction drawings, BOQ and share with clients.',
+                img: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=600&q=70',
+                features: ['Photorealistic 4K render','Construction drawings','Bill of Quantities','One-click share'],
+              },
+            ].map((s, i) => (
+              <div key={s.step} style={{ position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
+                onClick={() => window.location.href = '/studio'}>
+                <img src={s.img} alt={s.title} style={{ width: '100%', height: 260, objectFit: 'cover', display: 'block' }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,17,23,0.95) 0%, rgba(15,17,23,0.3) 60%, transparent 100%)' }} />
+                <div style={{ position: 'absolute', top: 16, left: 16, width: 36, height: 36, background: S.gold, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: 16 }}>{s.icon}</span>
+                </div>
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '0 20px 24px' }}>
+                  <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 9, color: S.gold, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', margin: '0 0 4px' }}>Step {s.step}</p>
+                  <h3 style={{ ...S.serif, color: '#fff', fontSize: 24, fontWeight: 400, margin: '0 0 8px' }}>{s.title}</h3>
+                  <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.6)', margin: '0 0 12px', lineHeight: 1.6 }}>{s.desc}</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                    {s.features.map(f => (
+                      <span key={f} style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 9, color: S.gold, background: 'rgba(201,162,39,0.15)', padding: '3px 8px', borderRadius: 2, fontWeight: 600 }}>{f}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* AI Decor Template preview strip */}
+          <div>
+            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 16, textAlign: 'center' }}>Sample AI Decor Templates</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 2 }}>
+              {[
+                { label: 'Nordic Natural', img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=400&q=60' },
+                { label: 'Modern Luxury',  img: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=400&q=60' },
+                { label: 'Japandi Calm',   img: 'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=400&q=60' },
+                { label: 'Vastu Modern',   img: 'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=400&q=60' },
+              ].map(t => (
+                <a key={t.label} href="/studio" style={{ position: 'relative', display: 'block', textDecoration: 'none' }}>
+                  <img src={t.img} alt={t.label} style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block' }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top,rgba(0,0,0,0.6) 0%,transparent 60%)' }} />
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                    <p style={{ fontFamily: "'DM Sans',sans-serif", color: '#fff', fontSize: 11, fontWeight: 600, margin: 0 }}>{t.label}</p>
+                    <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 8, color: '#000', background: S.gold, padding: '2px 6px', fontWeight: 700 }}>APPLY</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ══ SERVICES ────────────────────────────────────────────────────────── */}

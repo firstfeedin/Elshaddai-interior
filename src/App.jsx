@@ -50,6 +50,7 @@ const TimesheetPage      = lazy(() => import('./pages/app/TimesheetPage'))
 const ProjectHealthPage  = lazy(() => import('./pages/app/ProjectHealthPage'))
 const MaterialSpecPage   = lazy(() => import('./pages/app/MaterialSpecPage'))
 const NotFoundPage       = lazy(() => import('./pages/public/NotFoundPage'))
+const StudioPage         = lazy(() => import('./pages/app/StudioPage'))
 
 function CookieConsent() {
   const [show, setShow] = useState(false)
@@ -104,6 +105,7 @@ export default function App() {
             <Route path="/pricing"     element={<PricingPage />} />
             <Route path="/portfolio"   element={<PortfolioPage />} />
             <Route path="/blog"        element={<BlogPage />} />
+            <Route path="/studio"      element={<StudioPage />} />
 
             {/* ── Protected — all authenticated users ── */}
             <Route path="/dashboard"        element={<P><DashboardPage /></P>} />

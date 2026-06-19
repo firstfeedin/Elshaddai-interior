@@ -2,11 +2,10 @@ import { useState, useEffect, useRef } from 'react'
 
 const navLinks = [
   { label: 'Home',         href: '/'              },
+  { label: 'Studio',       href: '/studio'        },
   { label: 'Services',     href: '#services'      },
   { label: 'Portfolio',    href: '#portfolio'     },
   { label: 'Pricing',      href: '/pricing'       },
-  { label: 'How It Works', href: '#how-it-works'  },
-  { label: 'About Us',     href: '#about'         },
   { label: 'Contact',      href: '#contact'       },
 ]
 
