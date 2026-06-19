@@ -102,6 +102,157 @@ function GoldBtn({ children, onClick, style = {} }) {
   )
 }
 
+/* ─── Template Gallery Component ────────────────────────────────────────── */
+
+function TemplateGallery({ stylesArr, templates }) {
+  const [activeTab, setActiveTab] = useState('Mid-Century')
+  const [projectMode, setProjectMode] = useState('room') // 'room' | 'whole'
+  const filtered = templates.filter(t => t.style === activeTab)
+  const display = filtered.length > 0 ? filtered : templates.slice(0, 8)
+
+  return (
+    <section style={{ background:'#f8f6f2', padding:'72px 40px 64px', borderBottom:'1px solid #e7e5e4' }}>
+      <div style={{ maxWidth:1280, margin:'0 auto' }}>
+        <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', flexWrap:'wrap', gap:16, marginBottom:32 }}>
+          <div>
+            <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:9, letterSpacing:'0.3em', textTransform:'uppercase', fontWeight:700, color:S.gold }}>500+ Templates</span>
+            <h2 style={{ ...S.serif, fontSize:'clamp(22px,2.5vw,38px)', fontWeight:300, color:S.dark, margin:'8px 0 0' }}>
+              Quickly Start with a Template
+            </h2>
+          </div>
+          {/* Toggle */}
+          <div style={{ display:'flex', border:`1px solid ${S.border}`, borderRadius:4, overflow:'hidden' }}>
+            {['room','whole'].map(m => (
+              <button key={m} onClick={() => setProjectMode(m)}
+                style={{ fontFamily:"'DM Sans',sans-serif", fontSize:11, fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', padding:'8px 20px', border:'none', cursor:'pointer', transition:'all 0.2s',
+                  background: projectMode === m ? S.dark : '#fff',
+                  color: projectMode === m ? '#fff' : S.stone }}>
+                {m === 'room' ? 'Room Templates' : 'Whole House'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Style tabs */}
+        <div style={{ display:'flex', gap:4, flexWrap:'wrap', marginBottom:28 }}>
+          {stylesArr.map(s => (
+            <button key={s} onClick={() => setActiveTab(s)}
+              style={{ fontFamily:"'DM Sans',sans-serif", fontSize:11, fontWeight:600, padding:'7px 16px', borderRadius:20, border:`1px solid ${activeTab===s ? S.gold : S.border}`, cursor:'pointer', transition:'all 0.2s',
+                background: activeTab===s ? S.gold : '#fff',
+                color: activeTab===s ? '#000' : S.stone }}>
+              {s}
+            </button>
+          ))}
+        </div>
+
+        {/* Cards */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))', gap:16 }}>
+          {display.map((t,i) => (
+            <a key={i} href="/studio" style={{ textDecoration:'none', display:'block', borderRadius:8, overflow:'hidden', background:'#fff', border:`1px solid ${S.border}`, transition:'all 0.25s', boxShadow:'none' }}
+              onMouseEnter={e=>{e.currentTarget.style.boxShadow='0 8px 32px rgba(0,0,0,0.12)';e.currentTarget.style.transform='translateY(-3px)'}}
+              onMouseLeave={e=>{e.currentTarget.style.boxShadow='none';e.currentTarget.style.transform='none'}}>
+              <div style={{ position:'relative', paddingBottom:'66%', overflow:'hidden' }}>
+                <img src={t.img} alt={t.title} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} loading="lazy" />
+                <span style={{ position:'absolute', top:10, left:10, background:'#22c55e', color:'#fff', fontSize:9, fontWeight:700, padding:'3px 8px', borderRadius:3, letterSpacing:'0.1em' }}>FREE</span>
+              </div>
+              <div style={{ padding:'12px 14px 14px' }}>
+                <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:12, fontWeight:700, color:S.dark, margin:'0 0 2px' }}>{t.title}</p>
+                <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:10, color:'#a8a29e', margin:'0 0 8px' }}>by {t.author} · {t.room}</p>
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                  <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:9, color:S.stone, background:'#f3f4f6', padding:'3px 8px', borderRadius:10 }}>{t.style}</span>
+                  <span style={{ fontSize:14 }}>→</span>
+                </div>
+              </div>
+            </a>
+          ))}
+          {/* View all card */}
+          <a href="/studio" style={{ textDecoration:'none', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'#fff', border:`2px dashed ${S.border}`, borderRadius:8, minHeight:200, gap:10, transition:'border-color 0.2s' }}
+            onMouseEnter={e=>e.currentTarget.style.borderColor=S.gold}
+            onMouseLeave={e=>e.currentTarget.style.borderColor=S.border}>
+            <div style={{ width:40, height:40, borderRadius:'50%', background:S.dark, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:20 }}>+</div>
+            <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:11, fontWeight:700, color:S.dark, margin:0 }}>View All Templates</p>
+            <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:10, color:'#a8a29e', margin:0 }}>500+ free designs</p>
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ─── 3D Design Gallery Component ───────────────────────────────────────── */
+
+const REFS_3D = [
+  { room:'Living Room',  style:'Modern',       img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=75' },
+  { room:'Bedroom',      style:'Minimalist',   img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=600&q=75' },
+  { room:'Kitchen',      style:'Scandinavian', img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=600&q=75' },
+  { room:'Dining Room',  style:'Warm-Beige',   img:'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=600&q=75' },
+  { room:'Bathroom',     style:'Luxury',       img:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=600&q=75' },
+  { room:'Home Office',  style:'Industrial',   img:'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=600&q=75' },
+  { room:'Living Room',  style:'Japandi',      img:'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=600&q=75' },
+  { room:'Bedroom',      style:'Mid-Century',  img:'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=600&q=75' },
+  { room:'Kids Room',    style:'Playful',      img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&q=75' },
+  { room:'Terrace',      style:'Boho',         img:'https://images.unsplash.com/photo-1567016432779-094069958ea5?auto=format&fit=crop&w=600&q=75' },
+  { room:'Pooja Room',   style:'Traditional',  img:'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=600&q=75' },
+  { room:'Study Room',   style:'Classic',      img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=75' },
+  { room:'Living Room',  style:'Dark Mode',    img:'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=600&q=75' },
+  { room:'Master Suite', style:'Luxe',         img:'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=600&q=75' },
+  { room:'Kitchen',      style:'Modular',      img:'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?auto=format&fit=crop&w=600&q=75' },
+  { room:'Office',       style:'Corporate',    img:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=75' },
+  { room:'Bedroom',      style:'Cozy',         img:'https://images.unsplash.com/photo-1634712282287-14ed57b9cc89?auto=format&fit=crop&w=600&q=75' },
+  { room:'Living Room',  style:'French',       img:'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=600&q=75' },
+  { room:'Bathroom',     style:'Marble',       img:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=600&q=75' },
+  { room:'Dining',       style:'Modern',       img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=600&q=75' },
+  { room:'Balcony',      style:'Garden',       img:'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?auto=format&fit=crop&w=600&q=75' },
+  { room:'Living Room',  style:'Luxury',       img:'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=600&q=75' },
+  { room:'Bedroom',      style:'Warm',         img:'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=600&q=75' },
+]
+
+function ThreeDGallery() {
+  const [hovered, setHovered] = useState(null)
+  const [filter, setFilter] = useState('All')
+  const roomTypes = ['All','Living Room','Bedroom','Kitchen','Bathroom','Dining Room','Home Office']
+  const filtered = filter === 'All' ? REFS_3D : REFS_3D.filter(r => r.room === filter)
+  return (
+    <>
+      {/* Filter chips */}
+      <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:28, justifyContent:'center' }}>
+        {roomTypes.map(rt => (
+          <button key={rt} onClick={() => setFilter(rt)}
+            style={{ fontFamily:"'DM Sans',sans-serif", fontSize:10, fontWeight:600, padding:'6px 16px', borderRadius:20, border:`1px solid ${filter===rt ? S.gold : 'rgba(255,255,255,0.15)'}`, cursor:'pointer', transition:'all 0.2s', letterSpacing:'0.08em',
+              background: filter===rt ? S.gold : 'transparent',
+              color: filter===rt ? '#000' : 'rgba(255,255,255,0.55)' }}>
+            {rt}
+          </button>
+        ))}
+      </div>
+      {/* Grid */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))', gap:3 }}>
+        {filtered.map((ref,i) => (
+          <a key={i} href="/studio" style={{ textDecoration:'none', position:'relative', display:'block', paddingBottom:'75%', overflow:'hidden', cursor:'pointer' }}
+            onMouseEnter={() => setHovered(i)}
+            onMouseLeave={() => setHovered(null)}>
+            <img src={ref.img} alt={ref.room} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', transition:'transform 0.5s', transform: hovered===i ? 'scale(1.06)' : 'scale(1)' }} loading="lazy" />
+            <div style={{ position:'absolute', inset:0, background: hovered===i ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.2)', transition:'background 0.3s', display:'flex', flexDirection:'column', justifyContent:'flex-end', padding:14 }}>
+              <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:11, fontWeight:700, color:'#fff', margin:'0 0 2px', opacity: hovered===i ? 1 : 0, transition:'opacity 0.3s' }}>{ref.room}</p>
+              <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:9, color:'rgba(255,255,255,0.7)', margin:0, opacity: hovered===i ? 1 : 0, transition:'opacity 0.3s 0.05s' }}>{ref.style} Style</p>
+            </div>
+            {hovered===i && (
+              <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', background:'rgba(201,162,39,0.92)', borderRadius:'50%', width:40, height:40, display:'flex', alignItems:'center', justifyContent:'center', fontSize:16 }}>
+                +
+              </div>
+            )}
+          </a>
+        ))}
+      </div>
+      <div style={{ textAlign:'center', marginTop:40 }}>
+        <a href="/studio" style={{ display:'inline-flex', alignItems:'center', gap:10, background:S.gold, color:'#000', padding:'14px 40px', fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:11, letterSpacing:'0.18em', textTransform:'uppercase', textDecoration:'none' }}>
+          Open Design Studio →
+        </a>
+      </div>
+    </>
+  )
+}
+
 /* ─── Platform Demo Component ────────────────────────────────────────────── */
 
 const DEMO_TABS = [
@@ -1066,6 +1217,119 @@ export default function ElShaddaiHome() {
 
       {/* ══ LOGGED-IN: Role Dashboard / LOGGED-OUT: Platform Demo ─────────── */}
       {user ? <LoggedInPanel user={user} /> : <PlatformDemo />}
+
+      {/* ══ CREATE A FLOOR PLAN ──────────────────────────────────────────────── */}
+      <section style={{ background:'#fff', padding:'56px 40px 48px', borderBottom:'1px solid #f0ede8' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto' }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:32, flexWrap:'wrap', gap:12 }}>
+            <h2 style={{ ...S.serif, fontSize:'clamp(22px,2.5vw,36px)', fontWeight:400, color:S.dark, margin:0 }}>Create a Floor Plan</h2>
+            <a href="/studio" style={{ fontFamily:"'DM Sans',sans-serif", fontSize:11, color:S.gold, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', textDecoration:'none' }}>Beginner's Guide →</a>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:12 }}>
+            {[
+              { icon:'🖼', label:'Import Image',  desc:'JPG, PNG floor plan',  action:'/studio', badge:null },
+              { icon:'📐', label:'Import CAD',    desc:'DXF / DWG files',      action:'/studio', badge:null },
+              { icon:'✏️', label:'New Design',    desc:'Start from scratch',   action:'/studio', badge:null },
+              { icon:'📁', label:'My Designs',    desc:'Open saved projects',  action:'/login',  badge:null },
+              { icon:'🤖', label:'AI Planner',    desc:'AI floor plan magic',  action:'/studio', badge:'NEW' },
+            ].map(card => (
+              <a key={card.label} href={card.action} style={{ textDecoration:'none', display:'block', padding:'28px 20px', background:'#fafaf9', border:'1px solid #e7e5e4', borderRadius:8, textAlign:'center', cursor:'pointer', transition:'all 0.2s', position:'relative' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor='#c9a227'; e.currentTarget.style.boxShadow='0 4px 20px rgba(201,162,39,0.12)'; e.currentTarget.style.background='#fff' }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor='#e7e5e4'; e.currentTarget.style.boxShadow='none'; e.currentTarget.style.background='#fafaf9' }}>
+                {card.badge && <span style={{ position:'absolute', top:10, right:10, background:'#ef4444', color:'#fff', fontSize:8, fontWeight:700, padding:'2px 6px', borderRadius:3, letterSpacing:'0.1em' }}>{card.badge}</span>}
+                <div style={{ fontSize:32, marginBottom:12 }}>{card.icon}</div>
+                <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:13, fontWeight:700, color:S.dark, margin:'0 0 4px' }}>{card.label}</p>
+                <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:11, color:'#78716c', margin:0 }}>{card.desc}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══ TEMPLATE GALLERY ──────────────────────────────────────────────────── */}
+      {(() => {
+        const STYLES_TABS = ['Mid-Century','Modern-Style','Minimalist','Japandi','Warm-Beige','Industrial','Scandinavian','Bohemian']
+        const TEMPLATES = [
+          { title:"Mommy's Kitchen",      author:'Emily Design',    img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=400&q=70', room:'Kitchen',     style:'Modern-Style' },
+          { title:'American Colonial',    author:'Ashley Goachee',  img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=400&q=70', room:'Living Room',  style:'Mid-Century' },
+          { title:'MK Bedroom Suite',     author:'Anastasia',       img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=400&q=70', room:'Bedroom',     style:'Minimalist' },
+          { title:'Nordic Living',        author:'Lena B',          img:'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=400&q=70', room:'Living Room',  style:'Scandinavian' },
+          { title:'Japandi Bedroom',      author:'Yuki M',          img:'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=400&q=70', room:'Bedroom',      style:'Japandi' },
+          { title:'Industrial Loft',      author:'Marco R',         img:'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=400&q=70', room:'Living Room',  style:'Industrial' },
+          { title:'Boho Sanctuary',       author:'Priya S',         img:'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=400&q=70', room:'Bedroom',      style:'Bohemian' },
+          { title:'Warm Dining Room',     author:'Carlos M',        img:'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=400&q=70', room:'Dining Room',  style:'Warm-Beige' },
+          { title:'Minimal Home Office',  author:'Riya K',          img:'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=400&q=70', room:'Home Office',  style:'Minimalist' },
+          { title:'Mid-Century Lounge',   author:'Tom H',           img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=400&q=70', room:'Living Room',  style:'Mid-Century' },
+          { title:'Luxe Master Bath',     author:'Sofia R',         img:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=400&q=70', room:'Bathroom',     style:'Modern-Style' },
+          { title:'Kids Wonderland',      author:'Nina P',          img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=400&q=70', room:'Kids Room',    style:'Bohemian' },
+          { title:'Cozy Reading Nook',    author:'Arjun V',         img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=70', room:'Home Office',  style:'Warm-Beige' },
+          { title:'Scandinavian Kitchen', author:'Ingrid L',        img:'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?auto=format&fit=crop&w=400&q=70', room:'Kitchen',      style:'Scandinavian' },
+          { title:'Dark Mode Living',     author:'Dev K',           img:'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=400&q=70', room:'Living Room',  style:'Industrial' },
+          { title:'Japandi Home Office',  author:'Kenji T',         img:'https://images.unsplash.com/photo-1634712282287-14ed57b9cc89?auto=format&fit=crop&w=400&q=70', room:'Home Office',  style:'Japandi' },
+          { title:'French Country',       author:'Marie D',         img:'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=400&q=70', room:'Living Room',  style:'Warm-Beige' },
+          { title:'Vastu Bedroom',        author:'Meera R',         img:'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=400&q=70', room:'Bedroom',      style:'Mid-Century' },
+          { title:'Smart Home Hub',       author:'Raj P',           img:'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?auto=format&fit=crop&w=400&q=70', room:'Living Room',  style:'Modern-Style' },
+          { title:'Marble Bath Luxury',   author:'Elena V',         img:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=400&q=70', room:'Bathroom',     style:'Minimalist' },
+        ]
+        return (
+          <TemplateGallery stylesArr={STYLES_TABS} templates={TEMPLATES} />
+        )
+      })()}
+
+      {/* ══ 3D DESIGN REFERENCES ─────────────────────────────────────────────── */}
+      <section style={{ padding:'80px 40px', background:'#0f1117' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto' }}>
+          <div style={{ textAlign:'center', marginBottom:48 }}>
+            <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:9, letterSpacing:'0.3em', textTransform:'uppercase', fontWeight:700, color:S.gold }}>3D Design References</span>
+            <h2 style={{ ...S.serif, fontSize:'clamp(28px,3vw,46px)', fontWeight:300, color:'#fff', margin:'12px 0 12px' }}>Enhance Your Designs with Realistic 3D</h2>
+            <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:14, color:'rgba(255,255,255,0.4)', maxWidth:540, margin:'0 auto' }}>
+              Browse 23+ photorealistic 3D interior references across every room type and style — click any to open in the studio.
+            </p>
+          </div>
+          {/* Style filter tabs */}
+          <ThreeDGallery />
+        </div>
+      </section>
+
+      {/* ══ 3D MODEL STRIP ───────────────────────────────────────────────────── */}
+      <section style={{ background:'#fff', padding:'72px 40px', borderBottom:'1px solid #f0ede8' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', textAlign:'center' }}>
+          <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:9, letterSpacing:'0.3em', textTransform:'uppercase', fontWeight:700, color:S.gold }}>Furniture & 3D Models</span>
+          <h2 style={{ ...S.serif, fontSize:'clamp(24px,2.8vw,42px)', fontWeight:300, color:S.dark, margin:'12px 0 12px' }}>
+            Enhance Your Designs with 10M+ Realistic 3D Models
+          </h2>
+          <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:14, color:'#78716c', maxWidth:520, margin:'0 auto 48px', lineHeight:1.8 }}>
+            Drag and drop from our curated furniture catalog — sofas, beds, kitchens, lighting and more, all in GLB/GLTF format.
+          </p>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:2, marginBottom:40 }}>
+            {[
+              { icon:'🛋', label:'Sofas',     count:'1,240+' },
+              { icon:'🛏', label:'Beds',      count:'840+'  },
+              { icon:'🍽', label:'Dining',    count:'620+'  },
+              { icon:'💡', label:'Lighting',  count:'980+'  },
+              { icon:'🚿', label:'Bathroom',  count:'430+'  },
+              { icon:'🍳', label:'Kitchen',   count:'560+'  },
+              { icon:'🪑', label:'Chairs',    count:'1,100+'},
+              { icon:'🗄', label:'Storage',   count:'720+'  },
+              { icon:'🌿', label:'Plants',    count:'390+'  },
+              { icon:'🖼', label:'Wall Art',  count:'850+'  },
+              { icon:'🪞', label:'Mirrors',   count:'280+'  },
+              { icon:'🪟', label:'Windows',   count:'340+'  },
+            ].map(cat => (
+              <a key={cat.label} href="/studio" style={{ textDecoration:'none', display:'block', padding:'20px 10px', background:'#fafaf9', border:'1px solid #e7e5e4', borderRadius:6, textAlign:'center', transition:'all 0.2s' }}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor=S.gold;e.currentTarget.style.background='#fff'}}
+                onMouseLeave={e=>{e.currentTarget.style.borderColor='#e7e5e4';e.currentTarget.style.background='#fafaf9'}}>
+                <div style={{ fontSize:24, marginBottom:8 }}>{cat.icon}</div>
+                <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:11, fontWeight:700, color:S.dark, margin:'0 0 2px' }}>{cat.label}</p>
+                <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:9, color:'#a8a29e', margin:0 }}>{cat.count}</p>
+              </a>
+            ))}
+          </div>
+          <a href="/studio" style={{ display:'inline-flex', alignItems:'center', gap:10, background:S.dark, color:'#fff', padding:'14px 36px', fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:11, letterSpacing:'0.18em', textTransform:'uppercase', textDecoration:'none' }}>
+            Browse Full Catalog →
+          </a>
+        </div>
+      </section>
 
       {/* ══ ABOUT / HOW WE WORK ──────────────────────────────────────────────── */}
       <section id="about" className="es-section" style={{ padding: '120px 64px', background: '#fff' }}>
