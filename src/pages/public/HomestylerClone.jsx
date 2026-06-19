@@ -835,7 +835,7 @@ function PlatformDemo() {
             ))}
           </ul>
           <div style={{ display:'flex', gap:12, alignItems:'center' }}>
-            <button onClick={() => window.location.href='/floor-plan-ai'}
+            <button onClick={() => window.location.href='/studio'}
               style={{ padding:'13px 28px', background:tab.color, border:'none', color:'#000', cursor:'pointer', fontSize:11, fontWeight:700, letterSpacing:'0.18em', textTransform:'uppercase', fontFamily:"'DM Sans',sans-serif", transition:'opacity 0.2s' }}
               onMouseEnter={e=>e.currentTarget.style.opacity='0.85'} onMouseLeave={e=>e.currentTarget.style.opacity='1'}>
               Open Studio — Free
@@ -962,7 +962,7 @@ export default function ElShaddaiHome() {
         {/* Desktop nav */}
         <div className="es-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
           {[['About', 'about'], ['Work', 'listings'], ['Services', 'services'], ['AI Design', null], ['Contact', 'contact']].map(([label, id]) => (
-            <button key={label} onClick={() => id ? scrollTo(id) : window.location.href = '/ai-design'}
+            <button key={label} onClick={() => id ? scrollTo(id) : window.location.href = '/studio'}
               style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: scrolled ? S.stone : 'rgba(255,255,255,0.8)', padding: '4px 0', transition: 'color 0.2s' }}
               onMouseEnter={e => e.currentTarget.style.color = scrolled ? S.dark : '#fff'}
               onMouseLeave={e => e.currentTarget.style.color = scrolled ? S.stone : 'rgba(255,255,255,0.8)'}>
@@ -1016,7 +1016,7 @@ export default function ElShaddaiHome() {
         <div style={{ position: 'fixed', inset: 0, zIndex: 999, background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 32 }}>
           <button onClick={() => setMenuOpen(false)} style={{ position: 'absolute', top: 24, right: 24, background: 'none', border: 'none', fontSize: 28, cursor: 'pointer', color: S.dark }}>×</button>
           {[['About','about'],['Work','listings'],['Services','services'],['AI Design',null],['Contact','contact']].map(([l, id]) => (
-            <button key={l} onClick={() => { setMenuOpen(false); id ? scrollTo(id) : window.location.href='/ai-design' }}
+            <button key={l} onClick={() => { setMenuOpen(false); id ? scrollTo(id) : window.location.href='/studio' }}
               style={{ ...S.serif, background: 'none', border: 'none', fontSize: 32, fontWeight: 300, color: S.dark, cursor: 'pointer', letterSpacing: '0.05em' }}>{l}</button>
           ))}
           <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
@@ -1044,7 +1044,7 @@ export default function ElShaddaiHome() {
             Spaces that tell<br />your story.
           </h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-            <button onClick={() => window.location.href = '/floor-plan-ai'}
+            <button onClick={() => window.location.href = '/studio'}
               style={{ ...S.sans, background: S.gold, border: 'none', color: '#000', padding: '14px 32px', fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
               <span>✦</span> Try Floor Plan Studio — Free
             </button>
@@ -1289,7 +1289,7 @@ export default function ElShaddaiHome() {
               Design smarter<br />with AI.
             </h2>
           </div>
-          <GoldBtn onClick={() => window.location.href = '/ai-design'} style={{ flexShrink: 0 }}>Try AI Designer →</GoldBtn>
+          <GoldBtn onClick={() => window.location.href = '/studio'} style={{ flexShrink: 0 }}>Try AI Designer →</GoldBtn>
         </div>
 
         <div className="es-ai-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 1, background: S.border }}>
@@ -1315,7 +1315,7 @@ export default function ElShaddaiHome() {
             <p style={{ fontSize: 14, color: S.stone, lineHeight: 1.8, marginBottom: 28, fontWeight: 300 }}>
               Type your room idea in plain English or Hindi. Our AI generates a complete 3D design with furniture, materials, lighting and a full ₹ cost breakdown — instantly.
             </p>
-            <GoldBtn onClick={() => window.location.href = '/ai-design'}>Generate Free Design →</GoldBtn>
+            <GoldBtn onClick={() => window.location.href = '/studio'}>Generate Free Design →</GoldBtn>
           </div>
           {/* Mock terminal */}
           <div style={{ background: S.dark, borderRadius: 4, overflow: 'hidden' }}>
@@ -1363,7 +1363,7 @@ export default function ElShaddaiHome() {
               Professional 2D floor planning, photorealistic 3D rendering and 9 AI integrations — all in one platform built for Indian homes.
             </p>
             <div style={{ display: 'flex', gap: 14 }}>
-              <GoldBtn onClick={() => window.location.href = '/designer'}>Open Designer</GoldBtn>
+              <GoldBtn onClick={() => window.location.href = '/studio'}>Open Designer</GoldBtn>
               <OutlineBtn light onClick={() => window.location.href = '/portfolio'}>View Portfolio</OutlineBtn>
             </div>
           </div>
@@ -1506,7 +1506,7 @@ export default function ElShaddaiHome() {
           {/* Cols */}
           {[
             { title: 'Navigate', links: [['About', () => scrollTo('about')], ['Our Work', () => scrollTo('listings')], ['Services', () => scrollTo('services')], ['Contact', () => scrollTo('contact')]] },
-            { title: 'Platform', links: [['3D Designer', () => window.location.href='/designer'], ['AI Design', () => window.location.href='/ai-design'], ['Portfolio', () => window.location.href='/portfolio'], ['Pricing', () => window.location.href='/pricing']] },
+            { title: 'Platform', links: [['3D Designer', () => window.location.href='/studio'], ['AI Design', () => window.location.href='/studio'], ['Portfolio', () => window.location.href='/portfolio'], ['Pricing', () => window.location.href='/pricing']] },
             { title: 'Company',  links: [['Blog', () => window.location.href='/blog'], ['Dashboard', () => window.location.href='/dashboard'], ['contactus@divinemercyitsol.com', null], ['www.divinemercyitsol.com', null]] },
           ].map(col => (
             <div key={col.title}>
