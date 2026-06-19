@@ -1340,18 +1340,25 @@ export default function ElShaddaiHome() {
             ) : (
               <form onSubmit={async e => {
                 e.preventDefault()
+                // Web3Forms — browser-side only, delivers to contactus@divinemercyitsol.com
                 try {
-                  await fetch('/api/contact', {
+                  await fetch('https://api.web3forms.com/submit', {
                     method:  'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body:    JSON.stringify({
-                      name:    form.name,
-                      email:   form.email,
-                      phone:   form.phone || 'Not provided',
-                      message: form.message,
+                    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                    body: JSON.stringify({
+                      access_key: '20e5a729-9a98-4234-b88a-470634b6d474',
+                      subject:    `New Enquiry from ${form.name} — El Shaddai Interiors`,
+                      from_name:  'El Shaddai Website',
+                      reply_to:   form.email,
+                      name:       form.name,
+                      email:      form.email,
+                      phone:      form.phone || 'Not provided',
+                      message:    form.message,
                     }),
                   })
                 } catch {}
+                // Also ping backend for SMS alert
+                try { await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: form.name, email: form.email, phone: form.phone, message: form.message }) }) } catch {}
                 setSent(true)
               }} style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>

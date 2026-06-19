@@ -52,10 +52,18 @@ export default function Footer() {
     e.preventDefault()
     setBusy(true)
     try {
-      await fetch('/api/contact', {
+      await fetch('https://api.web3forms.com/submit', {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ name: form.name, email: form.email, message: form.message }),
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: '20e5a729-9a98-4234-b88a-470634b6d474',
+          subject:    `New Enquiry from ${form.name} — El Shaddai Interiors`,
+          from_name:  'El Shaddai Website',
+          reply_to:   form.email,
+          name:       form.name,
+          email:      form.email,
+          message:    form.message,
+        }),
       })
     } catch {}
     setSent(true)
