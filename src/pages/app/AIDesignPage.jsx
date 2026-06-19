@@ -19,7 +19,7 @@ Client: ${prompt}
 Respond ONLY with valid JSON (no markdown):
 {"style":"...","desc":"2-3 sentences","palette":["#HEX1","#HEX2","#HEX3","#HEX4","#HEX5"],"palette_names":["Name1","Name2","Name3","Name4","Name5"],"items":[{"name":"...","qty":1,"unit":25000,"total":25000}]}
 Include 6-8 items. Keep total within budget. Use INR prices realistic for India.`
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ contents: [{ parts: [{ text: userPrompt }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 1024 } }),
   })

@@ -27,8 +27,8 @@ const QUICK_PROMPTS = [
 const MODELS = [
   ['gemini-2.0-flash',      'v1beta'],
   ['gemini-2.0-flash-lite', 'v1beta'],
-  ['gemini-1.5-flash',      'v1'],
-  ['gemini-1.5-flash-8b',   'v1'],
+  ['gemini-2.0-flash',      'v1'],
+  ['gemini-2.0-flash-8b',   'v1'],
 ]
 
 function demoReply(text) {

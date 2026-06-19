@@ -61,7 +61,7 @@ async function aiGenerateBoard(prompt) {
     }
   }
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
     { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ contents:[{ role:'user', parts:[{ text:`Create an interior design mood board concept for: "${prompt}". Return JSON: { board_name, palette (5 hex codes), palette_names (5 names), description (2 sentences), keywords (5 words), materials (4 items), tiles (4 tile ids from: t1-t12), furniture (3 furniture ids from: f1-f8) }. No markdown.` }] }], generationConfig:{ temperature:0.8, maxOutputTokens:512 } }) }
   )

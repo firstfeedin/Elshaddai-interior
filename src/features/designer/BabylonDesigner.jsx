@@ -430,7 +430,7 @@ export default function BabylonDesigner({ onSave, onSwitch2D, floorPlanData }) {
     const prompt = `You are an expert Indian interior designer. Suggest 5 specific furniture pieces for a ${roomStyle.label} style room of ${roomArea} m² (${roomW}m × ${roomD}m, ${roomH}m height). Currently placed: ${existingFurniture}. Suggest items that complement the ${roomStyle.label} aesthetic. Format each suggestion as: "Item Name — brief reason (₹price range)". Focus on practical Indian market items.`
 
     try {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ contents:[{ parts:[{ text:prompt }] }] })
       })

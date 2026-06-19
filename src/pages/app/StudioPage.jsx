@@ -105,7 +105,7 @@ Catalog items (id, name, cat): ${CATALOG_ITEMS.map(i => `${i.id}:${i.name}(${i.c
 Materials: ${MATERIALS_CATALOG.map(m => m.name).join(', ')}
 Respond ONLY with valid JSON: {"itemIds":[1,2,3,4,5,6],"materialNames":["White Oak","Marble Carrara"],"tips":["tip1","tip2","tip3"]}`
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
       { method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.5,maxOutputTokens:512} }) }
     )
@@ -125,7 +125,7 @@ async function analyzeFloorPlan(base64, mimeType) {
   if (!GEMINI_KEY) return null
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
