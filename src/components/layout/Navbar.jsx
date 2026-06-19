@@ -133,9 +133,7 @@ function SearchBox() {
 export default function Navbar() {
   const [scrolled,  setScrolled]  = useState(false)
   const [menuOpen,  setMenuOpen]  = useState(false)
-  const [showUser,  setShowUser]  = useState(false)
   const [hovered,   setHovered]   = useState('')
-  const userRef = useRef(null)
   const location = useLocation()
 
   const user     = JSON.parse(localStorage.getItem('es_user') || 'null')
@@ -145,12 +143,6 @@ export default function Navbar() {
     const onScroll = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', onScroll, { passive:true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  useEffect(() => {
-    const off = e => { if (!userRef.current?.contains(e.target)) setShowUser(false) }
-    document.addEventListener('mousedown', off)
-    return () => document.removeEventListener('mousedown', off)
   }, [])
 
   useEffect(() => {
@@ -305,68 +297,53 @@ export default function Navbar() {
             <div className="desktop-only"><SearchBox /></div>
 
             {user ? (
-              /* ── Logged-in user ───────────────────────────────────────── */
-              <div ref={userRef} style={{ position:'relative', display:'flex', alignItems:'center', gap:10 }}>
-                <div style={{ textAlign:'right' }} className="desktop-only">
-                  <p style={{ margin:0, fontSize:11, fontWeight:700, color:'#fff', letterSpacing:'0.02em' }}>{user.name}</p>
-                  <p style={{ margin:0, fontSize:9, color:G, letterSpacing:'0.18em', textTransform:'uppercase', fontFamily:F }}>{ROLE_LABEL[user.role]||user.role}</p>
-                </div>
-                <button onClick={()=>setShowUser(v=>!v)}
-                  style={{
-                    width:38, height:38, background:`linear-gradient(135deg,${G},${G2})`,
-                    border:'none', fontFamily:F, fontWeight:900, fontSize:12, color:D,
-                    display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0,
-                    letterSpacing:'0.04em', cursor:'pointer',
-                    boxShadow:`0 4px 16px rgba(201,162,39,0.4)`,
-                    transition:'transform 0.2s',
-                  }}
-                  onMouseEnter={e=>e.currentTarget.style.transform='scale(1.08)'}
-                  onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'}>
-                  {initials}
-                </button>
-
-                {showUser && (
-                  <div style={{
-                    position:'absolute', top:'calc(100% + 14px)', right:0, width:230,
-                    background:'#14121a', border:`1px solid rgba(201,162,39,0.25)`,
-                    boxShadow:'0 24px 64px rgba(0,0,0,0.6)', zIndex:9999,
-                  }}>
-                    <div style={{ padding:'16px 18px', borderBottom:'1px solid rgba(255,255,255,0.06)' }}>
-                      <p style={{ margin:0, fontSize:12, fontWeight:700, color:'#fff', fontFamily:F }}>{user.name}</p>
-                      <p style={{ margin:'3px 0 0', fontSize:10, color:'#6b6580', fontFamily:F }}>{user.email}</p>
-                      <span style={{ display:'inline-block', marginTop:6, fontSize:8, fontWeight:800, letterSpacing:'0.2em', textTransform:'uppercase', color:G, background:`rgba(201,162,39,0.12)`, padding:'3px 8px', fontFamily:F }}>
-                        {ROLE_LABEL[user.role]||user.role}
-                      </span>
-                    </div>
-                    {[
-                      { label:'⊞  Dashboard',    route:'/dashboard'     },
-                      { label:'◈  Design Studio', route:'/studio'        },
-                      { label:'◻  My Profile',    route:'/settings'      },
-                      { label:'⊕  Notifications', route:'/notifications' },
-                    ].map(item=>(
-                      <a key={item.route} href={item.route}
-                        style={{
-                          display:'block', padding:'11px 18px', fontFamily:F, fontSize:11,
-                          color:'rgba(255,255,255,0.75)', borderBottom:'1px solid rgba(255,255,255,0.04)',
-                          transition:'all 0.15s', textDecoration:'none', letterSpacing:'0.04em',
-                        }}
-                        onMouseEnter={e=>{e.currentTarget.style.background='rgba(201,162,39,0.08)';e.currentTarget.style.color=G}}
-                        onMouseLeave={e=>{e.currentTarget.style.background='transparent';e.currentTarget.style.color='rgba(255,255,255,0.75)'}}>
-                        {item.label}
-                      </a>
-                    ))}
-                    <button onClick={doLogout}
+              /* ── Logged-in: flat inline links ─────────────────────────── */
+              <div style={{ display:'flex', alignItems:'center', gap:4 }} className="desktop-only">
+                {[
+                  { label:'Dashboard',     href:'/dashboard'     },
+                  { label:'Studio',        href:'/studio'        },
+                  { label:'Profile',       href:'/settings'      },
+                  { label:'Notifications', href:'/notifications' },
+                ].map(item => {
+                  const active = isActive(item.href)
+                  return (
+                    <a key={item.href} href={item.href}
                       style={{
-                        display:'block', width:'100%', padding:'12px 18px', background:'none',
-                        border:'none', textAlign:'left', fontFamily:F, fontSize:11, color:'#ef4444',
-                        fontWeight:600, letterSpacing:'0.04em', cursor:'pointer', transition:'background 0.15s',
+                        fontFamily:F, fontSize:10, letterSpacing:'0.18em', textTransform:'uppercase',
+                        fontWeight:700, color: active ? G : 'rgba(255,255,255,0.7)',
+                        padding:'22px 13px', textDecoration:'none', position:'relative',
+                        transition:'color 0.2s', display:'block',
                       }}
-                      onMouseEnter={e=>e.currentTarget.style.background='rgba(239,68,68,0.08)'}
-                      onMouseLeave={e=>e.currentTarget.style.background='none'}>
-                      ⎋  Sign Out
-                    </button>
-                  </div>
-                )}
+                      onMouseEnter={e=>e.currentTarget.style.color=G}
+                      onMouseLeave={e=>e.currentTarget.style.color=active?G:'rgba(255,255,255,0.7)'}>
+                      {item.label}
+                      <span style={{
+                        position:'absolute', bottom:16, left:13, right:13, height:1,
+                        background:`linear-gradient(90deg,${G},${G2})`,
+                        transform:`scaleX(${active?1:0})`,
+                        transformOrigin:'left', transition:'transform 0.25s cubic-bezier(0.4,0,0.2,1)',
+                      }}/>
+                    </a>
+                  )
+                })}
+                <div style={{ width:1, height:20, background:'rgba(255,255,255,0.12)', margin:'0 6px' }} />
+                <div style={{
+                  width:32, height:32, background:`linear-gradient(135deg,${G},${G2})`,
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  fontFamily:F, fontWeight:900, fontSize:11, color:D, flexShrink:0,
+                  boxShadow:`0 2px 10px rgba(196,149,106,0.4)`,
+                }}>{initials}</div>
+                <button onClick={doLogout}
+                  style={{
+                    fontFamily:F, fontSize:10, letterSpacing:'0.18em', textTransform:'uppercase',
+                    fontWeight:700, color:'rgba(239,68,68,0.7)', background:'none',
+                    border:'1px solid rgba(239,68,68,0.25)', cursor:'pointer',
+                    padding:'8px 16px', marginLeft:4, transition:'all 0.2s',
+                  }}
+                  onMouseEnter={e=>{e.currentTarget.style.color='#ef4444';e.currentTarget.style.borderColor='rgba(239,68,68,0.6)'}}
+                  onMouseLeave={e=>{e.currentTarget.style.color='rgba(239,68,68,0.7)';e.currentTarget.style.borderColor='rgba(239,68,68,0.25)'}}>
+                  Sign Out
+                </button>
               </div>
             ) : (
               /* ── Guest CTAs ────────────────────────────────────────────── */
