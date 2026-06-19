@@ -342,12 +342,23 @@ button { font-family: var(--font-body); cursor: pointer; }
 * { cursor: auto; }
 a, button, [role="button"] { cursor: pointer; }
 
-/* ── Mobile responsive helpers ─────────────────────────────────────────────── */
+/* ── Navbar layout helpers ──────────────────────────────────────────────────── */
+/* Desktop: show nav + search, hide hamburger */
+.desktop-nav    { display: flex !important; }
+.desktop-only   { display: flex !important; }
+.mobile-hamburger { display: none !important; }
+
+/* ── Mobile responsive helpers ──────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .desktop-nav  { display: none !important; }
+  .desktop-only { display: none !important; }
+  .mobile-hamburger { display: flex !important; }
+}
 @media (max-width: 768px) {
-  .section-pad   { padding: 64px 20px; }
+  .section-pad    { padding: 64px 20px; }
   .section-pad-sm { padding: 40px 20px; }
-  .mobile-hide   { display: none !important; }
+  .mobile-hide    { display: none !important; }
 }
 @media (max-width: 480px) {
-  .section-pad   { padding: 48px 16px; }
+  .section-pad  { padding: 48px 16px; }
 }

@@ -3,10 +3,9 @@
   "configurations": [
     {
       "name": "El Shaddai Dev",
-      "runtimeExecutable": "cmd",
-      "runtimeArgs": ["/c", "cd divinemercyitsolutions && npm run dev"],
-      "port": 5173,
-      "autoPort": false
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5173
     }
   ]
 }
