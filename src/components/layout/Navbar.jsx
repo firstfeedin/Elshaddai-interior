@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom'
 /* ─── Nav link definitions ────────────────────────────────────────────────── */
 const NAV_LINKS = [
   { label: 'Studio',    href: '/studio'    },
-  { label: 'Services',  href: '/#services' },
+  { label: 'Gallery',   href: '/gallery'   },
   { label: 'Portfolio', href: '/portfolio' },
   { label: 'Pricing',   href: '/pricing'   },
   { label: 'Blog',      href: '/blog'      },
