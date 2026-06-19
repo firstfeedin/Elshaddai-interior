@@ -35,9 +35,9 @@ const ROLE_LABEL = {
 }
 
 /* ─── Design tokens ────────────────────────────────────────────────────────── */
-const G   = '#c9a227'
-const G2  = '#e8c84e'
-const D   = '#0a0805'
+const G   = '#c4956a'
+const G2  = '#d4a882'
+const D   = '#2a0e14'
 const F   = "'DM Sans',system-ui,sans-serif"
 const FS  = "'Cormorant Garamond',serif"
 
@@ -181,7 +181,7 @@ export default function Navbar() {
       {/* ── Announcement strip (top gold bar) ────────────────────────────── */}
       <div style={{
         position:'fixed', top:0, left:0, right:0, zIndex:9002,
-        background: `linear-gradient(90deg, ${D} 0%, #1a1208 40%, #1a1208 60%, ${D} 100%)`,
+        background: `linear-gradient(90deg, ${D} 0%, #3d141e 40%, #3d141e 60%, ${D} 100%)`,
         borderBottom:`1px solid rgba(201,162,39,0.3)`,
         padding:'6px 40px',
         display:'flex', alignItems:'center', justifyContent:'center', gap:32,

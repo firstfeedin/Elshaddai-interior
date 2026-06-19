@@ -45,6 +45,9 @@ body.cursor-hover .es-cursor-ring{width:54px;height:54px;opacity:0.4}
 @keyframes titleIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
 @keyframes lineGrow{from{width:0}to{width:100%}}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes float3d{0%,100%{transform:perspective(1000px) rotateY(-6deg) translateY(0)}50%{transform:perspective(1000px) rotateY(-6deg) translateY(-10px)}}
+@keyframes float3dR{0%,100%{transform:perspective(1000px) rotateY(6deg) translateY(0)}50%{transform:perspective(1000px) rotateY(6deg) translateY(-10px)}}
+@keyframes arrowPulse{0%,100%{opacity:0.45;transform:translateX(0)}50%{opacity:1;transform:translateX(6px)}}
 
 .hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;animation:heroFade 18s ease-in-out infinite}
 .hero-img:nth-child(1){animation-delay:0s}
@@ -210,6 +213,48 @@ function BeforeAfter() {
   )
 }
 
+/* ─── Video Glimpse ──────────────────────────────────────────────────────── */
+function VideoGlimpse() {
+  const [frame, setFrame] = useState(0)
+  const FRAMES = [
+    { src:'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=1200&q=80', label:'Empty room — your starting point' },
+    { src:'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80', label:'Step 1 — Draw your 2D floor plan' },
+    { src:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80', label:'Step 2 — Add furniture & finishes' },
+    { src:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80', label:'Step 3 — Your 3D design is ready' },
+  ]
+  useEffect(() => {
+    const t = setInterval(() => setFrame(f => (f + 1) % FRAMES.length), 2800)
+    return () => clearInterval(t)
+  }, [])
+  return (
+    <div style={{ position:'relative', height:520, overflow:'hidden', cursor:'pointer' }} onClick={() => { window.location.href = '/studio' }}>
+      {FRAMES.map((f, i) => (
+        <div key={i} style={{ position:'absolute', inset:0, opacity: frame===i ? 1 : 0, transition:'opacity 0.9s ease', zIndex: frame===i ? 1 : 0 }}>
+          <img src={f.src} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} loading="lazy" />
+        </div>
+      ))}
+      {/* Overlay */}
+      <div style={{ position:'absolute', inset:0, zIndex:2, background:'rgba(30,10,14,0.48)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:28 }}>
+        {/* Play circle */}
+        <div style={{ width:80, height:80, border:`2px solid rgba(255,255,255,0.75)`, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.3s', backdropFilter:'blur(4px)' }}
+          onMouseEnter={e => { e.currentTarget.style.background = GOLD; e.currentTarget.style.borderColor = GOLD }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.75)' }}>
+          <div style={{ width:0, height:0, borderTop:'13px solid transparent', borderBottom:'13px solid transparent', borderLeft:`20px solid ${WHITE}`, marginLeft:6 }} />
+        </div>
+        <p style={{ fontFamily:SS, fontSize:14, fontWeight:300, color:'rgba(255,255,255,0.9)', letterSpacing:'0.06em', textAlign:'center' }}>{FRAMES[frame].label}</p>
+        <span style={{ fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.3em', textTransform:'uppercase', color:GOLD }}>Open Studio to Start →</span>
+      </div>
+      {/* Progress dots */}
+      <div style={{ position:'absolute', bottom:28, left:'50%', transform:'translateX(-50%)', display:'flex', gap:8, zIndex:3 }}>
+        {FRAMES.map((_,i) => (
+          <button key={i} onClick={e => { e.stopPropagation(); setFrame(i) }}
+            style={{ width: frame===i ? 28 : 8, height:4, background: frame===i ? GOLD : 'rgba(255,255,255,0.35)', border:'none', padding:0, cursor:'pointer', transition:'all 0.35s', outline:'none' }} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 /* ─── Main ───────────────────────────────────────────────────────────────── */
 export default function HomePage() {
   const nav = useNavigate()
@@ -340,6 +385,79 @@ export default function HomePage() {
       <Rule />
 
       {/* ══════════════════════════════════════════════════════════════════
+          II-B. STUDIO PREVIEW — 2D draft → 3D reality
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ background:DARK, padding:'120px clamp(40px,8vw,160px)' }}>
+        <div style={{ maxWidth:1200, margin:'0 auto' }}>
+
+          <div className="r" style={{ textAlign:'center', marginBottom:72 }}>
+            <SectionLabel>Studio Preview</SectionLabel>
+            <div style={{ width:36, height:1, background:GOLD, margin:'20px auto 36px' }} />
+            <h2 style={{ fontFamily:SF, fontSize:'clamp(38px,4.5vw,68px)', fontWeight:300, color:WHITE, lineHeight:1.05 }}>
+              2D draft. <em style={{ fontStyle:'italic', color:GOLD }}>3D reality.</em>
+            </h2>
+            <p style={{ fontFamily:SS, fontSize:14, fontWeight:300, color:'rgba(255,255,255,0.42)', marginTop:20, lineHeight:1.9 }}>
+              Draw your floor plan — watch it become a walkable 3D room in real time.
+            </p>
+          </div>
+
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 72px 1fr', alignItems:'center' }} className="col-sm">
+
+            {/* 2D Panel */}
+            <div className="rl" style={{ animation:'float3d 6s ease-in-out infinite' }}>
+              <div style={{ background:'rgba(255,255,255,0.04)', border:`1px solid rgba(255,255,255,0.1)`, overflow:'hidden' }}>
+                <div style={{ position:'relative' }}>
+                  <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=700&q=80" alt="2D Floor Plan"
+                    style={{ width:'100%', height:360, objectFit:'cover', display:'block', filter:'grayscale(0.15) brightness(0.88)' }} loading="lazy" />
+                  <div style={{ position:'absolute', top:16, left:16, background:'rgba(0,0,0,0.72)', padding:'6px 14px', backdropFilter:'blur(4px)' }}>
+                    <span style={{ fontFamily:SS, fontSize:8, fontWeight:700, letterSpacing:'0.3em', textTransform:'uppercase', color:WHITE }}>2D Floor Plan</span>
+                  </div>
+                </div>
+                <div style={{ padding:'20px 24px', borderTop:'1px solid rgba(255,255,255,0.07)' }}>
+                  <p style={{ fontFamily:SS, fontSize:11, color:'rgba(255,255,255,0.42)', margin:0, lineHeight:1.7 }}>Snap grid · AI generation · 500+ templates</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Arrow connector */}
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }} className="hide-sm">
+              <div style={{ width:1, height:40, background:'rgba(196,149,106,0.25)' }} />
+              <div style={{ width:40, height:40, border:`1px solid ${GOLD}`, display:'flex', alignItems:'center', justifyContent:'center', animation:'arrowPulse 1.8s ease-in-out infinite' }}>
+                <span style={{ color:GOLD, fontSize:16, fontFamily:SS }}>→</span>
+              </div>
+              <div style={{ width:1, height:40, background:'rgba(196,149,106,0.25)' }} />
+            </div>
+
+            {/* 3D Panel */}
+            <div className="rr" style={{ animation:'float3dR 6s ease-in-out 1s infinite' }}>
+              <div style={{ border:`1px solid rgba(196,149,106,0.3)`, overflow:'hidden', boxShadow:`0 32px 80px rgba(196,149,106,0.12)` }}>
+                <div style={{ position:'relative' }}>
+                  <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=700&q=80" alt="3D Render"
+                    style={{ width:'100%', height:360, objectFit:'cover', display:'block' }} loading="lazy" />
+                  <div style={{ position:'absolute', top:16, left:16, background:GOLD, padding:'6px 14px' }}>
+                    <span style={{ fontFamily:SS, fontSize:8, fontWeight:700, letterSpacing:'0.3em', textTransform:'uppercase', color:DARK }}>3D Live View</span>
+                  </div>
+                </div>
+                <div style={{ padding:'20px 24px', background:'rgba(196,149,106,0.06)', borderTop:`1px solid rgba(196,149,106,0.2)` }}>
+                  <p style={{ fontFamily:SS, fontSize:11, color:'rgba(255,255,255,0.52)', margin:0, lineHeight:1.7 }}>Photorealistic render · AR preview · PDF export</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="r" style={{ textAlign:'center', marginTop:64 }}>
+            <button onClick={() => nav('/studio')}
+              style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.3em', textTransform:'uppercase', color:DARK, background:GOLD, border:'none', padding:'18px 60px', cursor:'none', transition:'opacity 0.3s' }}
+              onMouseEnter={e => e.currentTarget.style.opacity='0.82'}
+              onMouseLeave={e => e.currentTarget.style.opacity='1'}>
+              ✦ Try the Studio — Free
+            </button>
+            <p style={{ fontFamily:SS, fontSize:10, color:'rgba(255,255,255,0.22)', marginTop:20, letterSpacing:'0.14em' }}>No signup · No download · Works in any browser</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════
           III. ROOM SHOWCASE — Alternating editorial blocks
       ══════════════════════════════════════════════════════════════════ */}
       <section style={{ background:WHITE, padding:'120px 0' }}>
@@ -436,36 +554,76 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════
-          V. PROCESS — Editorial numbered steps
+          V. HOW IT WORKS — Draw · Decorate · Render
       ══════════════════════════════════════════════════════════════════ */}
       <section style={{ background:CREAM, padding:'140px clamp(40px,8vw,160px)' }}>
         <div style={{ maxWidth:1200, margin:'0 auto' }}>
 
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:100, alignItems:'end', marginBottom:80 }} className="col-sm">
-            <div className="rl">
-              <SectionLabel>How It Works</SectionLabel>
-              <div style={{ width:36, height:1, background:GOLD, margin:'20px 0 44px' }} />
-              <h2 style={{ fontFamily:SF, fontSize:'clamp(38px,4vw,66px)', fontWeight:300, color:DARK, lineHeight:1.05 }}>
-                From blank room<br />to <em style={{ fontStyle:'italic', color:GOLD }}>finished design</em><br />in minutes.
-              </h2>
-            </div>
-            <p className="rr" style={{ fontFamily:SS, fontSize:15, fontWeight:300, color:MUTED, lineHeight:1.95 }}>
-              Our studio removes every barrier between your vision and a beautiful space. No training required. No software to install. No design degree needed — only imagination.
+          {/* Header */}
+          <div style={{ textAlign:'center', marginBottom:72 }} className="r">
+            <SectionLabel>How It Works</SectionLabel>
+            <div style={{ width:36, height:1, background:GOLD, margin:'20px auto 40px' }} />
+            <h2 style={{ fontFamily:SF, fontSize:'clamp(44px,5.5vw,82px)', fontWeight:300, color:DARK, lineHeight:1.0 }}>
+              Three steps.<br /><em style={{ fontStyle:'italic', color:GOLD }}>Infinite possibilities.</em>
+            </h2>
+            <p style={{ fontFamily:SS, fontSize:15, fontWeight:300, color:MUTED, marginTop:28, lineHeight:1.9, maxWidth:500, margin:'28px auto 0' }}>
+              No design degree. No software to install. Just open your browser and start creating.
             </p>
           </div>
 
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:0 }} className="col-sm">
+          {/* Step cards */}
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:3, marginBottom:60 }} className="col-sm">
             {[
-              { n:'01', title:'Draw Your Floor Plan', desc:'Sketch walls, doors, and windows with precision snap tools. Import a photo of your current room or start from one of 500+ templates.' },
-              { n:'02', title:'Furnish & Style',       desc:'Browse 150+ curated furniture pieces, apply wall colours, flooring finishes, and ceiling materials. Every change reflects instantly in 3D.' },
-              { n:'03', title:'Visualise & Share',     desc:'See your room in photorealistic 3D, view in AR, export a professional PDF report, or share a link directly with clients or family.' },
-            ].map(({ n, title, desc }, i) => (
-              <div key={i} className="r" style={{ animationDelay:`${i*100}ms`, borderLeft: i>0 ? `1px solid rgba(0,0,0,0.08)` : 'none', padding: i>0 ? '60px 0 60px 60px' : '60px 60px 60px 0', borderTop: '1px solid rgba(0,0,0,0.08)' }}>
-                <div style={{ fontFamily:SF, fontSize:'clamp(56px,6vw,88px)', fontWeight:300, color:'rgba(0,0,0,0.06)', lineHeight:1, marginBottom:32 }}>{n}</div>
-                <h3 style={{ fontFamily:SS, fontSize:15, fontWeight:600, color:DARK, marginBottom:16 }}>{title}</h3>
-                <p style={{ fontFamily:SS, fontSize:13, fontWeight:300, color:MUTED, lineHeight:1.9 }}>{desc}</p>
+              {
+                n:'01', title:'Draw', sub:'Your Floor Plan',
+                desc:'Sketch walls, doors and windows with precision snap tools. Or describe your room in text — AI draws the floor plan for you instantly.',
+                img:'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=80',
+                tag:'Snap grid · AI draft · 500+ templates',
+              },
+              {
+                n:'02', title:'Decorate', sub:'Add Furniture & Finishes',
+                desc:'Browse 150+ curated furniture pieces. Choose wall colours, flooring and ceiling finishes. Every selection reflects immediately in the live 3D view.',
+                img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=600&q=80',
+                tag:'150+ furniture · 30+ finishes · Live 3D',
+              },
+              {
+                n:'03', title:'Render', sub:'See & Share in 3D',
+                desc:'View your completed room in photorealistic 3D, explore in AR on your phone, export a professional PDF report, or share a link.',
+                img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80',
+                tag:'3D render · AR preview · PDF export',
+              },
+            ].map(({ n, title, sub, desc, img, tag }, i) => (
+              <div key={i} className="rs" style={{ animationDelay:`${i*110}ms`, background:WHITE, overflow:'hidden', cursor:'none', display:'flex', flexDirection:'column', transition:'transform 0.35s,box-shadow 0.35s', border:'1px solid rgba(0,0,0,0.05)' }}
+                onMouseEnter={e => { e.currentTarget.style.transform='translateY(-6px)'; e.currentTarget.style.boxShadow='0 32px 80px rgba(0,0,0,0.13)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform='none'; e.currentTarget.style.boxShadow='none' }}
+                onClick={() => nav('/studio')}>
+                {/* Image */}
+                <div className="img-wrap" style={{ position:'relative', height:280 }}>
+                  <img src={img} alt={title} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} loading="lazy" />
+                  <div style={{ position:'absolute', inset:0, background:`linear-gradient(to bottom, transparent 50%, rgba(42,14,20,0.6) 100%)` }} />
+                  <div style={{ position:'absolute', top:20, left:20, width:52, height:52, background:DARK, display:'flex', alignItems:'center', justifyContent:'center', border:`1px solid rgba(196,149,106,0.35)` }}>
+                    <span style={{ fontFamily:SF, fontSize:22, fontWeight:300, color:GOLD }}>{n}</span>
+                  </div>
+                </div>
+                {/* Text */}
+                <div style={{ padding:'32px 28px 36px', flex:1, display:'flex', flexDirection:'column' }}>
+                  <h3 style={{ fontFamily:SF, fontSize:40, fontWeight:300, color:DARK, lineHeight:1, margin:'0 0 4px' }}>{title}</h3>
+                  <div style={{ fontFamily:SS, fontSize:8, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:GOLD, marginBottom:20 }}>{sub}</div>
+                  <p style={{ fontFamily:SS, fontSize:13, fontWeight:300, color:MUTED, lineHeight:1.9, margin:'0 0 24px', flex:1 }}>{desc}</p>
+                  <p style={{ fontFamily:SS, fontSize:9, color:'rgba(0,0,0,0.28)', letterSpacing:'0.09em', margin:0 }}>{tag}</p>
+                </div>
               </div>
             ))}
+          </div>
+
+          {/* CTA */}
+          <div style={{ textAlign:'center' }} className="r">
+            <button onClick={() => nav('/studio')}
+              style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.3em', textTransform:'uppercase', color:WHITE, background:DARK, border:`2px solid ${DARK}`, padding:'18px 60px', cursor:'none', transition:'all 0.3s' }}
+              onMouseEnter={e => { e.currentTarget.style.background='transparent'; e.currentTarget.style.color=DARK }}
+              onMouseLeave={e => { e.currentTarget.style.background=DARK; e.currentTarget.style.color=WHITE }}>
+              Start Designing — It's Free →
+            </button>
           </div>
         </div>
       </section>
@@ -526,6 +684,29 @@ export default function HomePage() {
                 <img src={g.img} alt="" style={{ width:'100%', height:g.h, objectFit:'cover', display:'block' }} loading="lazy" />
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          VII-B. STUDIO IN ACTION — Animated design walkthrough
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ background:DARK2 }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', padding:'100px clamp(40px,6vw,100px)' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:48 }} className="col-sm">
+            <div className="rl">
+              <SectionLabel>Studio in Action</SectionLabel>
+              <div style={{ width:36, height:1, background:GOLD, margin:'20px 0 32px' }} />
+              <h2 style={{ fontFamily:SF, fontSize:'clamp(34px,4vw,58px)', fontWeight:300, color:WHITE, lineHeight:1.05 }}>
+                See the design<br />process unfold.
+              </h2>
+            </div>
+            <p className="rr" style={{ fontFamily:SS, fontSize:13, fontWeight:300, color:'rgba(255,255,255,0.42)', maxWidth:320, lineHeight:1.9, textAlign:'right', paddingBottom:4 }}>
+              From empty room to furnished 3D space — watch every step of the El Shaddai design workflow. Click to open the studio.
+            </p>
+          </div>
+          <div className="rs">
+            <VideoGlimpse />
           </div>
         </div>
       </section>
