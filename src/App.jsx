@@ -57,6 +57,9 @@ const MaterialSpecPage   = lazy(() => import('./pages/app/MaterialSpecPage'))
 const NotFoundPage       = lazy(() => import('./pages/public/NotFoundPage'))
 const StudioPage         = lazy(() => import('./pages/app/StudioPage'))
 const GalleryPage        = lazy(() => import('./pages/public/GalleryPage'))
+const AboutPage          = lazy(() => import('./pages/public/AboutPage'))
+const PrivacyPage        = lazy(() => import('./pages/public/PrivacyPage'))
+const TermsPage          = lazy(() => import('./pages/public/TermsPage'))
 
 function CookieConsent() {
   const [show, setShow] = useState(false)
@@ -75,11 +78,11 @@ function CookieConsent() {
     }}>
       <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.65)', maxWidth: 680, lineHeight: 1.6 }}>
         We use cookies to enhance your experience and analyse site usage. By continuing, you agree to our{' '}
-        <a href="#" style={{ color: '#c9a227', textDecoration: 'none' }}>Privacy Policy</a>.
+        <a href="/privacy-policy" style={{ color: '#c4956a', textDecoration: 'none' }}>Privacy Policy</a>.
       </p>
       <div style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
         <button onClick={() => setShow(false)} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.5)', padding: '8px 20px', fontSize: 11, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', cursor: 'pointer' }}>Decline</button>
-        <button onClick={accept} style={{ background: '#c9a227', border: 'none', color: '#000', padding: '8px 24px', fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', cursor: 'pointer' }}>Accept</button>
+        <button onClick={accept} style={{ background: '#c4956a', border: 'none', color: '#fff', padding: '8px 24px', fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', cursor: 'pointer' }}>Accept</button>
       </div>
     </div>
   )
@@ -87,7 +90,7 @@ function CookieConsent() {
 
 const Spinner = () => (
   <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fafaf9', flexDirection: 'column', gap: 14, fontFamily: "'DM Sans',sans-serif" }}>
-    <div style={{ width: 36, height: 36, border: '2px solid #e7e5e4', borderTopColor: '#c9a227', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+    <div style={{ width: 36, height: 36, border: '2px solid #e7e5e4', borderTopColor: '#c4956a', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
     <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     <p style={{ margin: 0, fontSize: 12, color: '#a8a29e' }}>Loading…</p>
   </div>
@@ -113,8 +116,11 @@ export default function App() {
             <Route path="/portfolio"   element={<PortfolioPage />} />
             <Route path="/blog"        element={<BlogPage />} />
             <Route path="/studio"      element={<StudioPage />} />
-            <Route path="/gallery"     element={<GalleryPage />} />
-            <Route path="/my-projects" element={<ProjectsPage />} />
+            <Route path="/gallery"        element={<GalleryPage />} />
+            <Route path="/about"          element={<AboutPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPage />} />
+            <Route path="/terms-of-service" element={<TermsPage />} />
+            <Route path="/my-projects"    element={<ProjectsPage />} />
 
             {/* ── Protected — all authenticated users ── */}
             <Route path="/dashboard"        element={<P><DashboardPage /></P>} />

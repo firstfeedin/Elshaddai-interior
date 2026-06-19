@@ -136,7 +136,7 @@ export default function Portfolio() {
         </div>
 
         <div className="text-center mt-12">
-          <a href="#contact" className="btn-outline px-10 py-4">
+          <a href="/#contact" className="btn-outline px-10 py-4">
             View All 2400+ Projects →
           </a>
         </div>

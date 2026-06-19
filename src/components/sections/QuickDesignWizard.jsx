@@ -234,7 +234,7 @@ function DesignResult({ form, onReset }) {
 
         {/* ── CTAs ── */}
         <div className="flex flex-col gap-3 pt-1">
-          <a href="#contact" className="w-full py-4 bg-gold-500 hover:bg-gold-600 text-white font-body font-bold text-sm rounded-sm text-center transition-colors duration-200 shadow-lg shadow-gold-500/30">
+          <a href="/#contact" className="w-full py-4 bg-gold-500 hover:bg-gold-600 text-white font-body font-bold text-sm rounded-sm text-center transition-colors duration-200 shadow-lg shadow-gold-500/30">
             ✦ Book Free Site Visit & Exact Quote
           </a>
           <div className="flex gap-3">

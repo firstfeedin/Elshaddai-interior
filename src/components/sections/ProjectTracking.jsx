@@ -127,7 +127,7 @@ export default function ProjectTracking() {
               ))}
             </div>
 
-            <a href="#contact" className="btn-gold w-full justify-center mt-6 text-xs py-3">
+            <a href="/#contact" className="btn-gold w-full justify-center mt-6 text-xs py-3">
               Track My Project
             </a>
           </div>

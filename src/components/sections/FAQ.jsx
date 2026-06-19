@@ -49,7 +49,7 @@ export default function FAQ() {
             Questions We Get Asked
           </h2>
           <p className="font-body text-stone-500 text-sm">
-            Can't find your answer? <a href="#contact" className="text-gold-600 hover:underline font-semibold">Talk to our team →</a>
+            Can't find your answer? <a href="/#contact" className="text-gold-600 hover:underline font-semibold">Talk to our team →</a>
           </p>
         </div>
 
@@ -84,7 +84,7 @@ export default function FAQ() {
           <p className="font-body text-white/50 text-sm mb-5">Our team is available Mon–Sat, 9 AM – 7 PM IST.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="mailto:contactus@divinemercyitsol.com" className="btn-gold px-7 py-3 text-sm">✉️ Email Us</a>
-            <a href="#contact" className="btn-outline-light px-7 py-3 text-sm">Book Consultation</a>
+            <a href="/#contact" className="btn-outline-light px-7 py-3 text-sm">Book Consultation</a>
           </div>
         </div>
       </div>

@@ -213,6 +213,69 @@ function BeforeAfter() {
   )
 }
 
+/* ─── Contact Form ───────────────────────────────────────────────────────── */
+function ContactForm() {
+  const [form, setForm]   = useState({ name:'', email:'', phone:'', message:'' })
+  const [status, setStatus] = useState('idle')
+  const up = k => e => setForm(f => ({ ...f, [k]: e.target.value }))
+  const inputStyle = { width:'100%', fontFamily:SS, fontSize:13, border:`1px solid rgba(0,0,0,0.13)`, padding:'12px 16px', background:CREAM, outline:'none', color:TEXT, boxSizing:'border-box', transition:'border-color 0.2s' }
+  const labelStyle = { fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.22em', textTransform:'uppercase', color:MUTED, display:'block', marginBottom:8 }
+
+  function submit(e) {
+    e.preventDefault()
+    if (!form.name || !form.email || !form.message) return
+    setStatus('sending')
+    setTimeout(() => setStatus('sent'), 1400)
+  }
+
+  if (status === 'sent') return (
+    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', textAlign:'center', padding:'80px 40px', background:WHITE, border:`1px solid rgba(0,0,0,0.06)` }}>
+      <div style={{ width:64, height:64, background:DARK, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:24 }}>
+        <span style={{ color:GOLD, fontSize:28 }}>✓</span>
+      </div>
+      <h3 style={{ fontFamily:SF, fontSize:32, fontWeight:300, color:DARK, margin:'0 0 12px' }}>Message Sent</h3>
+      <p style={{ fontFamily:SS, fontSize:13, fontWeight:300, color:MUTED, lineHeight:1.9, maxWidth:300, margin:0 }}>
+        Thank you for reaching out. We'll get back to you within 24 hours.
+      </p>
+    </div>
+  )
+
+  return (
+    <form onSubmit={submit} style={{ background:WHITE, padding:'48px 44px', border:`1px solid rgba(0,0,0,0.06)` }}>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0 20px' }}>
+        {[['name','Full Name','text','Your full name'],['email','Email Address','email','your@email.com']].map(([k,l,t,p])=>(
+          <div key={k} style={{ marginBottom:22 }}>
+            <label style={labelStyle}>{l}</label>
+            <input type={t} placeholder={p} value={form[k]} onChange={up(k)} required={k!=='phone'}
+              style={inputStyle}
+              onFocus={e=>e.target.style.borderColor=DARK} onBlur={e=>e.target.style.borderColor='rgba(0,0,0,0.13)'} />
+          </div>
+        ))}
+      </div>
+      <div style={{ marginBottom:22 }}>
+        <label style={labelStyle}>Phone Number</label>
+        <input type="tel" placeholder="+91 98765 43210" value={form.phone} onChange={up('phone')}
+          style={inputStyle}
+          onFocus={e=>e.target.style.borderColor=DARK} onBlur={e=>e.target.style.borderColor='rgba(0,0,0,0.13)'} />
+      </div>
+      <div style={{ marginBottom:32 }}>
+        <label style={labelStyle}>Your Message</label>
+        <textarea placeholder="Tell us about your project — room type, size, style preferences…" rows={5}
+          value={form.message} onChange={up('message')} required
+          style={{ ...inputStyle, resize:'vertical' }}
+          onFocus={e=>e.target.style.borderColor=DARK} onBlur={e=>e.target.style.borderColor='rgba(0,0,0,0.13)'} />
+      </div>
+      <button type="submit" disabled={status==='sending'}
+        style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:WHITE, background:DARK, border:'none', padding:'16px', cursor:'pointer', width:'100%', transition:'opacity 0.2s', opacity:status==='sending'?0.6:1 }}>
+        {status==='sending' ? 'Sending…' : 'Send Message →'}
+      </button>
+      <p style={{ fontFamily:SS, fontSize:10, color:MUTED, marginTop:16, textAlign:'center', letterSpacing:'0.08em' }}>
+        We respond within 24 hours · No spam, ever
+      </p>
+    </form>
+  )
+}
+
 /* ─── Style Templates ───────────────────────────────────────────────────── */
 const STYLE_DATA = {
   'Mid-Century': [
@@ -888,6 +951,48 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════
+          X. CONTACT — Get in touch
+      ══════════════════════════════════════════════════════════════════ */}
+      <section id="contact" style={{ background:CREAM, padding:'120px clamp(40px,8vw,160px)' }}>
+        <div style={{ maxWidth:1200, margin:'0 auto' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0 80px', alignItems:'start' }} className="col-sm">
+
+            {/* Left */}
+            <div className="rl">
+              <SectionLabel>Get In Touch</SectionLabel>
+              <div style={{ width:36, height:1, background:GOLD, margin:'20px 0 44px' }} />
+              <h2 style={{ fontFamily:SF, fontSize:'clamp(36px,4vw,60px)', fontWeight:300, color:DARK, lineHeight:1.05 }}>
+                Let's design<br /><em style={{ fontStyle:'italic', color:GOLD }}>your space.</em>
+              </h2>
+              <p style={{ fontFamily:SS, fontSize:14, fontWeight:300, color:MUTED, lineHeight:1.95, marginTop:28, maxWidth:380 }}>
+                Have a project in mind? Our team is ready to help you create the space you've always imagined — free consultation, zero commitment.
+              </p>
+              <div style={{ marginTop:52 }}>
+                {[
+                  ['✉','Email','hello@elshaddai.in'],
+                  ['✆','Phone','+91 98765 43210'],
+                  ['⊕','Location','Hyderabad, Telangana, India'],
+                ].map(([icon,label,value]) => (
+                  <div key={label} style={{ display:'flex', gap:20, alignItems:'flex-start', marginBottom:28, paddingBottom:28, borderBottom:`1px solid rgba(0,0,0,0.07)` }}>
+                    <span style={{ fontFamily:SS, fontSize:18, color:GOLD, width:24, flexShrink:0, marginTop:2 }}>{icon}</span>
+                    <div>
+                      <div style={{ fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.22em', textTransform:'uppercase', color:MUTED, marginBottom:4 }}>{label}</div>
+                      <div style={{ fontFamily:SF, fontSize:18, fontWeight:300, color:DARK }}>{value}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right — form */}
+            <div className="rr">
+              <ContactForm />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════
           FOOTER — Refined minimal
       ══════════════════════════════════════════════════════════════════ */}
       <footer style={{ background:'#0a0905', padding:'80px clamp(40px,8vw,160px) 48px' }}>
@@ -912,8 +1017,8 @@ export default function HomePage() {
 
             {[
               { title:'Studio', links:[['Design Studio','/studio'],['Gallery','/gallery'],['My Projects','/my-projects'],['Pricing','/pricing']] },
-              { title:'Company', links:[['Portfolio','/portfolio'],['Blog','/blog'],['Contact','#contact'],['About','#about']] },
-              { title:'Legal', links:[['Privacy Policy','#'],['Terms of Use','#'],['Cookie Policy','#']] },
+              { title:'Company', links:[['Portfolio','/portfolio'],['Blog','/blog'],['Contact','/#contact'],['About','/about']] },
+              { title:'Legal', links:[['Privacy Policy','/privacy-policy'],['Terms of Use','/terms-of-service'],['Cookie Policy','/privacy-policy']] },
             ].map((col, i) => (
               <div key={i}>
                 <div style={{ fontFamily:SS, fontSize:8, fontWeight:700, letterSpacing:'0.32em', textTransform:'uppercase', color:'rgba(255,255,255,0.25)', marginBottom:24 }}>{col.title}</div>
