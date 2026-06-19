@@ -50,10 +50,76 @@ const FURNITURE_CATS = [
   { id:'outdoor',   label:'Outdoor',    icon:'🌿' },
 ]
 
+const CATALOG_ITEMS = [
+  { id:1,  name:'Modern L-Sofa',         sku:'SOF-001', cat:'seating',  price:45000, img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=300&q=70',  match:['living','office'] },
+  { id:2,  name:'Accent Chair',          sku:'SOF-002', cat:'seating',  price:12000, img:'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?auto=format&fit=crop&w=300&q=70', match:['living','bedroom','office'] },
+  { id:3,  name:'3-Seater Sofa',         sku:'SOF-003', cat:'seating',  price:38000, img:'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=300&q=70', match:['living'] },
+  { id:4,  name:'King Bed Frame',        sku:'BED-001', cat:'bedroom',  price:55000, img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=300&q=70', match:['bedroom'] },
+  { id:5,  name:'Platform Bed Queen',    sku:'BED-002', cat:'bedroom',  price:38000, img:'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=300&q=70', match:['bedroom','kids'] },
+  { id:6,  name:'Bedside Table Pair',    sku:'BED-003', cat:'bedroom',  price:9500,  img:'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=300&q=70',  match:['bedroom'] },
+  { id:7,  name:'Dining Table 6-Seat',   sku:'DIN-001', cat:'dining',   price:38000, img:'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=300&q=70', match:['dining'] },
+  { id:8,  name:'Dining Chair Set/4',    sku:'DIN-002', cat:'dining',   price:22000, img:'https://images.unsplash.com/photo-1549488344-cbb6c34184c8?auto=format&fit=crop&w=300&q=70', match:['dining','kitchen'] },
+  { id:9,  name:'Bar Stool Pair',        sku:'DIN-003', cat:'dining',   price:8500,  img:'https://images.unsplash.com/photo-1540932239986-30128078f3c5?auto=format&fit=crop&w=300&q=70', match:['kitchen','dining'] },
+  { id:10, name:'Wardrobe 4-Door',       sku:'STR-001', cat:'storage',  price:75000, img:'https://images.unsplash.com/photo-1558997519-83ea9252eeb8?auto=format&fit=crop&w=300&q=70',  match:['bedroom'] },
+  { id:11, name:'Bookshelf 5-Tier',      sku:'STR-002', cat:'storage',  price:18000, img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=70', match:['living','office'] },
+  { id:12, name:'TV Unit Minimal',       sku:'STR-003', cat:'storage',  price:22000, img:'https://images.unsplash.com/photo-1593642634315-48f5414c3ad9?auto=format&fit=crop&w=300&q=70', match:['living'] },
+  { id:13, name:'Floor Lamp Arc',        sku:'LIT-001', cat:'lighting', price:8500,  img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=70', match:['living','bedroom','office'] },
+  { id:14, name:'Pendant Light Cluster', sku:'LIT-002', cat:'lighting', price:15000, img:'https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?auto=format&fit=crop&w=300&q=70', match:['dining','kitchen','living'] },
+  { id:15, name:'Wall Sconce Pair',      sku:'LIT-003', cat:'lighting', price:6500,  img:'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?auto=format&fit=crop&w=300&q=70', match:['bedroom','bathroom'] },
+  { id:16, name:'Ceramic Vase Set',      sku:'DEC-001', cat:'decor',    price:4500,  img:'https://images.unsplash.com/photo-1463320726281-696a485928c7?auto=format&fit=crop&w=300&q=70', match:['living','bedroom','dining'] },
+  { id:17, name:'Wall Art Canvas',       sku:'DEC-002', cat:'decor',    price:6000,  img:'https://images.unsplash.com/photo-1549887534-1541e9326578?auto=format&fit=crop&w=300&q=70', match:['living','bedroom','office'] },
+  { id:18, name:'Area Rug 8x10',         sku:'DEC-003', cat:'decor',    price:12000, img:'https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=300&q=70', match:['living','bedroom','dining'] },
+  { id:19, name:'Kitchen Island Pro',    sku:'KIT-001', cat:'kitchen',  price:85000, img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=300&q=70', match:['kitchen'] },
+  { id:20, name:'Modular Cabinet Set',   sku:'KIT-002', cat:'kitchen',  price:45000, img:'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?auto=format&fit=crop&w=300&q=70', match:['kitchen'] },
+  { id:21, name:'Office Ergonomic Chair',sku:'OFF-001', cat:'office',   price:22000, img:'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=300&q=70', match:['office'] },
+  { id:22, name:'Standing Desk 1.6m',    sku:'OFF-002', cat:'office',   price:28000, img:'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=300&q=70', match:['office'] },
+  { id:23, name:'Freestanding Bathtub',  sku:'BTH-001', cat:'bathroom', price:65000, img:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=300&q=70', match:['bathroom'] },
+  { id:24, name:'Pooja Mandir Teak',     sku:'POJ-001', cat:'decor',    price:35000, img:'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=300&q=70', match:['pooja'] },
+  { id:25, name:'Kids Study Table',      sku:'KID-001', cat:'bedroom',  price:14000, img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=300&q=70', match:['kids'] },
+]
+
+const MATERIALS_CATALOG = [
+  { name:'White Oak',       code:'#C8A86B', type:'Wood',   price:850,  unit:'sq ft', styles:['Scandinavian','Japandi','Minimalist'] },
+  { name:'Dark Walnut',     code:'#4A3220', type:'Wood',   price:1200, unit:'sq ft', styles:['Contemporary','Industrial','Art Deco'] },
+  { name:'Teak Natural',    code:'#B87333', type:'Wood',   price:1500, unit:'sq ft', styles:['Traditional','Bohemian'] },
+  { name:'Marble Carrara',  code:'#F0EBE0', type:'Stone',  price:2200, unit:'sq ft', styles:['Luxury','Art Deco','Contemporary'] },
+  { name:'Granite Black',   code:'#2C2C2C', type:'Stone',  price:1800, unit:'sq ft', styles:['Industrial','Contemporary'] },
+  { name:'Kadappa Stone',   code:'#4A4A40', type:'Stone',  price:950,  unit:'sq ft', styles:['Traditional','Vastu'] },
+  { name:'Velvet Navy',     code:'#1B2A4A', type:'Fabric', price:450,  unit:'m',     styles:['Luxury','Contemporary'] },
+  { name:'Linen Cream',     code:'#F5F0E8', type:'Fabric', price:320,  unit:'m',     styles:['Scandinavian','Japandi','Minimalist'] },
+  { name:'Brushed Gold',    code:'#B8860B', type:'Metal',  price:2800, unit:'piece', styles:['Luxury','Art Deco'] },
+  { name:'Matte Black',     code:'#1C1C1C', type:'Metal',  price:1600, unit:'piece', styles:['Industrial','Contemporary','Minimalist'] },
+]
+
 const RENDER_STYLES = ['Photorealistic','Watercolor','Sketch','Blueprint','Night Mode']
 const RESOLUTIONS   = ['HD (720p)','Full HD (1080p)','4K (2160p)','8K']
 const LIGHTINGS     = ['Daylight','Soft Afternoon','Golden Hour','Evening','Night']
 const CAMERAS       = ['Normal','Panorama','Aerial','Top View']
+
+async function getAISuggestedCatalog(roomType, style) {
+  const fallback = CATALOG_ITEMS.filter(i => i.match.includes(roomType?.id || 'living')).slice(0, 6)
+  if (!GEMINI_KEY) return { items: fallback, materials: MATERIALS_CATALOG.slice(0, 4) }
+  try {
+    const prompt = `You are an interior design AI. For a ${roomType?.label || 'Living Room'} with ${style || 'Modern'} style, suggest the best furniture and materials from this catalog.
+Catalog items (id, name, cat): ${CATALOG_ITEMS.map(i => `${i.id}:${i.name}(${i.cat})`).join(', ')}
+Materials: ${MATERIALS_CATALOG.map(m => m.name).join(', ')}
+Respond ONLY with valid JSON: {"itemIds":[1,2,3,4,5,6],"materialNames":["White Oak","Marble Carrara"],"tips":["tip1","tip2","tip3"]}`
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+      { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.5,maxOutputTokens:512} }) }
+    )
+    if (!res.ok) return { items: fallback, materials: MATERIALS_CATALOG.slice(0, 4) }
+    const data = await res.json()
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || ''
+    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim())
+    const items = (parsed.itemIds || []).map(id => CATALOG_ITEMS.find(i => i.id === id)).filter(Boolean)
+    const materials = (parsed.materialNames || []).map(n => MATERIALS_CATALOG.find(m => m.name === n)).filter(Boolean)
+    return { items: items.length ? items : fallback, materials: materials.length ? materials : MATERIALS_CATALOG.slice(0,4), tips: parsed.tips || [] }
+  } catch {
+    return { items: fallback, materials: MATERIALS_CATALOG.slice(0, 4) }
+  }
+}
 
 async function analyzeFloorPlan(base64, mimeType) {
   if (!GEMINI_KEY) return null
@@ -246,62 +312,187 @@ function DrawPanel({ onSelectRoom, uploadedPlan, onUpload, aiAnalysis, analyzing
   )
 }
 
+/* ─── Catalog Item Card ─── */
+function CatalogCard({ item, onAdd, added }) {
+  return (
+    <div style={{ background:C.bg, border:`1px solid ${added ? C.gold : C.border}`, borderRadius:6, overflow:'hidden', transition:'border-color 0.2s' }}>
+      <div style={{ position:'relative', height:90, overflow:'hidden' }}>
+        <img src={item.img} alt={item.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+        {added && (
+          <div style={{ position:'absolute', inset:0, background:'rgba(201,162,39,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <span style={{ fontSize:20 }}>✓</span>
+          </div>
+        )}
+      </div>
+      <div style={{ padding:'8px 8px 6px' }}>
+        <p style={{ color:C.text, fontSize:10, fontWeight:600, margin:'0 0 2px', lineHeight:1.3 }}>{item.name}</p>
+        <p style={{ color:C.muted, fontSize:8, margin:'0 0 6px', fontFamily:'monospace' }}>{item.sku}</p>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <span style={{ color:C.gold, fontSize:11, fontWeight:700 }}>₹{item.price.toLocaleString()}</span>
+          <button onClick={() => onAdd(item)} style={{
+            padding:'3px 8px', background: added ? C.gold : 'transparent',
+            border:`1px solid ${added ? C.gold : C.border}`, color: added ? '#000' : C.text,
+            borderRadius:3, cursor:'pointer', fontSize:8, fontWeight:700,
+          }}>{added ? '✓ Added' : '+ Add'}</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ─── Step 2: Decorate Panel ─── */
-function DecoratePanel({ templateScope, setTemplateScope, onApplyTemplate, activeCat, setActiveCat }) {
+function DecoratePanel({ templateScope, setTemplateScope, onApplyTemplate, activeCat, setActiveCat, aiCatalog, catalogLoading, addedItems, onAddItem }) {
   const [search, setSearch] = useState('')
+  const [subTab, setSubTab] = useState('templates') // 'templates' | 'catalog' | 'materials'
+
   const filtered = AI_TEMPLATES.filter(t =>
     t.label.toLowerCase().includes(search.toLowerCase()) ||
     t.style.toLowerCase().includes(search.toLowerCase())
   )
+
+  const catalogFiltered = activeCat === 'all'
+    ? (aiCatalog?.items || [])
+    : (aiCatalog?.items || []).filter(i => i.cat === activeCat)
+
   return (
-    <div style={{ height:'100%', overflowY:'auto', padding:'16px 12px', display:'flex', flexDirection:'column', gap:14 }}>
-      {/* AI Decor Templates */}
-      <div>
-        <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>AI Decor</p>
-        <div style={{ display:'flex', gap:4, marginBottom:8 }}>
-          {['Single Room','Whole House'].map(s => (
-            <button key={s} onClick={() => setTemplateScope(s)} style={{
-              flex:1, padding:'5px 4px', background: templateScope===s ? C.gold : C.bg,
-              color: templateScope===s ? '#000' : C.muted, border:`1px solid ${templateScope===s ? C.gold : C.border}`,
-              borderRadius:4, cursor:'pointer', fontSize:9, fontWeight:700,
-            }}>{s}</button>
-          ))}
-        </div>
-        <input
-          placeholder="Search styles…" value={search} onChange={e => setSearch(e.target.value)}
-          style={{ width:'100%', padding:'7px 10px', background:C.bg, border:`1px solid ${C.border}`, borderRadius:4, color:C.text, fontSize:11, outline:'none', boxSizing:'border-box', marginBottom:8 }} />
-        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
-          {filtered.map(t => (
-            <div key={t.id} style={{ position:'relative', borderRadius:6, overflow:'hidden', cursor:'pointer', border:`1px solid ${C.border}` }}
-              onClick={() => onApplyTemplate(t)}>
-              <img src={t.img} alt={t.label} style={{ width:'100%', height:80, objectFit:'cover', display:'block' }} />
-              <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 50%)', pointerEvents:'none' }} />
-              <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'6px 8px' }}>
-                <p style={{ color:'#fff', fontSize:10, fontWeight:700, margin:0 }}>{t.label}</p>
-                <p style={{ color:'rgba(255,255,255,0.6)', fontSize:9, margin:0 }}>{t.style} · {t.rooms}</p>
-              </div>
-              <div style={{ position:'absolute', top:6, right:6, padding:'2px 6px', background:C.gold, borderRadius:3 }}>
-                <span style={{ fontSize:8, fontWeight:700, color:'#000' }}>APPLY</span>
-              </div>
-            </div>
-          ))}
-        </div>
+    <div style={{ height:'100%', display:'flex', flexDirection:'column', overflow:'hidden' }}>
+      {/* Sub-tab bar */}
+      <div style={{ display:'flex', borderBottom:`1px solid ${C.border}`, flexShrink:0 }}>
+        {[['templates','🎨 Templates'],['catalog','🤖 AI Catalog'],['materials','🪨 Materials']].map(([id,label]) => (
+          <button key={id} onClick={() => setSubTab(id)} style={{
+            flex:1, padding:'9px 4px', background:'transparent',
+            color: subTab===id ? C.gold : C.muted,
+            border:'none', borderBottom: subTab===id ? `2px solid ${C.gold}` : '2px solid transparent',
+            cursor:'pointer', fontSize:9, fontWeight:700, letterSpacing:'0.05em',
+          }}>{label}</button>
+        ))}
       </div>
 
-      {/* Furniture Categories */}
-      <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:12 }}>
-        <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Furniture & Decor</p>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:4 }}>
-          {FURNITURE_CATS.map(c => (
-            <button key={c.id} onClick={() => setActiveCat(c.id)} style={{
-              padding:'8px 6px', background: activeCat===c.id ? C.gold : C.bg,
-              color: activeCat===c.id ? '#000' : C.text, border:`1px solid ${activeCat===c.id ? C.gold : C.border}`,
-              borderRadius:4, cursor:'pointer', fontSize:9, fontWeight:600, display:'flex', alignItems:'center', gap:4,
-            }}>
-              <span>{c.icon}</span> {c.label}
-            </button>
-          ))}
-        </div>
+      <div style={{ flex:1, overflowY:'auto', padding:'12px 10px' }}>
+
+        {/* ── Templates Tab ── */}
+        {subTab === 'templates' && (
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            <div style={{ display:'flex', gap:4 }}>
+              {['Single Room','Whole House'].map(s => (
+                <button key={s} onClick={() => setTemplateScope(s)} style={{
+                  flex:1, padding:'5px 4px', background: templateScope===s ? C.gold : C.bg,
+                  color: templateScope===s ? '#000' : C.muted, border:`1px solid ${templateScope===s ? C.gold : C.border}`,
+                  borderRadius:4, cursor:'pointer', fontSize:9, fontWeight:700,
+                }}>{s}</button>
+              ))}
+            </div>
+            <input
+              placeholder="Search styles…" value={search} onChange={e => setSearch(e.target.value)}
+              style={{ width:'100%', padding:'7px 10px', background:C.bg, border:`1px solid ${C.border}`, borderRadius:4, color:C.text, fontSize:11, outline:'none', boxSizing:'border-box' }} />
+            <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+              {filtered.map(t => (
+                <div key={t.id} style={{ position:'relative', borderRadius:6, overflow:'hidden', cursor:'pointer', border:`1px solid ${C.border}` }}
+                  onClick={() => onApplyTemplate(t)}>
+                  <img src={t.img} alt={t.label} style={{ width:'100%', height:80, objectFit:'cover', display:'block' }} />
+                  <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 50%)', pointerEvents:'none' }} />
+                  <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'6px 8px' }}>
+                    <p style={{ color:'#fff', fontSize:10, fontWeight:700, margin:0 }}>{t.label}</p>
+                    <p style={{ color:'rgba(255,255,255,0.6)', fontSize:9, margin:0 }}>{t.style} · {t.rooms}</p>
+                  </div>
+                  <div style={{ position:'absolute', top:6, right:6, padding:'2px 6px', background:C.gold, borderRadius:3 }}>
+                    <span style={{ fontSize:8, fontWeight:700, color:'#000' }}>APPLY</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── AI Catalog Tab ── */}
+        {subTab === 'catalog' && (
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            {/* AI Tips */}
+            {aiCatalog?.tips?.length > 0 && (
+              <div style={{ background:'rgba(37,99,235,0.1)', border:'1px solid rgba(37,99,235,0.3)', borderRadius:6, padding:10 }}>
+                <p style={{ color:'#60a5fa', fontSize:9, fontWeight:700, margin:'0 0 6px', letterSpacing:'0.1em' }}>🤖 AI DESIGN TIPS</p>
+                {aiCatalog.tips.map((tip, i) => (
+                  <p key={i} style={{ color:C.text, fontSize:10, margin:'0 0 4px', lineHeight:1.5 }}>· {tip}</p>
+                ))}
+              </div>
+            )}
+
+            {/* Category filter */}
+            <div style={{ display:'flex', gap:3, flexWrap:'wrap' }}>
+              <button onClick={() => setActiveCat('all')} style={{
+                padding:'3px 8px', background: activeCat==='all' ? C.gold : C.bg,
+                color: activeCat==='all' ? '#000' : C.muted, border:`1px solid ${activeCat==='all' ? C.gold : C.border}`,
+                borderRadius:3, cursor:'pointer', fontSize:8, fontWeight:700,
+              }}>All</button>
+              {FURNITURE_CATS.map(c => (
+                <button key={c.id} onClick={() => setActiveCat(c.id)} style={{
+                  padding:'3px 8px', background: activeCat===c.id ? C.gold : C.bg,
+                  color: activeCat===c.id ? '#000' : C.muted, border:`1px solid ${activeCat===c.id ? C.gold : C.border}`,
+                  borderRadius:3, cursor:'pointer', fontSize:8, fontWeight:700,
+                }}>{c.icon}</button>
+              ))}
+            </div>
+
+            {catalogLoading ? (
+              <div style={{ textAlign:'center', padding:'32px 0' }}>
+                <div style={{ width:32, height:32, border:`2px solid ${C.gold}`, borderTopColor:'transparent', borderRadius:'50%', animation:'spin 0.8s linear infinite', margin:'0 auto 10px' }} />
+                <p style={{ color:C.muted, fontSize:11, margin:0 }}>AI picking best items…</p>
+              </div>
+            ) : catalogFiltered.length === 0 ? (
+              <div style={{ textAlign:'center', padding:'24px 0', color:C.muted, fontSize:11 }}>
+                <div style={{ fontSize:28, marginBottom:8 }}>🛋</div>
+                Apply a template or select a room to see AI suggestions
+              </div>
+            ) : (
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:6 }}>
+                {catalogFiltered.map(item => (
+                  <CatalogCard key={item.id} item={item} onAdd={onAddItem} added={addedItems.some(a => a.id === item.id)} />
+                ))}
+              </div>
+            )}
+
+            {aiCatalog?.items?.length > 0 && (
+              <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:10, marginTop:4 }}>
+                <p style={{ color:C.muted, fontSize:9, margin:'0 0 4px' }}>
+                  {addedItems.length} item{addedItems.length !== 1 ? 's' : ''} added · Est. ₹{addedItems.reduce((s,i) => s+i.price, 0).toLocaleString()}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Materials Tab ── */}
+        {subTab === 'materials' && (
+          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+            <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', margin:'0 0 4px' }}>AI Recommended Materials</p>
+            {(aiCatalog?.materials || MATERIALS_CATALOG.slice(0,4)).map(m => (
+              <div key={m.name} style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 10px', background:C.bg, border:`1px solid ${C.border}`, borderRadius:6 }}>
+                <div style={{ width:28, height:28, borderRadius:4, background:m.code, border:'1px solid rgba(255,255,255,0.1)', flexShrink:0 }} />
+                <div style={{ flex:1, minWidth:0 }}>
+                  <p style={{ color:C.text, fontSize:10, fontWeight:600, margin:0 }}>{m.name}</p>
+                  <p style={{ color:C.muted, fontSize:8, margin:0 }}>{m.type} · ₹{m.price}/{m.unit}</p>
+                </div>
+                <button style={{ padding:'3px 8px', background:'transparent', border:`1px solid ${C.border}`, color:C.text, borderRadius:3, cursor:'pointer', fontSize:8, fontWeight:700, flexShrink:0 }}>+ Use</button>
+              </div>
+            ))}
+            {!aiCatalog?.materials && (
+              <p style={{ color:C.muted, fontSize:10, textAlign:'center', padding:'12px 0' }}>Apply a template to get AI material picks</p>
+            )}
+
+            <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:10, marginTop:4 }}>
+              <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', margin:'0 0 8px' }}>All Materials</p>
+              {MATERIALS_CATALOG.map(m => (
+                <div key={m.name} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 8px', borderRadius:4, cursor:'pointer', marginBottom:2 }}
+                  onMouseEnter={e => e.currentTarget.style.background = C.border}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                  <div style={{ width:20, height:20, borderRadius:3, background:m.code, border:'1px solid rgba(255,255,255,0.1)', flexShrink:0 }} />
+                  <span style={{ color:C.text, fontSize:10, flex:1 }}>{m.name}</span>
+                  <span style={{ color:C.muted, fontSize:8 }}>{m.type}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -503,7 +694,7 @@ function Loading({ label, sub }) {
 }
 
 /* ─── Right Properties Panel ─── */
-function RightPanel({ step, selectedRoom, appliedTemplate }) {
+function RightPanel({ step, selectedRoom, appliedTemplate, addedItems = [] }) {
   if (step === 1) return (
     <div style={{ width:220, background:C.panel, borderLeft:`1px solid ${C.border}`, padding:16, overflowY:'auto' }}>
       <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 12px' }}>Layer Settings</p>
@@ -552,13 +743,32 @@ function RightPanel({ step, selectedRoom, appliedTemplate }) {
       </div>
       <div>
         <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Room Stats</p>
-        {[['Total Area','560 ft²'],['Furniture','12 items'],['Est. Cost','₹8.4L']].map(([k,v]) => (
+        {[['Total Area','560 ft²'],['Furniture',`${addedItems.length} items`],['Est. Cost', addedItems.length ? `₹${(addedItems.reduce((s,i)=>s+i.price,0)/100000).toFixed(1)}L` : '—']].map(([k,v]) => (
           <div key={k} style={{ display:'flex', justifyContent:'space-between', marginBottom:7 }}>
             <span style={{ color:C.muted, fontSize:10 }}>{k}</span>
-            <span style={{ color:C.text, fontSize:10, fontWeight:600 }}>{v}</span>
+            <span style={{ color:k==='Est. Cost'&&addedItems.length ? C.gold : C.text, fontSize:10, fontWeight:600 }}>{v}</span>
           </div>
         ))}
       </div>
+
+      {addedItems.length > 0 && (
+        <div style={{ marginTop:12, borderTop:`1px solid ${C.border}`, paddingTop:12 }}>
+          <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', margin:'0 0 8px' }}>Design Cart</p>
+          {addedItems.map(item => (
+            <div key={item.id} style={{ display:'flex', justifyContent:'space-between', marginBottom:5, alignItems:'center' }}>
+              <p style={{ color:C.text, fontSize:9, margin:0, flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', paddingRight:4 }}>{item.name}</p>
+              <span style={{ color:C.gold, fontSize:9, fontWeight:700, flexShrink:0 }}>₹{(item.price/1000).toFixed(0)}K</span>
+            </div>
+          ))}
+          <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:8, marginTop:4, display:'flex', justifyContent:'space-between' }}>
+            <span style={{ color:C.text, fontSize:10, fontWeight:700 }}>Total</span>
+            <span style={{ color:C.gold, fontSize:11, fontWeight:700 }}>₹{addedItems.reduce((s,i)=>s+i.price,0).toLocaleString()}</span>
+          </div>
+          <button style={{ width:'100%', marginTop:8, padding:'8px', background:C.gold, border:'none', color:'#000', borderRadius:4, cursor:'pointer', fontSize:10, fontWeight:700 }}>
+            Request Quote →
+          </button>
+        </div>
+      )}
     </div>
   )
 
@@ -589,7 +799,7 @@ export default function StudioPage() {
   const [mode, setMode]                     = useState('3d')
   const [templateScope, setTemplateScope]   = useState('Single Room')
   const [appliedTemplate, setAppliedTemplate] = useState(null)
-  const [activeCat, setActiveCat]           = useState('seating')
+  const [activeCat, setActiveCat]           = useState('all')
   const [selectedRoom, setSelectedRoom]     = useState(null)
   const [uploadedPlan, setUploadedPlan]     = useState(null)
   const [aiAnalysis, setAiAnalysis]         = useState(null)
@@ -600,6 +810,9 @@ export default function StudioPage() {
   const [renderSettings, setRenderSettings] = useState({
     camera:'Normal', style:'Photorealistic', resolution:'4K (2160p)', lighting:'Daylight',
   })
+  const [aiCatalog, setAiCatalog]           = useState(null)
+  const [catalogLoading, setCatalogLoading] = useState(false)
+  const [addedItems, setAddedItems]         = useState([])
 
   const handleUpload = useCallback(async (e) => {
     const file = e.target.files?.[0]
@@ -635,10 +848,30 @@ export default function StudioPage() {
     }, 150)
   }, [])
 
-  const handleApplyTemplate = useCallback((t) => {
+  const handleAddItem = useCallback((item) => {
+    setAddedItems(prev =>
+      prev.some(a => a.id === item.id) ? prev.filter(a => a.id !== item.id) : [...prev, item]
+    )
+  }, [])
+
+  const handleApplyTemplate = useCallback(async (t) => {
     setAppliedTemplate(t)
     setMode('3d')
-  }, [])
+    setStep(2)
+    setCatalogLoading(true)
+    const result = await getAISuggestedCatalog(selectedRoom, t.style)
+    setAiCatalog(result)
+    setCatalogLoading(false)
+  }, [selectedRoom])
+
+  const handleSelectRoom = useCallback(async (r) => {
+    setSelectedRoom(r)
+    setStep(2)
+    setCatalogLoading(true)
+    const result = await getAISuggestedCatalog(r, appliedTemplate?.style)
+    setAiCatalog(result)
+    setCatalogLoading(false)
+  }, [appliedTemplate])
 
   return (
     <div style={{ height:'100vh', display:'flex', flexDirection:'column', overflow:'hidden', background:C.bg, fontFamily:"'DM Sans', system-ui, sans-serif" }}>
@@ -656,7 +889,7 @@ export default function StudioPage() {
         <div style={{ width:260, background:C.panel, borderRight:`1px solid ${C.border}`, flexShrink:0, overflow:'hidden', display:'flex', flexDirection:'column' }}>
           {step === 1 && (
             <DrawPanel
-              onSelectRoom={r => { setSelectedRoom(r); setStep(2) }}
+              onSelectRoom={handleSelectRoom}
               uploadedPlan={uploadedPlan}
               onUpload={handleUpload}
               aiAnalysis={aiAnalysis}
@@ -670,6 +903,10 @@ export default function StudioPage() {
               onApplyTemplate={handleApplyTemplate}
               activeCat={activeCat}
               setActiveCat={setActiveCat}
+              aiCatalog={aiCatalog}
+              catalogLoading={catalogLoading}
+              addedItems={addedItems}
+              onAddItem={handleAddItem}
             />
           )}
           {step === 3 && (
@@ -698,6 +935,7 @@ export default function StudioPage() {
           step={step}
           selectedRoom={selectedRoom}
           appliedTemplate={appliedTemplate}
+          addedItems={addedItems}
         />
       </div>
 
