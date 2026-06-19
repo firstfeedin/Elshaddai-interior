@@ -1,774 +1,642 @@
 /**
- * El Shaddai — Extraordinary Homepage
- * Industry-standard interior design platform UI
- * Inspired by: Houzz, Planner5D, Havenly, Homestyler, Canva
- * Design system: warm cream + deep charcoal + gold accent
+ * El Shaddai — Ultra-Premium Homepage
+ * Palette: Blush Marble & Graphite — Fendi Casa · Giorgio Armani Hotels · Italian Luxury
+ * Design language: Cinematic · Editorial · Minimal · Luxe
  */
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../../components/layout/Navbar'
 
-/* ─── Design Tokens ──────────────────────────────────────────────────────── */
-const GOLD   = '#c9a227'
-const GOLDD  = '#a07a18'
-const GOLDL  = '#e8c84e'
-const DARK   = '#0d0c08'
-const DARK2  = '#1a1710'
-const CREAM  = '#faf8f2'
+/* ─── Tokens — Blush Marble & Graphite ───────────────────────────────────── */
+const CREAM  = '#f5ede8'   /* Blush marble — warm background */
+const DARK   = '#2a0e14'   /* Deep Burgundy — primary dark */
+const DARK2  = '#1e0a0e'   /* Wine — dark sections */
 const WHITE  = '#ffffff'
-const TEXT   = '#1a1612'
-const MUTED  = '#78726c'
-const BORDER = 'rgba(0,0,0,0.07)'
-const SF = "'Cormorant Garamond',Georgia,serif"
-const SS = "'DM Sans',system-ui,sans-serif"
+const GOLD   = '#c4956a'   /* Terracotta — accent */
+const TEXT   = '#2e2e2c'   /* Graphite text */
+const MUTED  = '#9a8a82'   /* Warm grey muted */
+const SF     = "'Cormorant Garamond',Georgia,serif"
+const SS     = "'DM Sans',system-ui,sans-serif"
 
-/* ─── Global CSS (injected once) ─────────────────────────────────────────── */
-const GLOBAL_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap');
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body { background: ${CREAM}; color: ${TEXT}; }
+/* ─── Global CSS ─────────────────────────────────────────────────────────── */
+const CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
-  /* Scroll animations */
-  .reveal        { opacity:0; transform:translateY(40px);  transition: opacity 0.7s ease, transform 0.7s ease; }
-  .reveal-left   { opacity:0; transform:translateX(-40px); transition: opacity 0.7s ease, transform 0.7s ease; }
-  .reveal-right  { opacity:0; transform:translateX(40px);  transition: opacity 0.7s ease, transform 0.7s ease; }
-  .reveal-scale  { opacity:0; transform:scale(0.93);       transition: opacity 0.6s ease, transform 0.6s ease; }
-  .reveal.visible, .reveal-left.visible, .reveal-right.visible, .reveal-scale.visible { opacity:1; transform:none; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:${CREAM};color:${TEXT};cursor:none}
 
-  /* Animations */
-  @keyframes ticker    { from{transform:translateX(0)} to{transform:translateX(-50%)} }
-  @keyframes float     { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-  @keyframes fadeIn    { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
-  @keyframes pulseDot  { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
-  @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:none} }
-  @keyframes countUp   { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
-  @keyframes heroImg   { 0%{opacity:0;transform:scale(1.04)} 8%{opacity:1;transform:scale(1)} 33%{opacity:1;transform:scale(1)} 41%{opacity:0;transform:scale(0.98)} 100%{opacity:0} }
-  @keyframes shimmer   { 0%{background-position:200% center} 100%{background-position:-200% center} }
+/* Custom cursor */
+.es-cursor{pointer-events:none;position:fixed;top:0;left:0;z-index:99999;mix-blend-mode:difference}
+.es-cursor-dot{position:absolute;width:6px;height:6px;background:${WHITE};border-radius:50%;transform:translate(-50%,-50%);transition:width 0.2s,height 0.2s,opacity 0.2s}
+.es-cursor-ring{position:absolute;width:36px;height:36px;border:1px solid rgba(255,255,255,0.6);border-radius:50%;transform:translate(-50%,-50%);transition:all 0.12s cubic-bezier(0.25,0.46,0.45,0.94);opacity:0.7}
+body.cursor-hover .es-cursor-dot{width:10px;height:10px}
+body.cursor-hover .es-cursor-ring{width:54px;height:54px;opacity:0.4}
 
-  /* Hero image carousel */
-  .hero-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; animation: heroImg 15s ease-in-out infinite; }
-  .hero-img:nth-child(1) { animation-delay: 0s; }
-  .hero-img:nth-child(2) { animation-delay: 5s; }
-  .hero-img:nth-child(3) { animation-delay: 10s; }
+/* Reveal */
+.r{opacity:0;transform:translateY(32px);transition:opacity 0.9s cubic-bezier(0.22,1,0.36,1),transform 0.9s cubic-bezier(0.22,1,0.36,1)}
+.rl{opacity:0;transform:translateX(-40px);transition:opacity 1s cubic-bezier(0.22,1,0.36,1),transform 1s cubic-bezier(0.22,1,0.36,1)}
+.rr{opacity:0;transform:translateX(40px);transition:opacity 1s cubic-bezier(0.22,1,0.36,1),transform 1s cubic-bezier(0.22,1,0.36,1)}
+.rs{opacity:0;transform:scale(0.96);transition:opacity 0.9s cubic-bezier(0.22,1,0.36,1),transform 0.9s cubic-bezier(0.22,1,0.36,1)}
+.r.v,.rl.v,.rr.v,.rs.v{opacity:1;transform:none}
 
-  /* Hover utilities */
-  .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-  .card-hover:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(0,0,0,0.12); }
+/* Animations */
+@keyframes heroFade{0%{opacity:0;transform:scale(1.04)}8%{opacity:1;transform:scale(1)}33%{opacity:1}42%{opacity:0;transform:scale(0.98)}100%{opacity:0}}
+@keyframes titleIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes lineGrow{from{width:0}to{width:100%}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
-  /* Before/after slider */
-  .ba-slider { position:relative; overflow:hidden; cursor:ew-resize; user-select:none; }
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;animation:heroFade 18s ease-in-out infinite}
+.hero-img:nth-child(1){animation-delay:0s}
+.hero-img:nth-child(2){animation-delay:6s}
+.hero-img:nth-child(3){animation-delay:12s}
 
-  /* Scrollbar hide */
-  .no-scrollbar::-webkit-scrollbar { display:none; }
-  .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+/* Hover underline */
+.hover-line{position:relative;display:inline-block}
+.hover-line::after{content:'';position:absolute;bottom:0;left:0;height:1px;background:currentColor;width:0;transition:width 0.4s cubic-bezier(0.22,1,0.36,1)}
+.hover-line:hover::after{width:100%}
 
-  /* Mobile */
-  @media (max-width:768px) {
-    .hide-mobile { display:none !important; }
-    .stack-mobile { flex-direction:column !important; }
-    .full-mobile  { width:100% !important; }
-  }
+/* Image zoom */
+.img-wrap{overflow:hidden}
+.img-wrap img{transition:transform 0.8s cubic-bezier(0.22,1,0.36,1)}
+.img-wrap:hover img{transform:scale(1.04)}
+
+/* Scrollbar */
+.no-scroll::-webkit-scrollbar{display:none}
+.no-scroll{-ms-overflow-style:none;scrollbar-width:none}
+
+@media(max-width:900px){
+  body{cursor:auto}
+  .es-cursor{display:none}
+  .hide-sm{display:none!important}
+  .col-sm{flex-direction:column!important}
+  .full-sm{width:100%!important}
+}
 `
 
 /* ─── Data ───────────────────────────────────────────────────────────────── */
-const HERO_IMGS = [
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85',
-  'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=1600&q=85',
-  'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=1600&q=85',
+const HERO_IMAGES = [
+  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1800&q=90',
+  'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1800&q=90',
+  'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=1800&q=90',
 ]
 
-const STATS = [
-  { val:'20K+', label:'Rooms Designed',     sub:'by our community'       },
-  { val:'150+', label:'Furniture Items',    sub:'in the free catalog'    },
-  { val:'500+', label:'Room Templates',     sub:'ready to customize'     },
-  { val:'100%', label:'Free to Use',        sub:'no credit card needed'  },
+const ROOMS = [
+  {
+    n: '01', room: 'Living Room', style: 'Contemporary Luxe',
+    desc: 'A living room should feel both curated and effortless — the space where every element has intention yet nothing feels forced.',
+    img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=85',
+  },
+  {
+    n: '02', room: 'Master Bedroom', style: 'Serene Minimalism',
+    desc: 'The bedroom is not merely a place to sleep, but a sanctuary for restoration. Every surface, every fabric, every light deliberate.',
+    img: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=900&q=85',
+  },
+  {
+    n: '03', room: 'Kitchen & Dining', style: 'Modern Warmth',
+    desc: 'Where form meets function in perfect balance. A kitchen that inspires cooking and a dining space that invites conversation.',
+    img: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=900&q=85',
+  },
 ]
 
-const STYLE_QUIZ = [
-  { id:'modern',    label:'Modern & Minimal',  sub:'Clean lines, neutral tones, less is more',       img:'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=600&q=80', color:'#2d2d2d' },
-  { id:'luxe',      label:'Classic & Luxe',    sub:'Rich textures, gold accents, timeless elegance', img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=600&q=80', color:'#8b6914' },
-  { id:'boho',      label:'Boho & Natural',    sub:'Plants, rattan, earthy colours and warmth',      img:'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=600&q=80', color:'#5a7c4a' },
-  { id:'japandi',   label:'Japandi Calm',       sub:'Japanese simplicity meets Scandinavian warmth',  img:'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=600&q=80', color:'#6b5b45' },
+const GALLERY = [
+  { img:'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=500&q=85', h:380 },
+  { img:'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=500&q=85', h:260 },
+  { img:'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=500&q=85', h:480 },
+  { img:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=500&q=85', h:320 },
+  { img:'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=500&q=85', h:400 },
+  { img:'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=500&q=85', h:300 },
 ]
 
-const HOW_STEPS = [
-  { n:'01', icon:'🏠', title:'Draw Your Room',     desc:'Sketch walls, add doors and windows. Use our snap grid for precision — no experience needed.',  img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80' },
-  { n:'02', icon:'🛋',  title:'Style & Furnish',   desc:'Browse 150+ furniture items, choose wall colours, flooring and ceiling finishes from our catalog.', img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=600&q=80' },
-  { n:'03', icon:'✨', title:'Visualise in 3D',    desc:'See your room come alive in real-time 3D. View in AR, export renders, or share with a link.',      img:'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=600&q=80' },
-]
+const BEFORE_IMG = 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?auto=format&fit=crop&w=1000&q=90'
+const AFTER_IMG  = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=90'
 
-const FEATURES = [
-  { icon:'📐', title:'Snap-to-Grid Drawing',     desc:'Precise wall drawing with measurement display and auto-snap alignment', badge:'Studio', color:'#eef2ff' },
-  { icon:'🚪', title:'Doors & Windows Library',  desc:'Dedicated library for single, double, sliding doors and all window types', badge:'Studio', color:'#fef9ee' },
-  { icon:'🛋',  title:'150+ Furniture Catalog',   desc:'Seating, beds, dining, storage, lighting, decor, kitchen and bathroom', badge:'Free', color:'#f0fdf4' },
-  { icon:'🎨', title:'Material Editor',           desc:'Walls, floors and ceilings — choose from 30+ surface materials per layer', badge:'Studio', color:'#fdf4ff' },
-  { icon:'📱', title:'AR Room Preview',           desc:'Point your phone at any room and see the furniture placed in real space', badge:'New', color:'#fff1f1' },
-  { icon:'✦',  title:'AI Floor Plan',            desc:'Describe your room in words — Gemini AI draws the floor plan instantly', badge:'AI', color:'#f0fdf4' },
-  { icon:'📄', title:'PDF Design Report',         desc:'Export a professional 2-page PDF with floor plan, 3D view and furniture schedule', badge:'Export', color:'#fef9ee' },
-  { icon:'⬆',  title:'Custom 3D Model Upload',   desc:'Upload your own GLB/GLTF models to place real brand furniture in your design', badge:'Pro', color:'#eef2ff' },
-  { icon:'💾', title:'Save & Share Designs',      desc:'Auto-save to browser, share with a link, or export as JSON for later', badge:'Free', color:'#f0fdf4' },
-  { icon:'↩',  title:'Undo / Redo History',       desc:'Full 50-step undo/redo stack so you can explore without fear', badge:'Studio', color:'#fff1f1' },
-  { icon:'🛒', title:'Shop the Look',             desc:'Every furniture item links directly to Amazon.in to purchase', badge:'Commerce', color:'#fef9ee' },
-  { icon:'🏷',  title:'Named Version Saves',       desc:'Save design snapshots with names and restore them any time', badge:'Studio', color:'#fdf4ff' },
-]
+/* ─── Custom Cursor ──────────────────────────────────────────────────────── */
+function Cursor() {
+  const dotRef  = useRef(null)
+  const ringRef = useRef(null)
 
-const COMMUNITY = [
-  { title:'Scandinavian Living',    user:'Priya R.',  likes:2841, img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=500&q=80',  tall:true  },
-  { title:'Japandi Bedroom',        user:'Kenji T.',  likes:1924, img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=500&q=80',  tall:false },
-  { title:'Boho Reading Nook',      user:'Anya K.',   likes:3102, img:'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=500&q=80',  tall:false },
-  { title:'Dark Luxe Master Suite', user:'Raj M.',    likes:4289, img:'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=500&q=80',  tall:true  },
-  { title:'Nordic Kitchen',         user:'Lena B.',   likes:1563, img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=500&q=80',  tall:false },
-  { title:'Warm Dining Room',       user:'Sofia R.',  likes:2190, img:'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=500&q=80',  tall:false },
-  { title:'Industrial Home Office', user:'Dev S.',    likes:1748, img:'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=500&q=80',  tall:true  },
-  { title:'Artisan Bathroom',       user:'Marie D.',  likes:2934, img:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=500&q=80',  tall:false },
-  { title:'Kids Treehouse Room',    user:'Nina P.',   likes:5012, img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=500&q=80',  tall:false },
-]
-
-const TEMPLATES = [
-  { title:'Modern Living Room',  style:'Modern',      img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=400&q=75', room:'Living' },
-  { title:'Japandi Bedroom',     style:'Japandi',     img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=400&q=75', room:'Bedroom' },
-  { title:'Nordic Kitchen',      style:'Scandi',      img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=400&q=75', room:'Kitchen' },
-  { title:'Warm Dining',         style:'Classic',     img:'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=400&q=75', room:'Dining' },
-  { title:'Luxe Bathroom',       style:'Luxury',      img:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=400&q=75', room:'Bathroom' },
-  { title:'Minimal Home Office', style:'Minimalist',  img:'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=400&q=75', room:'Office' },
-  { title:'Boho Sanctuary',      style:'Bohemian',    img:'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=400&q=75', room:'Bedroom' },
-  { title:'Dark Luxe Living',    style:'Industrial',  img:'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=400&q=75', room:'Living' },
-  { title:'Kids Playroom',       style:'Playful',     img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=400&q=75', room:'Kids' },
-  { title:'Pooja Room',          style:'Traditional', img:'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=400&q=75', room:'Pooja' },
-]
-
-const BEFORE_IMG = 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?auto=format&fit=crop&w=900&q=85'
-const AFTER_IMG  = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=85'
-
-const TICKER_ITEMS = ['Floor Plan','3D Visualization','AR Preview','AI Floor Plan','Furniture Catalog','Material Editor','PDF Export','Custom Models','Version History','Room Templates','Shop the Look','Snap Grid','Doors & Windows']
-
-/* ─── Hooks ──────────────────────────────────────────────────────────────── */
-function useReveal() {
   useEffect(() => {
-    const sel = '.reveal,.reveal-left,.reveal-right,.reveal-scale'
-    function run() {
-      const els = document.querySelectorAll(sel)
-      const io = new IntersectionObserver(entries => {
-        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target) } })
-      }, { threshold: 0.1 })
-      els.forEach(el => io.observe(el))
-      return io
+    let rx = 0, ry = 0, cx = 0, cy = 0
+    let raf
+
+    function onMove(e) {
+      cx = e.clientX; cy = e.clientY
+      if (dotRef.current) {
+        dotRef.current.style.left = cx + 'px'
+        dotRef.current.style.top  = cy + 'px'
+      }
     }
-    const io = run()
-    return () => io.disconnect()
+
+    function loop() {
+      rx += (cx - rx) * 0.12
+      ry += (cy - ry) * 0.12
+      if (ringRef.current) {
+        ringRef.current.style.left = rx + 'px'
+        ringRef.current.style.top  = ry + 'px'
+      }
+      raf = requestAnimationFrame(loop)
+    }
+
+    function onEnter() { document.body.classList.add('cursor-hover') }
+    function onLeave() { document.body.classList.remove('cursor-hover') }
+
+    window.addEventListener('mousemove', onMove)
+    document.querySelectorAll('a,button,[role=button]').forEach(el => {
+      el.addEventListener('mouseenter', onEnter)
+      el.addEventListener('mouseleave', onLeave)
+    })
+    raf = requestAnimationFrame(loop)
+    return () => { window.removeEventListener('mousemove', onMove); cancelAnimationFrame(raf) }
   }, [])
+
+  return (
+    <div className="es-cursor">
+      <div ref={dotRef}  className="es-cursor-dot" />
+      <div ref={ringRef} className="es-cursor-ring" />
+    </div>
+  )
 }
 
-function useCountUp(end, inView) {
-  const [n, setN] = useState(0)
-  useEffect(() => {
-    if (!inView) return
-    const num = parseInt(end.replace(/\D/g,''))
-    let start = null
-    function step(ts) {
-      if (!start) start = ts
-      const p = Math.min((ts - start) / 1600, 1)
-      const ease = 1 - Math.pow(1 - p, 3)
-      setN(Math.round(ease * num))
-      if (p < 1) requestAnimationFrame(step)
-    }
-    requestAnimationFrame(step)
-  }, [inView, end])
-  return n
-}
-
-/* ─── Before/After Slider ────────────────────────────────────────────────── */
-function BeforeAfterSlider() {
-  const [pos, setPos] = useState(50)
-  const [dragging, setDragging] = useState(false)
+/* ─── Before/After ───────────────────────────────────────────────────────── */
+function BeforeAfter() {
+  const [pos, setPos]   = useState(50)
+  const [drag, setDrag] = useState(false)
   const ref = useRef(null)
 
-  const move = useCallback(clientX => {
+  const move = useCallback(x => {
     if (!ref.current) return
     const r = ref.current.getBoundingClientRect()
-    setPos(Math.max(5, Math.min(95, ((clientX - r.left) / r.width) * 100)))
+    setPos(Math.max(4, Math.min(96, (x - r.left) / r.width * 100)))
   }, [])
 
   useEffect(() => {
-    if (!dragging) return
-    const up = () => setDragging(false)
+    if (!drag) return
+    const up = () => setDrag(false)
     const mv = e => move(e.touches ? e.touches[0].clientX : e.clientX)
     window.addEventListener('mousemove', mv)
     window.addEventListener('mouseup', up)
     window.addEventListener('touchmove', mv, { passive: true })
     window.addEventListener('touchend', up)
-    return () => { window.removeEventListener('mousemove',mv); window.removeEventListener('mouseup',up); window.removeEventListener('touchmove',mv); window.removeEventListener('touchend',up) }
-  }, [dragging, move])
+    return () => {
+      window.removeEventListener('mousemove', mv)
+      window.removeEventListener('mouseup', up)
+      window.removeEventListener('touchmove', mv)
+      window.removeEventListener('touchend', up)
+    }
+  }, [drag, move])
 
   return (
-    <div ref={ref} className="ba-slider"
-      onMouseDown={e=>{ setDragging(true); move(e.clientX) }}
-      onTouchStart={e=>{ setDragging(true); move(e.touches[0].clientX) }}
-      style={{ width:'100%', height:480, position:'relative', borderRadius:2, overflow:'hidden' }}>
-
-      {/* Before (base) */}
+    <div ref={ref}
+      onMouseDown={e => { setDrag(true); move(e.clientX) }}
+      onTouchStart={e => { setDrag(true); move(e.touches[0].clientX) }}
+      style={{ position:'relative', width:'100%', height:520, overflow:'hidden', cursor:'ew-resize', userSelect:'none' }}>
       <img src={BEFORE_IMG} alt="Before" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />
-
-      {/* After (clipped) */}
       <div style={{ position:'absolute', inset:0, width:`${pos}%`, overflow:'hidden' }}>
-        <img src={AFTER_IMG} alt="After" style={{ position:'absolute', inset:0, width:`${100/pos*100}%`, maxWidth:'unset', height:'100%', objectFit:'cover' }} />
+        <img src={AFTER_IMG} alt="After" style={{ position:'absolute', inset:0, width:`${10000/pos}%`, maxWidth:'none', height:'100%', objectFit:'cover' }} />
       </div>
-
-      {/* Divider */}
-      <div style={{ position:'absolute', top:0, bottom:0, left:`${pos}%`, width:2, background:WHITE, transform:'translateX(-50%)', zIndex:10 }}>
-        <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:44, height:44, background:WHITE, borderRadius:'50%', boxShadow:'0 4px 24px rgba(0,0,0,0.25)', display:'flex', alignItems:'center', justifyContent:'center', gap:2 }}>
-          <span style={{ fontSize:11, color:DARK }}>◀</span>
-          <span style={{ fontSize:11, color:DARK }}>▶</span>
+      {/* Divider line */}
+      <div style={{ position:'absolute', top:0, bottom:0, left:`${pos}%`, width:1, background:WHITE, transform:'translateX(-50%)', zIndex:10 }}>
+        {/* Handle */}
+        <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:48, height:48, background:DARK, border:`1px solid rgba(255,255,255,0.3)`, display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+          <span style={{ color:WHITE, fontSize:10, fontFamily:SS }}>&#8592;</span>
+          <span style={{ color:WHITE, fontSize:10, fontFamily:SS }}>&#8594;</span>
         </div>
       </div>
-
       {/* Labels */}
-      <div style={{ position:'absolute', top:16, left:16, background:'rgba(0,0,0,0.6)', color:WHITE, padding:'5px 14px', fontFamily:SS, fontSize:11, fontWeight:700, letterSpacing:'0.14em', textTransform:'uppercase', backdropFilter:'blur(4px)' }}>Before</div>
-      <div style={{ position:'absolute', top:16, right:16, background:GOLD, color:DARK, padding:'5px 14px', fontFamily:SS, fontSize:11, fontWeight:700, letterSpacing:'0.14em', textTransform:'uppercase' }}>After</div>
+      <span style={{ position:'absolute', top:24, left:24, fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.3em', textTransform:'uppercase', color:'rgba(255,255,255,0.7)', background:'rgba(0,0,0,0.4)', padding:'5px 12px', backdropFilter:'blur(4px)' }}>Before</span>
+      <span style={{ position:'absolute', top:24, right:24, fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.3em', textTransform:'uppercase', color:DARK, background:GOLD, padding:'5px 12px' }}>After</span>
     </div>
   )
 }
 
-/* ─── Stat Counter Card ──────────────────────────────────────────────────── */
-function StatCard({ val, label, sub, inView }) {
-  const num = useCountUp(val, inView)
-  const suffix = val.replace(/[\d]/g,'')
-  return (
-    <div style={{ flex:1, minWidth:140, textAlign:'center', padding:'28px 16px' }}>
-      <div style={{ fontFamily:SF, fontSize:'clamp(40px,4vw,62px)', fontWeight:400, color:GOLD, lineHeight:1, letterSpacing:'-0.02em' }}>
-        {num}{suffix}
-      </div>
-      <div style={{ fontFamily:SS, fontSize:13, fontWeight:700, color:TEXT, marginTop:6 }}>{label}</div>
-      <div style={{ fontFamily:SS, fontSize:11, color:MUTED, marginTop:2 }}>{sub}</div>
-    </div>
-  )
-}
-
-/* ─── Main Export ────────────────────────────────────────────────────────── */
+/* ─── Main ───────────────────────────────────────────────────────────────── */
 export default function HomePage() {
-  useReveal()
   const nav = useNavigate()
-  const [quizSel,    setQuizSel]    = useState(null)
-  const [statsVis,   setStatsVis]   = useState(false)
-  const [likedCards, setLikedCards] = useState({})
-  const [hovTemplate, setHovTemplate] = useState(null)
-  const statsRef = useRef(null)
+  const [hovRoom, setHovRoom] = useState(null)
 
-  /* Inject global CSS once */
+  /* Inject CSS */
   useEffect(() => {
-    const id = 'hs-global'
+    const id = 'es-premium-css'
     if (!document.getElementById(id)) {
-      const s = document.createElement('style'); s.id = id; s.textContent = GLOBAL_CSS; document.head.appendChild(s)
+      const s = document.createElement('style')
+      s.id = id; s.textContent = CSS; document.head.appendChild(s)
     }
   }, [])
 
-  /* Stats visibility */
+  /* Scroll reveal */
   useEffect(() => {
-    if (!statsRef.current) return
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setStatsVis(true); io.disconnect() } }, { threshold: 0.3 })
-    io.observe(statsRef.current)
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('v'); io.unobserve(e.target) } })
+    }, { threshold: 0.08 })
+    setTimeout(() => {
+      document.querySelectorAll('.r,.rl,.rr,.rs').forEach(el => io.observe(el))
+    }, 100)
     return () => io.disconnect()
   }, [])
 
-  /* Re-run reveal after mount for any late renders */
+  /* Cursor hover delegation */
   useEffect(() => {
-    setTimeout(() => {
-      const els = document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale')
-      const io = new IntersectionObserver(entries => {
-        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible') })
-      }, { threshold: 0.08 })
-      els.forEach(el => io.observe(el))
-    }, 200)
+    function on(e) { if (e.target.closest('a,button,[role=button]')) document.body.classList.add('cursor-hover') }
+    function off()  { document.body.classList.remove('cursor-hover') }
+    document.addEventListener('mouseover', on)
+    document.addEventListener('mouseout',  off)
+    return () => { document.removeEventListener('mouseover', on); document.removeEventListener('mouseout', off) }
   }, [])
 
-  function toggleLike(i) { setLikedCards(p => ({ ...p, [i]: !p[i] })) }
+  const SectionLabel = ({ children }) => (
+    <span style={{ fontFamily:SS, fontSize:9, fontWeight:600, letterSpacing:'0.38em', textTransform:'uppercase', color:GOLD }}>
+      {children}
+    </span>
+  )
+
+  const Rule = ({ light }) => (
+    <div style={{ height:1, background: light ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)', marginBottom: 0 }} />
+  )
 
   return (
-    <div style={{ fontFamily:SS, background:CREAM, minHeight:'100vh', overflowX:'hidden' }}>
+    <div style={{ fontFamily:SS, background:CREAM, overflowX:'hidden' }}>
+      <Cursor />
       <Navbar />
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          HERO — Immersive fullscreen with cycling photography
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ position:'relative', height:'100svh', minHeight:600, background:DARK, overflow:'hidden' }}>
-
-        {/* Background cycling images */}
-        {HERO_IMGS.map((src,i) => (
-          <img key={i} src={src} alt="" className="hero-img" style={{ animationDelay:`${i*5}s` }} />
+      {/* ══════════════════════════════════════════════════════════════════
+          I. CINEMATIC HERO
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ position:'relative', height:'100svh', minHeight:680, overflow:'hidden', background:DARK }}>
+        {/* Cycling images */}
+        {HERO_IMAGES.map((src, i) => (
+          <img key={i} src={src} alt="" className="hero-img" style={{ animationDelay:`${i*6}s` }} />
         ))}
-        <div style={{ position:'absolute', inset:0, background:'linear-gradient(to right, rgba(13,12,8,0.88) 40%, rgba(13,12,8,0.2))', zIndex:1 }} />
-        <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(13,12,8,0.6) 0%, transparent 50%)', zIndex:1 }} />
+        {/* Overlay gradient — very restrained */}
+        <div style={{ position:'absolute', inset:0, background:'linear-gradient(to bottom, rgba(13,12,8,0.18) 0%, rgba(13,12,8,0.58) 100%)', zIndex:1 }} />
 
-        {/* Content */}
-        <div style={{ position:'relative', zIndex:2, height:'100%', display:'flex', alignItems:'center', padding:'0 clamp(24px,6vw,100px)', maxWidth:1300, margin:'0 auto' }}>
-          <div style={{ maxWidth:700, animation:'fadeIn 1s ease 0.2s both' }}>
+        {/* Content — centered, editorial */}
+        <div style={{ position:'relative', zIndex:2, height:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', textAlign:'center', padding:'0 clamp(32px,8vw,180px)' }}>
 
-            {/* Eyebrow */}
-            <div style={{ display:'inline-flex', alignItems:'center', gap:8, border:'1px solid rgba(201,162,39,0.35)', padding:'6px 14px', marginBottom:28, backdropFilter:'blur(8px)', background:'rgba(201,162,39,0.06)' }}>
-              <span style={{ width:6, height:6, borderRadius:'50%', background:GOLD, animation:'pulseDot 1.8s ease-in-out infinite' }} />
-              <span style={{ fontFamily:SS, fontSize:10, fontWeight:700, color:GOLD, letterSpacing:'0.28em', textTransform:'uppercase' }}>Free Interior Design Tool</span>
-            </div>
+          {/* Thin gold rule above headline */}
+          <div style={{ width:48, height:1, background:GOLD, marginBottom:36, animation:'titleIn 1.2s ease 0.3s both' }} />
 
-            {/* Headline */}
-            <h1 style={{ fontFamily:SF, fontSize:'clamp(42px,6.5vw,96px)', fontWeight:300, color:WHITE, lineHeight:1.0, letterSpacing:'-0.02em', marginBottom:24 }}>
-              Design your<br />
-              <em style={{ color:GOLD, fontStyle:'italic' }}>dream space</em><br />
-              in minutes.
-            </h1>
+          <h1 style={{ fontFamily:SF, fontWeight:300, fontSize:'clamp(52px,7.5vw,118px)', color:WHITE, lineHeight:1.0, letterSpacing:'-0.02em', marginBottom:0, animation:'titleIn 1.2s ease 0.5s both' }}>
+            The art of<br />
+            <em style={{ fontStyle:'italic', color:GOLD }}>beautiful living.</em>
+          </h1>
 
-            {/* Sub */}
-            <p style={{ fontFamily:SS, fontSize:'clamp(15px,1.5vw,18px)', color:'rgba(255,255,255,0.65)', lineHeight:1.8, maxWidth:520, marginBottom:40 }}>
-              Anyone can design a beautiful home. No experience needed — just pick a style, place furniture, and see it in 3D instantly.
-            </p>
-
-            {/* CTAs */}
-            <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
-              <button onClick={()=>nav('/studio')}
-                style={{ fontFamily:SS, fontSize:12, fontWeight:800, letterSpacing:'0.18em', textTransform:'uppercase',
-                  padding:'16px 40px', background:`linear-gradient(135deg,${GOLD},${GOLDL})`, color:DARK,
-                  border:'none', cursor:'pointer', transition:'all 0.25s', boxShadow:`0 8px 32px rgba(201,162,39,0.4)` }}
-                onMouseEnter={e=>{ e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow=`0 16px 48px rgba(201,162,39,0.5)` }}
-                onMouseLeave={e=>{ e.currentTarget.style.transform='none'; e.currentTarget.style.boxShadow=`0 8px 32px rgba(201,162,39,0.4)` }}>
-                Start Designing Free →
-              </button>
-              <button onClick={()=>nav('/gallery')}
-                style={{ fontFamily:SS, fontSize:12, fontWeight:700, letterSpacing:'0.14em', textTransform:'uppercase',
-                  padding:'16px 32px', background:'transparent', color:'rgba(255,255,255,0.8)',
-                  border:'1px solid rgba(255,255,255,0.2)', cursor:'pointer', transition:'all 0.2s', backdropFilter:'blur(8px)' }}
-                onMouseEnter={e=>{ e.currentTarget.style.borderColor='rgba(255,255,255,0.5)'; e.currentTarget.style.color=WHITE }}
-                onMouseLeave={e=>{ e.currentTarget.style.borderColor='rgba(255,255,255,0.2)'; e.currentTarget.style.color='rgba(255,255,255,0.8)' }}>
-                Browse Inspiration
-              </button>
-            </div>
-
-            {/* Social proof */}
-            <div style={{ display:'flex', alignItems:'center', gap:16, marginTop:36, flexWrap:'wrap' }}>
-              <div style={{ display:'flex' }}>
-                {['🧑','👩','🧑','👩','🧑'].map((e,i) => (
-                  <div key={i} style={{ width:34, height:34, borderRadius:'50%', background:`hsl(${25+i*20},45%,${48+i*5}%)`, border:'2px solid rgba(13,12,8,0.8)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:15, marginLeft:i>0?-10:0 }}>{e}</div>
-                ))}
-              </div>
-              <div>
-                <div style={{ fontFamily:SS, fontSize:12, fontWeight:700, color:WHITE }}>Loved by 20,000+ designers</div>
-                <div style={{ fontFamily:SS, fontSize:10, color:'rgba(255,255,255,0.4)' }}>homeowners, architects &amp; students</div>
-              </div>
-              <div style={{ display:'flex', gap:2, marginLeft:4 }}>
-                {'★★★★★'.split('').map((_,i) => <span key={i} style={{ color:GOLD, fontSize:16 }}>★</span>)}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Floating feature pills */}
-        <div className="hide-mobile" style={{ position:'absolute', right:'5%', top:'50%', transform:'translateY(-50%)', zIndex:2, display:'flex', flexDirection:'column', gap:10, animation:'slideDown 1s ease 0.6s both' }}>
-          {[['📐','Snap Grid'],['🚪','Doors & Windows'],['📱','AR Preview'],['✦','AI Floor Plan'],['🛋','150+ Furniture']].map(([ic,lb],i)=>(
-            <div key={i} style={{ background:'rgba(255,255,255,0.08)', backdropFilter:'blur(12px)', border:'1px solid rgba(255,255,255,0.12)', padding:'10px 18px', display:'flex', alignItems:'center', gap:10, animation:`float ${3+i*0.4}s ease-in-out infinite`, animationDelay:`${i*0.3}s` }}>
-              <span style={{ fontSize:16 }}>{ic}</span>
-              <span style={{ fontFamily:SS, fontSize:10, fontWeight:700, color:'rgba(255,255,255,0.85)', letterSpacing:'0.1em', whiteSpace:'nowrap' }}>{lb}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Scroll hint */}
-        <div style={{ position:'absolute', bottom:32, left:'50%', transform:'translateX(-50%)', zIndex:2, textAlign:'center' }}>
-          <div style={{ fontFamily:SS, fontSize:9, letterSpacing:'0.28em', color:'rgba(255,255,255,0.3)', textTransform:'uppercase', marginBottom:10 }}>Discover</div>
-          <div style={{ width:1, height:52, background:'linear-gradient(to bottom,rgba(255,255,255,0.4),transparent)', margin:'0 auto' }} />
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          TICKER — Scrolling feature names
-      ══════════════════════════════════════════════════════════════════════ */}
-      <div style={{ background:GOLD, padding:'13px 0', overflow:'hidden' }}>
-        <div style={{ display:'flex', whiteSpace:'nowrap', animation:'ticker 30s linear infinite' }}>
-          {[0,1,2].map(d => (
-            <span key={d} style={{ display:'inline-flex' }}>
-              {TICKER_ITEMS.map((s,i) => (
-                <span key={i} style={{ fontFamily:SS, fontSize:10, fontWeight:800, letterSpacing:'0.26em', textTransform:'uppercase', color:DARK, padding:'0 28px' }}>
-                  ✦ {s}
-                </span>
-              ))}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          STATS — Animated counters
-      ══════════════════════════════════════════════════════════════════════ */}
-      <div ref={statsRef} style={{ background:DARK, borderTop:`1px solid rgba(255,255,255,0.05)` }}>
-        <div style={{ maxWidth:1100, margin:'0 auto', display:'flex', flexWrap:'wrap', justifyContent:'center', gap:0 }}>
-          {STATS.map((s,i) => (
-            <StatCard key={i} {...s} inView={statsVis} />
-          ))}
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          HOW IT WORKS — 3 visual steps
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ padding:'110px clamp(24px,6vw,80px)', background:CREAM }}>
-        <div style={{ maxWidth:1200, margin:'0 auto' }}>
-
-          <div style={{ textAlign:'center', marginBottom:70 }} className="reveal">
-            <div style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:GOLD, marginBottom:14 }}>Simple 3-Step Process</div>
-            <h2 style={{ fontFamily:SF, fontSize:'clamp(36px,4.5vw,68px)', fontWeight:300, color:DARK, lineHeight:1.05, letterSpacing:'-0.01em' }}>
-              From blank room to<br /><em style={{ fontStyle:'italic', color:GOLD }}>stunning design</em>
-            </h2>
-            <p style={{ fontFamily:SS, fontSize:16, color:MUTED, maxWidth:560, margin:'20px auto 0', lineHeight:1.8 }}>
-              No architecture degree. No design software. No expensive consultants. Just you and your imagination.
-            </p>
-          </div>
-
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))', gap:32 }}>
-            {HOW_STEPS.map((s,i) => (
-              <div key={i} className="reveal card-hover" style={{ background:WHITE, border:`1px solid ${BORDER}`, overflow:'hidden', animationDelay:`${i*120}ms` }}>
-                <div style={{ position:'relative', height:240, overflow:'hidden' }}>
-                  <img src={s.img} alt={s.title} style={{ width:'100%', height:'100%', objectFit:'cover', transition:'transform 0.5s ease' }}
-                    onMouseEnter={e=>e.currentTarget.style.transform='scale(1.06)'}
-                    onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'} loading="lazy" />
-                  <div style={{ position:'absolute', top:0, left:0, width:60, height:60, background:GOLD, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    <span style={{ fontFamily:SS, fontSize:22, fontWeight:800, color:DARK }}>{s.n}</span>
-                  </div>
-                </div>
-                <div style={{ padding:'28px 28px 32px' }}>
-                  <div style={{ fontSize:28, marginBottom:12 }}>{s.icon}</div>
-                  <h3 style={{ fontFamily:SF, fontSize:28, fontWeight:400, color:DARK, marginBottom:10 }}>{s.title}</h3>
-                  <p style={{ fontFamily:SS, fontSize:14, color:MUTED, lineHeight:1.8 }}>{s.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ textAlign:'center', marginTop:56 }} className="reveal">
-            <button onClick={()=>nav('/studio')}
-              style={{ fontFamily:SS, fontSize:11, fontWeight:800, letterSpacing:'0.2em', textTransform:'uppercase',
-                padding:'15px 48px', background:DARK, color:WHITE, border:'none', cursor:'pointer', transition:'all 0.25s' }}
-              onMouseEnter={e=>{ e.currentTarget.style.background=GOLD; e.currentTarget.style.color=DARK }}
-              onMouseLeave={e=>{ e.currentTarget.style.background=DARK; e.currentTarget.style.color=WHITE }}>
-              Try It Now — It's Free →
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          STYLE QUIZ — Discover your design personality
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ padding:'100px clamp(24px,6vw,80px)', background:DARK2 }}>
-        <div style={{ maxWidth:1200, margin:'0 auto' }}>
-          <div style={{ textAlign:'center', marginBottom:60 }} className="reveal">
-            <div style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:GOLD, marginBottom:14 }}>Design Style Quiz</div>
-            <h2 style={{ fontFamily:SF, fontSize:'clamp(32px,4vw,60px)', fontWeight:300, color:WHITE, lineHeight:1.1 }}>
-              What's your design<br /><em style={{ color:GOLD }}>personality?</em>
-            </h2>
-            <p style={{ fontFamily:SS, fontSize:15, color:'rgba(255,255,255,0.5)', marginTop:18 }}>Pick your vibe — we'll open the studio styled just for you</p>
-          </div>
-
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:16 }}>
-            {STYLE_QUIZ.map((s,i) => {
-              const sel = quizSel === s.id
-              return (
-                <div key={i} className="reveal" style={{ animationDelay:`${i*80}ms` }}>
-                  <button onClick={() => { setQuizSel(s.id); setTimeout(() => nav('/studio'), 600) }}
-                    style={{ width:'100%', textAlign:'left', cursor:'pointer', border:`2px solid ${sel ? GOLD : 'transparent'}`,
-                      outline:'none', background:'none', padding:0, position:'relative', overflow:'hidden', transition:'border-color 0.2s' }}>
-                    <div style={{ position:'relative', paddingBottom:'80%', overflow:'hidden' }}>
-                      <img src={s.img} alt={s.label} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', transition:'transform 0.5s ease' }}
-                        onMouseEnter={e=>e.currentTarget.style.transform='scale(1.06)'}
-                        onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'} loading="lazy" />
-                      <div style={{ position:'absolute', inset:0, background:`linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 50%)` }} />
-                      {sel && <div style={{ position:'absolute', inset:0, background:'rgba(201,162,39,0.15)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                        <div style={{ width:52, height:52, border:`3px solid ${GOLD}`, display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'50%', fontSize:22, color:GOLD }}>✓</div>
-                      </div>}
-                      <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'20px 20px 22px' }}>
-                        <div style={{ fontFamily:SF, fontSize:22, fontWeight:400, color:WHITE, marginBottom:4 }}>{s.label}</div>
-                        <div style={{ fontFamily:SS, fontSize:11, color:'rgba(255,255,255,0.6)', lineHeight:1.5 }}>{s.sub}</div>
-                      </div>
-                    </div>
-                  </button>
-                </div>
-              )
-            })}
-          </div>
-
-          <p style={{ textAlign:'center', fontFamily:SS, fontSize:12, color:'rgba(255,255,255,0.3)', marginTop:32 }}>
-            Click any style to open the Studio — or{' '}
-            <button onClick={()=>nav('/studio')} style={{ background:'none', border:'none', color:GOLD, fontFamily:SS, fontSize:12, cursor:'pointer', textDecoration:'underline' }}>start from scratch</button>
+          <p style={{ fontFamily:SS, fontSize:'clamp(13px,1.1vw,15px)', fontWeight:300, color:'rgba(255,255,255,0.55)', letterSpacing:'0.12em', marginTop:36, maxWidth:500, lineHeight:1.9, animation:'titleIn 1.2s ease 0.8s both' }}>
+            Design extraordinary interiors — from a blank floor plan to a photorealistic room — entirely in your browser. No experience required.
           </p>
-        </div>
-      </section>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          TEMPLATE GALLERY — Horizontal scroll
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ padding:'100px 0 80px', background:CREAM, overflow:'hidden' }}>
-        <div style={{ maxWidth:1200, margin:'0 auto', padding:'0 clamp(24px,6vw,80px)' }}>
-          <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', flexWrap:'wrap', gap:20, marginBottom:48 }} className="reveal">
-            <div>
-              <div style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:GOLD, marginBottom:14 }}>500+ Free Templates</div>
-              <h2 style={{ fontFamily:SF, fontSize:'clamp(32px,4vw,58px)', fontWeight:300, color:DARK, lineHeight:1.05 }}>
-                Start from a<br /><em style={{ fontStyle:'italic', color:GOLDD }}>beautiful room</em>
-              </h2>
-            </div>
-            <button onClick={()=>nav('/studio')}
-              style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.18em', textTransform:'uppercase', padding:'12px 28px', background:'transparent', border:`1px solid ${DARK}`, color:DARK, cursor:'pointer', transition:'all 0.2s', flexShrink:0 }}
-              onMouseEnter={e=>{ e.currentTarget.style.background=DARK; e.currentTarget.style.color=WHITE }}
-              onMouseLeave={e=>{ e.currentTarget.style.background='transparent'; e.currentTarget.style.color=DARK }}>
-              View All Templates →
+          <div style={{ display:'flex', alignItems:'center', gap:48, marginTop:56, animation:'titleIn 1.2s ease 1.1s both' }}>
+            <button onClick={() => nav('/studio')}
+              style={{ fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.34em', textTransform:'uppercase', color:WHITE, background:'transparent', border:'none', cursor:'none', padding:0, transition:'opacity 0.3s' }}
+              onMouseEnter={e => e.currentTarget.style.opacity='0.6'}
+              onMouseLeave={e => e.currentTarget.style.opacity='1'}>
+              <span className="hover-line">Begin Designing</span>
+              &nbsp;&nbsp;&#8594;
+            </button>
+
+            <div style={{ width:1, height:32, background:'rgba(255,255,255,0.2)' }} />
+
+            <button onClick={() => nav('/gallery')}
+              style={{ fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.34em', textTransform:'uppercase', color:'rgba(255,255,255,0.5)', background:'transparent', border:'none', cursor:'none', padding:0, transition:'opacity 0.3s' }}
+              onMouseEnter={e => e.currentTarget.style.opacity='0.8'}
+              onMouseLeave={e => e.currentTarget.style.opacity='1'}>
+              <span className="hover-line">View Gallery</span>
             </button>
           </div>
         </div>
 
-        {/* Horizontal scroll */}
-        <div className="no-scrollbar" style={{ display:'flex', gap:20, overflowX:'auto', padding:'4px clamp(24px,6vw,80px) 20px' }}>
-          {TEMPLATES.map((t,i) => (
-            <div key={i} className="card-hover" style={{ flexShrink:0, width:280, cursor:'pointer', position:'relative', background:WHITE, border:`1px solid ${BORDER}`, overflow:'hidden' }}
-              onClick={()=>nav('/studio')}
-              onMouseEnter={()=>setHovTemplate(i)}
-              onMouseLeave={()=>setHovTemplate(null)}>
-              <div style={{ position:'relative', height:200, overflow:'hidden' }}>
-                <img src={t.img} alt={t.title} style={{ width:'100%', height:'100%', objectFit:'cover', transition:'transform 0.5s ease', transform:hovTemplate===i?'scale(1.08)':'scale(1)' }} loading="lazy" />
-                <div style={{ position:'absolute', inset:0, background:`rgba(13,12,8,${hovTemplate===i?0.45:0.1})`, transition:'background 0.3s', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  {hovTemplate===i && (
-                    <div style={{ background:GOLD, color:DARK, padding:'9px 22px', fontFamily:SS, fontSize:10, fontWeight:800, letterSpacing:'0.18em', textTransform:'uppercase' }}>
-                      Use Template →
-                    </div>
-                  )}
-                </div>
-                <div style={{ position:'absolute', top:10, right:10, background:'#16a34a', color:WHITE, padding:'3px 8px', fontFamily:SS, fontSize:9, fontWeight:800, letterSpacing:'0.1em' }}>FREE</div>
+        {/* Bottom scroll hint */}
+        <div style={{ position:'absolute', bottom:40, left:'50%', transform:'translateX(-50%)', zIndex:2, textAlign:'center', animation:'titleIn 1.5s ease 1.4s both' }}>
+          <div style={{ width:1, height:60, background:'linear-gradient(to bottom,rgba(255,255,255,0.5),transparent)', margin:'0 auto' }} />
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          II. MANIFESTO
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ background:CREAM, padding:'140px clamp(40px,8vw,160px)' }}>
+        <div style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 2fr', gap:80, alignItems:'start' }} className="col-sm">
+          <div className="rl" style={{ paddingTop:12 }}>
+            <SectionLabel>Our Philosophy</SectionLabel>
+            <div style={{ width:36, height:1, background:GOLD, marginTop:20 }} />
+          </div>
+
+          <div className="r">
+            <blockquote style={{ fontFamily:SF, fontSize:'clamp(28px,3.2vw,52px)', fontWeight:300, color:DARK, lineHeight:1.25, fontStyle:'italic', marginBottom:48 }}>
+              "We believe every room has the potential to be extraordinary. You simply need the tools to reveal it."
+            </blockquote>
+            <p style={{ fontFamily:SS, fontSize:15, fontWeight:300, color:MUTED, lineHeight:1.9, maxWidth:560 }}>
+              El Shaddai is an interior design studio built for everyone — the homeowner reimagining their living room, the student furnishing their first apartment, the professional curating a premium workspace. Our platform provides photorealistic 3D design tools that were once available only to trained architects and designers.
+            </p>
+            <button onClick={() => nav('/studio')} style={{ marginTop:48, fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.34em', textTransform:'uppercase', color:DARK, background:'transparent', border:'none', cursor:'none', padding:0, transition:'opacity 0.3s' }}
+              onMouseEnter={e => e.currentTarget.style.opacity='0.45'}
+              onMouseLeave={e => e.currentTarget.style.opacity='1'}>
+              <span className="hover-line">Explore the Studio &#8594;</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <Rule />
+
+      {/* ══════════════════════════════════════════════════════════════════
+          III. ROOM SHOWCASE — Alternating editorial blocks
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ background:WHITE, padding:'120px 0' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 clamp(40px,6vw,100px)' }}>
+
+          {/* Header */}
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:80, borderBottom:`1px solid rgba(0,0,0,0.07)`, paddingBottom:32 }} className="col-sm r">
+            <h2 style={{ fontFamily:SF, fontSize:'clamp(40px,4.5vw,70px)', fontWeight:300, color:DARK, lineHeight:1.0 }}>
+              Every room,<br /><em style={{ fontStyle:'italic', color:GOLD }}>perfected.</em>
+            </h2>
+            <SectionLabel>Featured Spaces</SectionLabel>
+          </div>
+
+          {/* Rooms */}
+          {ROOMS.map((rm, i) => (
+            <div key={i} style={{ display:'grid', gridTemplateColumns: i%2===0 ? '1.1fr 0.9fr' : '0.9fr 1.1fr', gap:0, alignItems:'stretch', minHeight:500, marginBottom:2 }} className="col-sm">
+
+              {/* Image — left for even, right for odd */}
+              <div className={`img-wrap ${i%2===0?'rl':'rr'}`} style={{ order: i%2===0?1:2 }}>
+                <img src={rm.img} alt={rm.room} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block', minHeight:400 }} loading="lazy" />
               </div>
-              <div style={{ padding:'16px 18px' }}>
-                <div style={{ fontFamily:SF, fontSize:17, fontWeight:400, color:DARK, marginBottom:4 }}>{t.title}</div>
-                <div style={{ fontFamily:SS, fontSize:10, color:MUTED }}>{t.style} · {t.room}</div>
+
+              {/* Text */}
+              <div className={`r`} style={{ order: i%2===0?2:1, padding:'60px 64px', background: i===1 ? DARK2 : CREAM, display:'flex', flexDirection:'column', justifyContent:'center' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom:36 }}>
+                  <span style={{ fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.36em', color:GOLD }}>{rm.n}</span>
+                  <div style={{ flex:1, height:1, background:'rgba(201,162,39,0.3)' }} />
+                </div>
+                <h3 style={{ fontFamily:SF, fontSize:'clamp(32px,3vw,50px)', fontWeight:300, color: i===1 ? WHITE : DARK, lineHeight:1.1, marginBottom:12 }}>{rm.room}</h3>
+                <div style={{ fontFamily:SS, fontSize:9, fontWeight:600, letterSpacing:'0.28em', textTransform:'uppercase', color:GOLD, marginBottom:28 }}>{rm.style}</div>
+                <p style={{ fontFamily:SS, fontSize:14, fontWeight:300, color: i===1 ? 'rgba(255,255,255,0.55)' : MUTED, lineHeight:1.95 }}>{rm.desc}</p>
+                <button onClick={() => nav('/studio')}
+                  style={{ marginTop:44, fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.34em', textTransform:'uppercase', color: i===1 ? WHITE : DARK, background:'transparent', border:'none', cursor:'none', padding:0, alignSelf:'flex-start', transition:'opacity 0.3s' }}
+                  onMouseEnter={e => e.currentTarget.style.opacity='0.4'}
+                  onMouseLeave={e => e.currentTarget.style.opacity='1'}>
+                  <span className="hover-line">Design This Room &#8594;</span>
+                </button>
               </div>
             </div>
           ))}
-          {/* "See all" card */}
-          <div style={{ flexShrink:0, width:240, border:`2px dashed ${BORDER}`, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:14, cursor:'pointer', padding:32, transition:'border-color 0.2s' }}
-            onClick={()=>nav('/studio')}
-            onMouseEnter={e=>e.currentTarget.style.borderColor=GOLD}
-            onMouseLeave={e=>e.currentTarget.style.borderColor=BORDER}>
-            <div style={{ width:52, height:52, background:DARK, display:'flex', alignItems:'center', justifyContent:'center', color:WHITE, fontSize:24, fontWeight:300 }}>+</div>
-            <div style={{ fontFamily:SS, fontSize:12, fontWeight:700, color:DARK, textAlign:'center' }}>500+ More Templates</div>
-            <div style={{ fontFamily:SS, fontSize:10, color:MUTED, textAlign:'center' }}>All free · No sign-in</div>
-          </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          FEATURES GRID — What you can do
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ padding:'100px clamp(24px,6vw,80px)', background:WHITE }}>
+      {/* ══════════════════════════════════════════════════════════════════
+          IV. THE STUDIO — Dark editorial
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ background:DARK, padding:'140px clamp(40px,8vw,160px)' }}>
         <div style={{ maxWidth:1200, margin:'0 auto' }}>
-          <div style={{ textAlign:'center', marginBottom:70 }} className="reveal">
-            <div style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:GOLD, marginBottom:14 }}>Every Tool You Need</div>
-            <h2 style={{ fontFamily:SF, fontSize:'clamp(34px,4.5vw,64px)', fontWeight:300, color:DARK, lineHeight:1.05 }}>
-              Professional-grade tools.<br /><em style={{ fontStyle:'italic', color:GOLD }}>Zero cost.</em>
-            </h2>
-            <p style={{ fontFamily:SS, fontSize:16, color:MUTED, maxWidth:520, margin:'20px auto 0', lineHeight:1.8 }}>
-              Everything Homestyler has — and features they don't — all in your browser, free forever.
-            </p>
-          </div>
 
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(260px,1fr))', gap:20 }}>
-            {FEATURES.map((f,i) => (
-              <div key={i} className="reveal card-hover" style={{ background:f.color, border:`1px solid rgba(0,0,0,0.05)`, padding:'28px 26px', animationDelay:`${i*50}ms` }}>
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:16 }}>
-                  <span style={{ fontSize:32 }}>{f.icon}</span>
-                  <span style={{ fontFamily:SS, fontSize:8, fontWeight:800, letterSpacing:'0.14em', textTransform:'uppercase', background:DARK, color:WHITE, padding:'3px 8px' }}>{f.badge}</span>
-                </div>
-                <h3 style={{ fontFamily:SS, fontSize:14, fontWeight:700, color:DARK, marginBottom:8 }}>{f.title}</h3>
-                <p style={{ fontFamily:SS, fontSize:12, color:MUTED, lineHeight:1.7 }}>{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'80px 100px', alignItems:'start' }} className="col-sm">
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          BEFORE/AFTER — Transformation showcase
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ padding:'100px clamp(24px,6vw,80px)', background:DARK, overflow:'hidden' }}>
-        <div style={{ maxWidth:1100, margin:'0 auto' }}>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:60, alignItems:'center' }} className="stack-mobile">
-            <div className="reveal-left">
-              <div style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:GOLD, marginBottom:18 }}>Transformation</div>
-              <h2 style={{ fontFamily:SF, fontSize:'clamp(34px,4vw,58px)', fontWeight:300, color:WHITE, lineHeight:1.1, marginBottom:22 }}>
-                See the<br /><em style={{ color:GOLD }}>difference</em><br />it makes.
+            {/* Left — headline */}
+            <div className="rl">
+              <SectionLabel>The Design Studio</SectionLabel>
+              <div style={{ width:36, height:1, background:GOLD, margin:'20px 0 44px' }} />
+              <h2 style={{ fontFamily:SF, fontSize:'clamp(40px,4.5vw,72px)', fontWeight:300, color:WHITE, lineHeight:1.0, marginBottom:32 }}>
+                Professional<br />tools. <em style={{ fontStyle:'italic', color:GOLD }}>Zero<br />compromise.</em>
               </h2>
-              <p style={{ fontFamily:SS, fontSize:15, color:'rgba(255,255,255,0.55)', lineHeight:1.8, marginBottom:36 }}>
-                Drag the slider to compare an empty room against a fully designed space. This is what you can create — for free, today, in your browser.
+              <p style={{ fontFamily:SS, fontSize:14, fontWeight:300, color:'rgba(255,255,255,0.45)', lineHeight:1.95, maxWidth:440, marginBottom:52 }}>
+                Everything a professional interior designer uses — floor plan drawing, 3D visualisation, material selection, furniture catalogue, AR preview — consolidated into one elegant, browser-based studio. Free, always.
               </p>
-              <button onClick={()=>nav('/studio')}
-                style={{ fontFamily:SS, fontSize:11, fontWeight:800, letterSpacing:'0.2em', textTransform:'uppercase', padding:'14px 40px', background:GOLD, color:DARK, border:'none', cursor:'pointer', transition:'all 0.25s' }}
-                onMouseEnter={e=>{ e.currentTarget.style.background=GOLDL; e.currentTarget.style.transform='translateY(-2px)' }}
-                onMouseLeave={e=>{ e.currentTarget.style.background=GOLD; e.currentTarget.style.transform='none' }}>
-                Design Your Room →
+              <button onClick={() => nav('/studio')}
+                style={{ display:'inline-flex', alignItems:'center', gap:16, fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.34em', textTransform:'uppercase', color:DARK, background:GOLD, border:'none', padding:'18px 40px', cursor:'none', transition:'opacity 0.3s' }}
+                onMouseEnter={e => e.currentTarget.style.opacity='0.85'}
+                onMouseLeave={e => e.currentTarget.style.opacity='1'}>
+                Open Studio
               </button>
             </div>
-            <div className="reveal-right">
-              <BeforeAfterSlider />
-              <p style={{ fontFamily:SS, fontSize:10, color:'rgba(255,255,255,0.3)', marginTop:12, textAlign:'center', letterSpacing:'0.1em' }}>← Drag the slider to compare</p>
+
+            {/* Right — numbered capability list */}
+            <div className="rr">
+              {[
+                ['01', 'Precision Floor Plan', 'Draw walls, doors, and windows with snap-to-grid accuracy. Measurements display in real time.'],
+                ['02', '3D Live Visualisation', 'Every wall you draw, every piece of furniture you place, instantly visible in a live 3D scene.'],
+                ['03', 'Material & Finish Editor', 'Choose from 30+ wall, floor, and ceiling finishes. See your choices reflected in the 3D view immediately.'],
+                ['04', 'AI Floor Plan Generator', 'Describe your room in natural language. Gemini AI draws the walls for you in seconds.'],
+                ['05', 'AR Room Preview', 'Point your phone at any room to see your furniture placed in real physical space using WebXR.'],
+                ['06', 'Export & Share', 'Generate a professional PDF design report, export PNG renders, or share a link for client review.'],
+              ].map(([n, title, desc], i) => (
+                <div key={i} className="r" style={{ animationDelay:`${i*80}ms`, borderTop:`1px solid rgba(255,255,255,0.07)`, padding:'28px 0' }}>
+                  <div style={{ display:'flex', gap:24, alignItems:'flex-start' }}>
+                    <span style={{ fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.2em', color:GOLD, flexShrink:0, paddingTop:4 }}>{n}</span>
+                    <div>
+                      <div style={{ fontFamily:SS, fontSize:13, fontWeight:600, color:WHITE, marginBottom:6 }}>{title}</div>
+                      <div style={{ fontFamily:SS, fontSize:12, fontWeight:300, color:'rgba(255,255,255,0.35)', lineHeight:1.8 }}>{desc}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <div style={{ borderTop:'1px solid rgba(255,255,255,0.07)' }} />
             </div>
           </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          COMMUNITY — Masonry inspiration wall
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ padding:'100px clamp(24px,6vw,80px)', background:CREAM }}>
+      {/* ══════════════════════════════════════════════════════════════════
+          V. PROCESS — Editorial numbered steps
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ background:CREAM, padding:'140px clamp(40px,8vw,160px)' }}>
         <div style={{ maxWidth:1200, margin:'0 auto' }}>
-          <div style={{ textAlign:'center', marginBottom:60 }} className="reveal">
-            <div style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:GOLD, marginBottom:14 }}>Community Creations</div>
-            <h2 style={{ fontFamily:SF, fontSize:'clamp(32px,4vw,58px)', fontWeight:300, color:DARK, lineHeight:1.05 }}>
-              Real rooms designed<br /><em style={{ fontStyle:'italic', color:GOLD }}>by real people</em>
-            </h2>
-            <p style={{ fontFamily:SS, fontSize:15, color:MUTED, marginTop:18 }}>Every design you see was made by someone with no prior design experience — just curiosity.</p>
+
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:100, alignItems:'end', marginBottom:80 }} className="col-sm">
+            <div className="rl">
+              <SectionLabel>How It Works</SectionLabel>
+              <div style={{ width:36, height:1, background:GOLD, margin:'20px 0 44px' }} />
+              <h2 style={{ fontFamily:SF, fontSize:'clamp(38px,4vw,66px)', fontWeight:300, color:DARK, lineHeight:1.05 }}>
+                From blank room<br />to <em style={{ fontStyle:'italic', color:GOLD }}>finished design</em><br />in minutes.
+              </h2>
+            </div>
+            <p className="rr" style={{ fontFamily:SS, fontSize:15, fontWeight:300, color:MUTED, lineHeight:1.95 }}>
+              Our studio removes every barrier between your vision and a beautiful space. No training required. No software to install. No design degree needed — only imagination.
+            </p>
           </div>
 
-          {/* Masonry-style grid (CSS columns) */}
-          <div style={{ columns:'repeat(3, 1fr)', columnGap:16, gap:16 }}>
-            {COMMUNITY.map((c,i) => (
-              <div key={i} className="reveal card-hover" style={{ breakInside:'avoid', marginBottom:16, background:WHITE, border:`1px solid ${BORDER}`, overflow:'hidden', animationDelay:`${i*60}ms`, position:'relative', cursor:'pointer' }}
-                onClick={()=>nav('/gallery')}>
-                <div style={{ position:'relative', paddingBottom:c.tall?'120%':'75%', overflow:'hidden' }}>
-                  <img src={c.img} alt={c.title} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', transition:'transform 0.5s ease' }}
-                    onMouseEnter={e=>e.currentTarget.style.transform='scale(1.05)'}
-                    onMouseLeave={e=>e.currentTarget.style.transform='none'} loading="lazy" />
-                </div>
-                <div style={{ padding:'14px 16px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                  <div>
-                    <div style={{ fontFamily:SS, fontSize:12, fontWeight:700, color:DARK }}>{c.title}</div>
-                    <div style={{ fontFamily:SS, fontSize:10, color:MUTED, marginTop:2 }}>by {c.user}</div>
-                  </div>
-                  <button onClick={e=>{ e.stopPropagation(); toggleLike(i) }}
-                    style={{ background:'none', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:5, padding:'4px 6px' }}>
-                    <span style={{ fontSize:16, color:likedCards[i]?'#ef4444':MUTED, transition:'all 0.2s', transform:likedCards[i]?'scale(1.2)':'scale(1)' }}>
-                      {likedCards[i]?'♥':'♡'}
-                    </span>
-                    <span style={{ fontFamily:SS, fontSize:10, color:MUTED }}>
-                      {(c.likes + (likedCards[i]?1:0)).toLocaleString('en-IN')}
-                    </span>
-                  </button>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:0 }} className="col-sm">
+            {[
+              { n:'01', title:'Draw Your Floor Plan', desc:'Sketch walls, doors, and windows with precision snap tools. Import a photo of your current room or start from one of 500+ templates.' },
+              { n:'02', title:'Furnish & Style',       desc:'Browse 150+ curated furniture pieces, apply wall colours, flooring finishes, and ceiling materials. Every change reflects instantly in 3D.' },
+              { n:'03', title:'Visualise & Share',     desc:'See your room in photorealistic 3D, view in AR, export a professional PDF report, or share a link directly with clients or family.' },
+            ].map(({ n, title, desc }, i) => (
+              <div key={i} className="r" style={{ animationDelay:`${i*100}ms`, borderLeft: i>0 ? `1px solid rgba(0,0,0,0.08)` : 'none', padding: i>0 ? '60px 0 60px 60px' : '60px 60px 60px 0', borderTop: '1px solid rgba(0,0,0,0.08)' }}>
+                <div style={{ fontFamily:SF, fontSize:'clamp(56px,6vw,88px)', fontWeight:300, color:'rgba(0,0,0,0.06)', lineHeight:1, marginBottom:32 }}>{n}</div>
+                <h3 style={{ fontFamily:SS, fontSize:15, fontWeight:600, color:DARK, marginBottom:16 }}>{title}</h3>
+                <p style={{ fontFamily:SS, fontSize:13, fontWeight:300, color:MUTED, lineHeight:1.9 }}>{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Rule />
+
+      {/* ══════════════════════════════════════════════════════════════════
+          VI. TRANSFORMATION — Before/After slider
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ background:WHITE }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', padding:'120px clamp(40px,6vw,100px)' }}>
+
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:60 }} className="col-sm">
+            <div className="rl">
+              <SectionLabel>The Transformation</SectionLabel>
+              <div style={{ width:36, height:1, background:GOLD, margin:'20px 0 36px' }} />
+              <h2 style={{ fontFamily:SF, fontSize:'clamp(36px,4vw,62px)', fontWeight:300, color:DARK, lineHeight:1.05 }}>
+                See what becomes<br />possible.
+              </h2>
+            </div>
+            <p className="rr" style={{ fontFamily:SS, fontSize:13, fontWeight:300, color:MUTED, maxWidth:360, lineHeight:1.9, textAlign:'right', paddingBottom:4 }}>
+              Drag the divider to compare an empty room against a fully realised El Shaddai design. This is what you create — free, today, in minutes.
+            </p>
+          </div>
+
+          <div className="rs">
+            <BeforeAfter />
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          VII. INSPIRATION GALLERY — Editorial image grid
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ background:DARK2, padding:'120px clamp(40px,6vw,100px)' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto' }}>
+
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:64 }}>
+            <div className="rl">
+              <SectionLabel>Inspiration</SectionLabel>
+              <div style={{ width:36, height:1, background:GOLD, margin:'20px 0 32px' }} />
+              <h2 style={{ fontFamily:SF, fontSize:'clamp(36px,4vw,60px)', fontWeight:300, color:WHITE, lineHeight:1.05 }}>
+                Rooms created<br />by our community.
+              </h2>
+            </div>
+            <button onClick={() => nav('/gallery')} className="rr"
+              style={{ fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.34em', textTransform:'uppercase', color:'rgba(255,255,255,0.45)', background:'transparent', border:'none', cursor:'none', alignSelf:'flex-end', marginBottom:8, transition:'color 0.3s' }}
+              onMouseEnter={e => e.currentTarget.style.color=WHITE}
+              onMouseLeave={e => e.currentTarget.style.color='rgba(255,255,255,0.45)'}>
+              <span className="hover-line">View All &#8594;</span>
+            </button>
+          </div>
+
+          {/* Masonry columns */}
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:3 }} className="r">
+            {GALLERY.map((g, i) => (
+              <div key={i} className="img-wrap" style={{ cursor:'none' }} onClick={() => nav('/gallery')}>
+                <img src={g.img} alt="" style={{ width:'100%', height:g.h, objectFit:'cover', display:'block' }} loading="lazy" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          VIII. ROOM TYPES — Elegant horizontal navigation
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ background:CREAM, padding:'100px clamp(40px,6vw,100px)' }}>
+        <div style={{ maxWidth:1200, margin:'0 auto' }}>
+          <div style={{ textAlign:'center', marginBottom:56 }} className="r">
+            <SectionLabel>Design Every Space</SectionLabel>
+            <h2 style={{ fontFamily:SF, fontSize:'clamp(32px,3.5vw,54px)', fontWeight:300, color:DARK, marginTop:20, lineHeight:1.05 }}>
+              Every room in your home.
+            </h2>
+          </div>
+
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:0, borderTop:`1px solid rgba(0,0,0,0.07)`, borderLeft:`1px solid rgba(0,0,0,0.07)` }}>
+            {[
+              ['Living Room','https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&q=70'],
+              ['Bedroom','https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=300&q=70'],
+              ['Kitchen','https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&q=70'],
+              ['Bathroom','https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=300&q=70'],
+              ['Home Office','https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=300&q=70'],
+              ['Dining Room','https://images.unsplash.com/photo-1617806118233-18e1de247200?w=300&q=70'],
+              ['Kids Room','https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&q=70'],
+              ['Pooja Room','https://images.unsplash.com/photo-1600121848594-d8644e57abab?w=300&q=70'],
+              ['Outdoor','https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=300&q=70'],
+              ['Commercial','https://images.unsplash.com/photo-1497366216548-37526070297c?w=300&q=70'],
+            ].map(([label, img], i) => (
+              <div key={i} className="r img-wrap" style={{ animationDelay:`${i*40}ms`, position:'relative', borderRight:`1px solid rgba(0,0,0,0.07)`, borderBottom:`1px solid rgba(0,0,0,0.07)`, cursor:'none', overflow:'hidden' }}
+                onClick={() => nav('/studio')}>
+                <img src={img} alt={label} style={{ width:'100%', height:140, objectFit:'cover', display:'block', filter:'brightness(0.7)', transition:'filter 0.4s ease, transform 0.6s ease' }}
+                  onMouseEnter={e => { e.currentTarget.style.filter='brightness(0.85)'; e.currentTarget.style.transform='scale(1.05)' }}
+                  onMouseLeave={e => { e.currentTarget.style.filter='brightness(0.7)'; e.currentTarget.style.transform='scale(1)' }} loading="lazy" />
+                <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', pointerEvents:'none' }}>
+                  <span style={{ fontFamily:SS, fontSize:10, fontWeight:600, letterSpacing:'0.16em', textTransform:'uppercase', color:WHITE, textShadow:'0 1px 12px rgba(0,0,0,0.5)', textAlign:'center' }}>{label}</span>
                 </div>
               </div>
             ))}
           </div>
-
-          <div style={{ textAlign:'center', marginTop:52 }} className="reveal">
-            <button onClick={()=>nav('/gallery')}
-              style={{ fontFamily:SS, fontSize:11, fontWeight:800, letterSpacing:'0.2em', textTransform:'uppercase', padding:'14px 44px', background:'transparent', color:DARK, border:`2px solid ${DARK}`, cursor:'pointer', transition:'all 0.25s' }}
-              onMouseEnter={e=>{ e.currentTarget.style.background=DARK; e.currentTarget.style.color=WHITE }}
-              onMouseLeave={e=>{ e.currentTarget.style.background='transparent'; e.currentTarget.style.color=DARK }}>
-              Explore Gallery →
-            </button>
-          </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          ROOM TYPES — Quick entry points by room
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ padding:'80px clamp(24px,6vw,80px)', background:WHITE }}>
-        <div style={{ maxWidth:1200, margin:'0 auto' }}>
-          <div style={{ textAlign:'center', marginBottom:52 }} className="reveal">
-            <h2 style={{ fontFamily:SF, fontSize:'clamp(28px,3.5vw,50px)', fontWeight:300, color:DARK }}>
-              Design every room in your home
+      {/* ══════════════════════════════════════════════════════════════════
+          IX. FINAL CTA — Ultra minimal
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ position:'relative', overflow:'hidden', background:DARK }}>
+        <img src="https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=1800&q=85" alt=""
+          style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', opacity:0.15 }} />
+        <div style={{ position:'relative', zIndex:1, padding:'160px clamp(40px,8vw,160px)', textAlign:'center', maxWidth:900, margin:'0 auto' }}>
+          <div className="r">
+            <SectionLabel>Begin Now</SectionLabel>
+            <div style={{ width:36, height:1, background:GOLD, margin:'24px auto 52px' }} />
+            <h2 style={{ fontFamily:SF, fontSize:'clamp(48px,7vw,110px)', fontWeight:300, color:WHITE, lineHeight:0.95, letterSpacing:'-0.02em', marginBottom:52 }}>
+              Your dream<br />space starts<br /><em style={{ fontStyle:'italic', color:GOLD }}>here.</em>
             </h2>
-          </div>
-          <div style={{ display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap' }}>
-            {[
-              ['🛋','Living Room'],['🛏','Bedroom'],['🍳','Kitchen'],['🍽','Dining'],
-              ['🛁','Bathroom'],['💻','Home Office'],['👶','Kids Room'],['🪔','Pooja Room'],
-              ['🌿','Balcony'],['🏢','Commercial'],
-            ].map(([ic,lb],i)=>(
-              <button key={i} onClick={()=>nav('/studio')} className="reveal" style={{ animationDelay:`${i*40}ms`, display:'flex', alignItems:'center', gap:10, padding:'14px 24px', border:`1px solid ${BORDER}`, background:CREAM, cursor:'pointer', fontFamily:SS, fontSize:12, fontWeight:600, color:TEXT, transition:'all 0.2s' }}
-                onMouseEnter={e=>{ e.currentTarget.style.background=GOLD; e.currentTarget.style.color=DARK; e.currentTarget.style.borderColor=GOLD }}
-                onMouseLeave={e=>{ e.currentTarget.style.background=CREAM; e.currentTarget.style.color=TEXT; e.currentTarget.style.borderColor=BORDER }}>
-                <span style={{ fontSize:20 }}>{ic}</span>
-                {lb}
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:40, flexWrap:'wrap' }}>
+              <button onClick={() => nav('/studio')}
+                style={{ fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.38em', textTransform:'uppercase', color:DARK, background:GOLD, border:'none', padding:'20px 60px', cursor:'none', transition:'opacity 0.3s' }}
+                onMouseEnter={e => e.currentTarget.style.opacity='0.85'}
+                onMouseLeave={e => e.currentTarget.style.opacity='1'}>
+                Begin Designing
               </button>
-            ))}
+              <button onClick={() => nav('/gallery')}
+                style={{ fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.34em', textTransform:'uppercase', color:'rgba(255,255,255,0.45)', background:'transparent', border:'none', cursor:'none', padding:0, transition:'color 0.3s' }}
+                onMouseEnter={e => e.currentTarget.style.color=WHITE}
+                onMouseLeave={e => e.currentTarget.style.color='rgba(255,255,255,0.45)'}>
+                <span className="hover-line">Explore Gallery &#8594;</span>
+              </button>
+            </div>
+            <p style={{ fontFamily:SS, fontSize:11, fontWeight:300, color:'rgba(255,255,255,0.2)', marginTop:48, letterSpacing:'0.12em' }}>
+              Free forever &nbsp;·&nbsp; Works in any browser &nbsp;·&nbsp; No download required
+            </p>
           </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          FINAL CTA — Full-width emotional push
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ position:'relative', overflow:'hidden', background:DARK, padding:'100px clamp(24px,6vw,80px)' }}>
-        <img src="https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=1600&q=80" alt=""
-          style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', opacity:0.12 }} />
-        <div style={{ position:'relative', zIndex:1, maxWidth:800, margin:'0 auto', textAlign:'center' }}>
-          <div style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:GOLD, marginBottom:22 }} className="reveal">Start Today</div>
-          <h2 style={{ fontFamily:SF, fontSize:'clamp(40px,6vw,88px)', fontWeight:300, color:WHITE, lineHeight:1.0, marginBottom:24, letterSpacing:'-0.02em' }} className="reveal">
-            Your dream space<br />starts with<br /><em style={{ color:GOLD }}>one click.</em>
-          </h2>
-          <p style={{ fontFamily:SS, fontSize:16, color:'rgba(255,255,255,0.5)', lineHeight:1.8, marginBottom:48, maxWidth:480, margin:'0 auto 48px' }} className="reveal">
-            No downloads. No signup required. No design experience needed. Just start designing right now.
-          </p>
-          <div style={{ display:'flex', gap:14, justifyContent:'center', flexWrap:'wrap' }} className="reveal">
-            <button onClick={()=>nav('/studio')}
-              style={{ fontFamily:SS, fontSize:13, fontWeight:800, letterSpacing:'0.2em', textTransform:'uppercase', padding:'18px 56px', background:`linear-gradient(135deg,${GOLD},${GOLDL})`, color:DARK, border:'none', cursor:'pointer', boxShadow:`0 10px 40px rgba(201,162,39,0.4)`, transition:'all 0.25s' }}
-              onMouseEnter={e=>{ e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.boxShadow=`0 20px 60px rgba(201,162,39,0.55)` }}
-              onMouseLeave={e=>{ e.currentTarget.style.transform='none'; e.currentTarget.style.boxShadow=`0 10px 40px rgba(201,162,39,0.4)` }}>
-              Start Designing Free
-            </button>
-            <button onClick={()=>nav('/gallery')}
-              style={{ fontFamily:SS, fontSize:12, fontWeight:700, letterSpacing:'0.14em', textTransform:'uppercase', padding:'18px 36px', background:'transparent', color:'rgba(255,255,255,0.7)', border:'1px solid rgba(255,255,255,0.2)', cursor:'pointer', transition:'all 0.2s' }}
-              onMouseEnter={e=>{ e.currentTarget.style.borderColor='rgba(255,255,255,0.5)'; e.currentTarget.style.color=WHITE }}
-              onMouseLeave={e=>{ e.currentTarget.style.borderColor='rgba(255,255,255,0.2)'; e.currentTarget.style.color='rgba(255,255,255,0.7)' }}>
-              Browse Inspiration
-            </button>
-          </div>
-          <p style={{ fontFamily:SS, fontSize:11, color:'rgba(255,255,255,0.25)', marginTop:28 }}>Free forever · Works in your browser · No credit card</p>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          FOOTER
-      ══════════════════════════════════════════════════════════════════════ */}
-      <footer style={{ background:'#0a0905', borderTop:'1px solid rgba(255,255,255,0.06)', padding:'60px clamp(24px,6vw,80px) 36px' }}>
+      {/* ══════════════════════════════════════════════════════════════════
+          FOOTER — Refined minimal
+      ══════════════════════════════════════════════════════════════════ */}
+      <footer style={{ background:'#0a0905', padding:'80px clamp(40px,8vw,160px) 48px' }}>
         <div style={{ maxWidth:1200, margin:'0 auto' }}>
-          <div style={{ display:'grid', gridTemplateColumns:'2fr repeat(3, 1fr)', gap:48, marginBottom:52 }} className="stack-mobile">
+
+          {/* Top */}
+          <div style={{ display:'grid', gridTemplateColumns:'1.4fr 1fr 1fr 1fr', gap:60, marginBottom:72, borderBottom:'1px solid rgba(255,255,255,0.06)', paddingBottom:72 }} className="col-sm">
+
             {/* Brand */}
             <div>
-              <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:18 }}>
-                <div style={{ width:34, height:34, background:GOLD, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:SF, fontSize:16, fontWeight:500, color:DARK }}>ES</div>
+              <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:24 }}>
+                <div style={{ width:36, height:36, background:GOLD, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:SF, fontSize:16, fontWeight:400, color:DARK }}>ES</div>
                 <div>
-                  <div style={{ fontFamily:SF, fontSize:20, color:WHITE, letterSpacing:'0.04em' }}>El Shaddai</div>
-                  <div style={{ fontFamily:SS, fontSize:9, color:'rgba(255,255,255,0.35)', letterSpacing:'0.2em', textTransform:'uppercase' }}>Interior Design</div>
+                  <div style={{ fontFamily:SF, fontSize:18, fontWeight:300, color:WHITE, letterSpacing:'0.04em' }}>El Shaddai</div>
+                  <div style={{ fontFamily:SS, fontSize:8, color:'rgba(255,255,255,0.3)', letterSpacing:'0.28em', textTransform:'uppercase', marginTop:1 }}>Interior Design</div>
                 </div>
               </div>
-              <p style={{ fontFamily:SS, fontSize:13, color:'rgba(255,255,255,0.4)', lineHeight:1.8, maxWidth:260 }}>
-                A free, browser-based interior design tool for everyone — no experience or download required.
+              <p style={{ fontFamily:SS, fontSize:12, fontWeight:300, color:'rgba(255,255,255,0.35)', lineHeight:1.9, maxWidth:260 }}>
+                A free, browser-based interior design platform. Design extraordinary spaces — no experience required.
               </p>
-              <div style={{ display:'flex', gap:8, marginTop:22 }}>
-                {[['Instagram','📷'],['Facebook','📘'],['YouTube','▶'],['Pinterest','📌']].map(([n,ic])=>(
-                  <a key={n} href="#" style={{ width:36, height:36, background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.08)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14, textDecoration:'none', transition:'background 0.2s' }}
-                    onMouseEnter={e=>e.currentTarget.style.background=GOLD}
-                    onMouseLeave={e=>e.currentTarget.style.background='rgba(255,255,255,0.06)'}>
-                    {ic}
-                  </a>
-                ))}
-              </div>
             </div>
 
-            {/* Links */}
             {[
-              { title:'Tool', links:[['Studio','/studio'],['Gallery','/gallery'],['My Projects','/my-projects'],['Pricing','/pricing']] },
+              { title:'Studio', links:[['Design Studio','/studio'],['Gallery','/gallery'],['My Projects','/my-projects'],['Pricing','/pricing']] },
               { title:'Company', links:[['Portfolio','/portfolio'],['Blog','/blog'],['Contact','#contact'],['About','#about']] },
-              { title:'Support', links:[['How to Use','/blog'],['FAQ','/pricing'],['Privacy Policy','#'],['Terms','#']] },
-            ].map((col,i)=>(
+              { title:'Legal', links:[['Privacy Policy','#'],['Terms of Use','#'],['Cookie Policy','#']] },
+            ].map((col, i) => (
               <div key={i}>
-                <div style={{ fontFamily:SS, fontSize:9, fontWeight:800, letterSpacing:'0.26em', textTransform:'uppercase', color:'rgba(255,255,255,0.3)', marginBottom:20 }}>{col.title}</div>
-                {col.links.map(([label,href])=>(
-                  <a key={label} href={href} style={{ display:'block', fontFamily:SS, fontSize:13, color:'rgba(255,255,255,0.5)', textDecoration:'none', marginBottom:12, transition:'color 0.2s' }}
-                    onMouseEnter={e=>e.currentTarget.style.color=GOLD}
-                    onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,0.5)'}>
+                <div style={{ fontFamily:SS, fontSize:8, fontWeight:700, letterSpacing:'0.32em', textTransform:'uppercase', color:'rgba(255,255,255,0.25)', marginBottom:24 }}>{col.title}</div>
+                {col.links.map(([label, href]) => (
+                  <a key={label} href={href} style={{ display:'block', fontFamily:SS, fontSize:12, fontWeight:300, color:'rgba(255,255,255,0.45)', textDecoration:'none', marginBottom:14, letterSpacing:'0.02em', transition:'color 0.2s' }}
+                    onMouseEnter={e => e.currentTarget.style.color=WHITE}
+                    onMouseLeave={e => e.currentTarget.style.color='rgba(255,255,255,0.45)'}>
                     {label}
                   </a>
                 ))}
@@ -776,9 +644,14 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div style={{ borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:28, display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:12 }}>
-            <p style={{ fontFamily:SS, fontSize:11, color:'rgba(255,255,255,0.2)' }}>© 2025 El Shaddai Interior Design. Made with ♥ in India.</p>
-            <p style={{ fontFamily:SS, fontSize:11, color:'rgba(255,255,255,0.2)' }}>elshaddaiinterior.vercel.app</p>
+          {/* Bottom */}
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:16 }}>
+            <p style={{ fontFamily:SS, fontSize:11, fontWeight:300, color:'rgba(255,255,255,0.18)', letterSpacing:'0.04em' }}>
+              &copy; 2025 El Shaddai Interior Design. All rights reserved.
+            </p>
+            <p style={{ fontFamily:SS, fontSize:11, fontWeight:300, color:'rgba(255,255,255,0.18)', letterSpacing:'0.04em' }}>
+              elshaddaiinterior.vercel.app
+            </p>
           </div>
         </div>
       </footer>
