@@ -1301,7 +1301,6 @@ export default function ElShaddaiHome() {
             </p>
             {[
               { label: 'Office Address', val: 'Hyderabad, Telangana, India', href: 'https://maps.google.com/?q=Hyderabad,Telangana,India' },
-              { label: 'Phone Number',   val: '+91 98765 43210',       href: 'tel:+919876543210' },
               { label: 'Email',          val: 'contactus@divinemercyitsol.com', href: 'mailto:contactus@divinemercyitsol.com' },
               { label: 'WhatsApp',       val: 'Chat with us on WhatsApp', href: 'https://wa.me/919876543210?text=Hi%20El%20Shaddai%2C%20I%27m%20interested%20in%20your%20interior%20design%20services.' },
             ].map(row => (
@@ -1372,7 +1371,7 @@ export default function ElShaddaiHome() {
                     </div>
                   ))}
                 </div>
-                {[['Phone Number', 'phone', 'tel', '+91 98765 43210'], ['Message', 'message', 'textarea', 'Tell us about your design vision...']].map(([lbl, name, type, ph]) => (
+                {[['Message', 'message', 'textarea', 'Tell us about your design vision...']].map(([lbl, name, type, ph]) => (
                   <div key={name} style={{ marginBottom: 20 }}>
                     <label style={{ ...S.label, display: 'block', marginBottom: 8, color: '#a8a29e' }}>{lbl}</label>
                     {type === 'textarea'

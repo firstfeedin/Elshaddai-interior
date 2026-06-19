@@ -56,9 +56,6 @@ export default function LeadGeneration() {
 
             {/* Contact info */}
             <div className="flex flex-col gap-2 text-sm font-body">
-              <a href="tel:+919876543210" className="flex items-center gap-2 text-stone-600 hover:text-gold-600 transition-colors">
-                📞 +91 98765 43210
-              </a>
               <a href="mailto:contactus@divinemercyitsol.com" className="flex items-center gap-2 text-stone-600 hover:text-gold-600 transition-colors">
                 ✉️ contactus@divinemercyitsol.com
               </a>

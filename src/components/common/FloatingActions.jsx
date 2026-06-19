@@ -26,13 +26,6 @@ export default function FloatingActions() {
             <span className="font-body text-sm font-semibold text-stone-700 group-hover:text-green-600">WhatsApp Us</span>
           </a>
 
-          {/* Call */}
-          <a href="tel:+919876543210"
-            className="flex items-center gap-3 bg-white shadow-xl shadow-black/15 border border-stone-100 rounded-full pl-4 pr-5 py-2.5 hover:shadow-2xl transition-all duration-200 group">
-            <span className="text-xl">📞</span>
-            <span className="font-body text-sm font-semibold text-stone-700 group-hover:text-navy-700">+91 98765 43210</span>
-          </a>
-
           {/* Start Designing */}
           <a href="#design-wizard"
             className="flex items-center gap-3 bg-gold-500 shadow-xl shadow-gold-500/30 rounded-full pl-4 pr-5 py-2.5 hover:bg-gold-600 hover:shadow-2xl transition-all duration-200">
@@ -53,10 +46,6 @@ export default function FloatingActions() {
       {/* Mobile sticky bottom bar */}
       <div className={`fixed bottom-0 left-0 right-0 z-50 lg:hidden transition-all duration-500 ${visible ? 'translate-y-0' : 'translate-y-full'}`}>
         <div className="bg-white border-t border-stone-200 shadow-2xl px-4 py-3 flex gap-2">
-          <a href="tel:+919876543210"
-            className="flex-1 flex items-center justify-center gap-2 border border-stone-300 rounded-sm py-3 text-xs font-body font-semibold text-stone-700 hover:bg-stone-50 active:bg-stone-100 transition-colors">
-            📞 Call Now
-          </a>
           <a href="https://wa.me/919876543210?text=Hi%20El%20Shaddai%2C%20I%27m%20interested%20in%20interior%20design."
             target="_blank" rel="noopener noreferrer"
             className="flex-1 flex items-center justify-center gap-2 border border-stone-300 rounded-sm py-3 text-xs font-body font-semibold text-stone-700 hover:bg-stone-50 active:bg-stone-100 transition-colors">

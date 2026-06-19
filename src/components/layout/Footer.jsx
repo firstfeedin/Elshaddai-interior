@@ -136,11 +136,6 @@ export default function Footer() {
             <p className="font-body text-xs font-semibold tracking-[0.25em] uppercase text-gold-400 mb-5">Get In Touch</p>
             <ul className="space-y-3 mb-6">
               <li>
-                <a href="tel:+919876543210" className="font-body text-sm text-white/55 hover:text-gold-400 transition-colors flex items-center gap-2">
-                  📞 +91 98765 43210
-                </a>
-              </li>
-              <li>
                 <a href="mailto:contactus@divinemercyitsol.com" className="font-body text-sm text-white/55 hover:text-gold-400 transition-colors flex items-center gap-2">
                   ✉️ contactus@divinemercyitsol.com
                 </a>

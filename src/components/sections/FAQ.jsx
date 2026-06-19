@@ -83,7 +83,7 @@ export default function FAQ() {
           <h3 className="font-display text-2xl text-white font-light mb-2">Still have questions?</h3>
           <p className="font-body text-white/50 text-sm mb-5">Our team is available Mon–Sat, 9 AM – 7 PM IST.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="tel:+919876543210" className="btn-gold px-7 py-3 text-sm">📞 Call Us Now</a>
+            <a href="mailto:contactus@divinemercyitsol.com" className="btn-gold px-7 py-3 text-sm">✉️ Email Us</a>
             <a href="#contact" className="btn-outline-light px-7 py-3 text-sm">Book Consultation</a>
           </div>
         </div>
