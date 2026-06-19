@@ -301,8 +301,8 @@ export default function Navbar() {
 
           {/* ── Right side ────────────────────────────────────────────────── */}
           <div style={{ display:'flex', alignItems:'center', gap:10, flexShrink:0 }}>
-            {/* Search — only when logged in on desktop */}
-            {user && <div className="desktop-only"><SearchBox /></div>}
+            {/* Search — always visible on desktop */}
+            <div className="desktop-only"><SearchBox /></div>
 
             {user ? (
               /* ── Logged-in user ───────────────────────────────────────── */

@@ -213,6 +213,88 @@ function BeforeAfter() {
   )
 }
 
+/* ─── Style Templates ───────────────────────────────────────────────────── */
+const STYLE_DATA = {
+  'Mid-Century': [
+    { img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=500&q=80', room:'Living Room' },
+    { img:'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=500&q=80', room:'Bedroom' },
+    { img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=500&q=80', room:'Kitchen' },
+    { img:'https://images.unsplash.com/photo-1549497538-303791108f95?auto=format&fit=crop&w=500&q=80', room:'Dining Room' },
+  ],
+  'Modern': [
+    { img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=500&q=80', room:'Living Room' },
+    { img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=500&q=80', room:'Bedroom' },
+    { img:'https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=500&q=80', room:'Kitchen' },
+    { img:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=500&q=80', room:'Office' },
+  ],
+  'Minimalist': [
+    { img:'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=500&q=80', room:'Living Room' },
+    { img:'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=500&q=80', room:'Bedroom' },
+    { img:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=500&q=80', room:'Bathroom' },
+    { img:'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=500&q=80', room:'Office' },
+  ],
+  'Japandi': [
+    { img:'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=500&q=80', room:'Living Room' },
+    { img:'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=500&q=80', room:'Bedroom' },
+    { img:'https://images.unsplash.com/photo-1495433324511-bf8e92934d90?auto=format&fit=crop&w=500&q=80', room:'Kitchen' },
+    { img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80', room:'Reading Nook' },
+  ],
+  'Warm & Cosy': [
+    { img:'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=500&q=80', room:'Living Room' },
+    { img:'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=500&q=80', room:'Bedroom' },
+    { img:'https://images.unsplash.com/photo-1556020685-ae41abfc9365?auto=format&fit=crop&w=500&q=80', room:'Dining Room' },
+    { img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=500&q=80', room:'Kids Room' },
+  ],
+}
+const STYLE_TABS = Object.keys(STYLE_DATA)
+
+function StyleTemplates() {
+  const [active, setActive] = useState('Mid-Century')
+  const rooms = STYLE_DATA[active]
+  return (
+    <div>
+      {/* Tab strip */}
+      <div style={{ display:'flex', gap:0, borderBottom:`1px solid rgba(0,0,0,0.08)`, marginBottom:40, overflowX:'auto' }} className="no-scroll">
+        {STYLE_TABS.map(tab => (
+          <button key={tab} onClick={() => setActive(tab)}
+            style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.18em', textTransform:'uppercase',
+              color: active===tab ? DARK : MUTED,
+              background:'none', border:'none', cursor:'pointer',
+              padding:'0 28px 16px', whiteSpace:'nowrap',
+              borderBottom: active===tab ? `2px solid ${DARK}` : '2px solid transparent',
+              transition:'all 0.2s', marginBottom:-1,
+            }}>
+            {tab}
+          </button>
+        ))}
+      </div>
+      {/* Room grid */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:3 }} className="col-sm">
+        {rooms.map((r, i) => (
+          <div key={i} className="img-wrap" style={{ position:'relative', cursor:'none', overflow:'hidden' }}
+            onClick={() => { window.location.href = '/studio' }}>
+            <img src={r.img} alt={r.room} style={{ width:'100%', height:220, objectFit:'cover', display:'block' }} loading="lazy" />
+            <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(42,14,20,0.7) 0%, transparent 55%)', pointerEvents:'none' }} />
+            <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'14px 16px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <span style={{ fontFamily:SS, fontSize:10, fontWeight:600, letterSpacing:'0.14em', textTransform:'uppercase', color:WHITE }}>{r.room}</span>
+              <span style={{ fontFamily:SS, fontSize:9, color:GOLD }}>Use →</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      {/* Footer link */}
+      <div style={{ textAlign:'center', marginTop:36 }}>
+        <button onClick={() => { window.location.href='/studio' }}
+          style={{ fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:MUTED, background:'none', border:'none', cursor:'pointer', transition:'color 0.2s' }}
+          onMouseEnter={e=>e.currentTarget.style.color=DARK}
+          onMouseLeave={e=>e.currentTarget.style.color=MUTED}>
+          Browse all styles in the Studio →
+        </button>
+      </div>
+    </div>
+  )
+}
+
 /* ─── Video Glimpse ──────────────────────────────────────────────────────── */
 function VideoGlimpse() {
   const [frame, setFrame] = useState(0)
@@ -498,6 +580,27 @@ export default function HomePage() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          III-B. STYLE TEMPLATES — Tabbed design gallery
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ background:WHITE, padding:'100px clamp(40px,8vw,160px)' }}>
+        <div style={{ maxWidth:1200, margin:'0 auto' }}>
+          <div className="r" style={{ textAlign:'center', marginBottom:52 }}>
+            <SectionLabel>Style Templates</SectionLabel>
+            <div style={{ width:36, height:1, background:GOLD, margin:'20px auto 36px' }} />
+            <h2 style={{ fontFamily:SF, fontSize:'clamp(38px,4.5vw,66px)', fontWeight:300, color:DARK, lineHeight:1.05 }}>
+              Design fast with <em style={{ fontStyle:'italic', color:GOLD }}>500+ templates.</em>
+            </h2>
+            <p style={{ fontFamily:SS, fontSize:14, fontWeight:300, color:MUTED, marginTop:20, lineHeight:1.9 }}>
+              Pick a style that speaks to you — every template opens instantly in the studio.
+            </p>
+          </div>
+          <div className="r">
+            <StyleTemplates />
+          </div>
         </div>
       </section>
 
