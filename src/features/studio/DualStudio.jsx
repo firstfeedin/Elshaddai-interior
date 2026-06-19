@@ -15,7 +15,11 @@
 
 import { useState, useRef, useCallback, useEffect, Suspense, lazy } from 'react'
 import CATALOG, { CATEGORIES, MATERIALS } from '../../data/furnitureCatalog'
-import { saveProject, getProject, listProjects, encodeShareLink } from '../../utils/projectStorage'
+import { saveProject, getProject, encodeShareLink, decodeShareLink } from '../../utils/projectStorage'
+import { exportDesignPDF } from '../../utils/exportUtils'
+import ARViewer         from './ARViewer'
+import CustomModelUpload from './CustomModelUpload'
+import AIFloorPlan      from './AIFloorPlan'
 
 const FloorPlanEngine = lazy(() => import('./FloorPlanEngine'))
 const ThreeEngine     = lazy(() => import('./ThreeEngine'))
@@ -90,7 +94,7 @@ function CatalogPanel({ onAdd }) {
             padding:'7px 10px', fontFamily:T.F, fontSize:11, outline:'none', boxSizing:'border-box' }}
           onFocus={e=>e.target.style.borderColor=T.gold}
           onBlur={e=>e.target.style.borderColor=T.border} />
-        <div style={{ display:'flex', gap:4, marginTop:6 }}>
+        <div style={{ display:'flex', gap:4, marginTop:6, alignItems:'center' }}>
           <Chip active={sortBy==='name'} small onClick={()=>setSort('name')}>A–Z</Chip>
           <Chip active={sortBy==='price'} small onClick={()=>setSort('price')}>Price</Chip>
           <span style={{ flex:1 }} />
@@ -193,7 +197,7 @@ function MaterialsPanel({ materials, onChange }) {
   )
 }
 
-function PropertiesPanel({ selected, walls, furniture, onDeleteWall, onUpdateFurniture, onDeleteFurniture }) {
+function PropertiesPanel({ selected, walls, furniture, onDeleteWall, onUpdateFurniture, onDeleteFurniture, onViewAR }) {
   if (!selected) {
     return (
       <div style={{ padding:24, textAlign:'center' }}>
@@ -260,6 +264,12 @@ function PropertiesPanel({ selected, walls, furniture, onDeleteWall, onUpdateFur
             letterSpacing:'0.14em', textTransform:'uppercase', textDecoration:'none' }}>
           🛒 Shop This
         </a>
+        <button onClick={()=>onViewAR?.(fi)}
+          style={{ display:'block', width:'100%', padding:'8px', background:'rgba(59,130,246,0.1)',
+            border:'1px solid rgba(59,130,246,0.5)', color:'#3b82f6', fontFamily:T.F, fontSize:10, fontWeight:700,
+            letterSpacing:'0.14em', textTransform:'uppercase', cursor:'pointer' }}>
+          📱 View in AR
+        </button>
       </div>
     )
   }
@@ -477,6 +487,40 @@ export default function DualStudio({ initialProjectId }) {
   const [dragging,   setDragging]   = useState(false)
   const [status,     setStatus]     = useState({ walls:0, doors:0, windows:0, totalLength:'0.0' })
   const [leftCollapsed, setLeftCollapsed] = useState(false)
+  const [showAR,        setShowAR]        = useState(false)
+  const [arItem,        setArItem]        = useState(null)
+  const [showUpload,    setShowUpload]    = useState(false)
+  const [showAIFP,      setShowAIFP]      = useState(false)
+  const [customItems,   setCustomItems]   = useState([])
+  const [history,       setHistory]       = useState([{ walls:[], furniture:[] }])
+  const [histIdx,       setHistIdx]       = useState(0)
+
+  function pushHistory(newWalls, newFurniture) {
+    setHistory(h => {
+      const next = h.slice(0, histIdx + 1)
+      next.push({ walls: newWalls, furniture: newFurniture })
+      return next.slice(-50)
+    })
+    setHistIdx(i => Math.min(i + 1, 49))
+  }
+
+  function undo() {
+    setHistIdx(i => {
+      const prev = Math.max(0, i - 1)
+      const snap = history[prev]
+      if (snap) { setWalls(snap.walls); setFurniture(snap.furniture) }
+      return prev
+    })
+  }
+
+  function redo() {
+    setHistIdx(i => {
+      const next = Math.min(history.length - 1, i + 1)
+      const snap = history[next]
+      if (snap) { setWalls(snap.walls); setFurniture(snap.furniture) }
+      return next
+    })
+  }
   const splitRef  = useRef(null)
   const planRef   = useRef(null)
   const threeRef  = useRef(null)
@@ -491,9 +535,10 @@ export default function DualStudio({ initialProjectId }) {
     const params = new URLSearchParams(window.location.search)
     const share = params.get('share')
     if (share) {
-      const { decodeShareLink } = require('../../utils/projectStorage')
-      const d = decodeShareLink(share)
-      if (d) { setPName(d.name||'Shared Design'); setWalls(d.walls||[]); setFurniture(d.furniture||[]); setMaterials(d.materials||materials) }
+      try {
+        const d = decodeShareLink(share)
+        if (d) { setPName(d.name||'Shared Design'); setWalls(d.walls||[]); setFurniture(d.furniture||[]); setMaterials(d.materials||materials) }
+      } catch(e) { console.warn('Invalid share link') }
     }
   }, [])
 
@@ -503,8 +548,8 @@ export default function DualStudio({ initialProjectId }) {
     function onKey(e) {
       if (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return
       if ((e.ctrlKey||e.metaKey) && e.key==='s') { e.preventDefault(); setShowSave(true); return }
-      if ((e.ctrlKey||e.metaKey) && e.key==='z') { planRef.current?.undo(); return }
-      if ((e.ctrlKey||e.metaKey) && e.key==='y') { planRef.current?.redo(); return }
+      if ((e.ctrlKey||e.metaKey) && e.key==='z') { e.preventDefault(); undo(); planRef.current?.undo(); return }
+      if ((e.ctrlKey||e.metaKey) && e.key==='y') { e.preventDefault(); redo(); planRef.current?.redo(); return }
       if (e.key==='Escape') { setSelectedId(null); planRef.current?.cancelDrawing(); return }
       if ((e.key==='Delete'||e.key==='Backspace') && selectedId) {
         setWalls(w=>w.filter(x=>x.id!==selectedId)); setSelectedId(null); return
@@ -596,6 +641,10 @@ export default function DualStudio({ initialProjectId }) {
           <TinyBtn icon="💾" tip="Export JSON" onClick={()=>{ const a=document.createElement('a'); a.href='data:application/json,'+encodeURIComponent(JSON.stringify({walls,furniture,materials},null,2)); a.download='design.json'; a.click() }} />
           <TinyBtn icon="🖼" tip="Export PNG" onClick={()=>planRef.current?.exportPNG()?.then?.(u=>{const a=document.createElement('a');a.href=u;a.download='floorplan.png';a.click()})} />
           <TinyBtn icon="📷" tip="3D Screenshot" onClick={()=>{ const u=threeRef.current?.screenshot(); if(u){const a=document.createElement('a');a.href=u;a.download='render.png';a.click()} }} />
+          <TinyBtn icon="📄" tip="Export PDF Report" onClick={()=>exportDesignPDF({ projectName, walls, furniture, materials, canvasEl:planRef.current?.getCanvas?.(), threeEl:threeRef.current?.getCanvas?.() })} />
+          <Divider v />
+          <TinyBtn icon="✦" tip="AI Floor Plan Generator" onClick={()=>setShowAIFP(true)} />
+          <TinyBtn icon="⬆" tip="Upload Custom 3D Model" onClick={()=>setShowUpload(true)} />
 
           <Divider v />
 
@@ -723,7 +772,8 @@ export default function DualStudio({ initialProjectId }) {
             {rightTab==='properties' && <PropertiesPanel selected={selectedId} walls={walls} furniture={furniture}
               onDeleteWall={id=>setWalls(w=>w.filter(x=>x.id!==id))}
               onUpdateFurniture={(id,upd)=>setFurniture(f=>f.map(x=>x.id===id?{...x,...upd}:x))}
-              onDeleteFurniture={id=>setFurniture(f=>f.filter(x=>x.id!==id))} />}
+              onDeleteFurniture={id=>setFurniture(f=>f.filter(x=>x.id!==id))}
+              onViewAR={fi=>{ setArItem(fi); setShowAR(true) }} />}
             {rightTab==='ai'         && <AIPanel walls={walls} furniture={furniture} />}
           </div>
         </div>
@@ -746,6 +796,19 @@ export default function DualStudio({ initialProjectId }) {
       {showSave && (
         <SaveModal project={project} walls={walls} furniture={furniture} materials={materials}
           onSaved={p=>setProject(p)} onClose={()=>setShowSave(false)} />
+      )}
+      {showAR && arItem && (
+        <ARViewer item={arItem} onClose={()=>{ setShowAR(false); setArItem(null) }} />
+      )}
+      {showUpload && (
+        <CustomModelUpload
+          onUpload={item=>{ setCustomItems(c=>[...c,item]); addFurniture(item) }}
+          onClose={()=>setShowUpload(false)} />
+      )}
+      {showAIFP && (
+        <AIFloorPlan
+          onGenerate={aiWalls=>{ setWalls(w=>[...w, ...aiWalls]); pushHistory([...walls,...aiWalls], furniture) }}
+          onClose={()=>setShowAIFP(false)} />
       )}
     </div>
   )

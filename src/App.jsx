@@ -1,7 +1,12 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Suspense, lazy, useState, useEffect } from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { AuthProvider } from './context/AuthContext'
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { staleTime: 5 * 60 * 1000, retry: 1 } },
+})
 import AuthPage        from './pages/public/AuthPage'
 import ProtectedRoute  from './components/layout/ProtectedRoute'
 import ChatbotAssistant from './components/layout/ChatbotAssistant'
@@ -94,6 +99,7 @@ function P({ children, roles }) {
 
 export default function App() {
   return (
+    <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ''}>
       <AuthProvider>
@@ -163,5 +169,6 @@ export default function App() {
       </AuthProvider>
       </GoogleOAuthProvider>
     </BrowserRouter>
+    </QueryClientProvider>
   )
 }
