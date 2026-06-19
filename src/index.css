@@ -343,16 +343,17 @@ button { font-family: var(--font-body); cursor: pointer; }
 a, button, [role="button"] { cursor: pointer; }
 
 /* ── Navbar layout helpers ──────────────────────────────────────────────────── */
-/* Desktop: show nav + search, hide hamburger */
-.desktop-nav    { display: flex !important; }
-.desktop-only   { display: flex !important; }
+.desktop-nav      { display: flex !important; flex-wrap: nowrap; }
+.desktop-only     { display: flex !important; }
 .mobile-hamburger { display: none !important; }
 
-/* ── Mobile responsive helpers ──────────────────────────────────────────────── */
+/* ── Navbar compact on small screens — links always visible, no hamburger ───── */
 @media (max-width: 900px) {
-  .desktop-nav  { display: none !important; }
-  .desktop-only { display: none !important; }
-  .mobile-hamburger { display: flex !important; }
+  .desktop-nav a  { padding: 18px 9px !important; font-size: 9px !important; letter-spacing: 0.1em !important; }
+  .desktop-only   { display: none !important; }
+}
+@media (max-width: 600px) {
+  .desktop-nav a  { padding: 16px 6px !important; font-size: 8px !important; letter-spacing: 0.06em !important; }
 }
 @media (max-width: 768px) {
   .section-pad    { padding: 64px 20px; }
