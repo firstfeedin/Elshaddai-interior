@@ -1,30 +1,54 @@
+// Simple in-memory rate limiter (resets on cold start)
+const rateMap = new Map()
+function isRateLimited(ip) {
+  const now = Date.now()
+  const entry = rateMap.get(ip) || { count: 0, start: now }
+  if (now - entry.start > 60_000) { rateMap.set(ip, { count: 1, start: now }); return false }
+  if (entry.count >= 5) return true
+  rateMap.set(ip, { ...entry, count: entry.count + 1 })
+  return false
+}
+
+function sanitize(str = '') {
+  return String(str).replace(/[\r\n\t]/g, ' ').trim().slice(0, 1000)
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim())
+}
+
+const ALLOWED_ORIGINS = [
+  'https://elshaddaiinterior.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+]
+
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  const origin = req.headers.origin || ''
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin)
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Vary', 'Origin')
 
   if (req.method === 'OPTIONS') return res.status(200).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const { name, email, phone, message } = req.body || {}
-  if (!name || !email || !message) return res.status(400).json({ error: 'Missing required fields' })
+  // Rate limiting
+  const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.socket?.remoteAddress || 'unknown'
+  if (isRateLimited(ip)) return res.status(429).json({ error: 'Too many requests. Please wait a minute.' })
 
-  // ── Web3Forms → contactus@divinemercyitsol.com ──────────────────
-  const web3 = await fetch('https://api.web3forms.com/submit', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({
-      access_key: '20e5a729-9a98-4234-b88a-470634b6d474',
-      subject:    `New Enquiry from ${name} — El Shaddai Interiors`,
-      from_name:  'El Shaddai Website',
-      reply_to:   email,
-      name, email,
-      phone:   phone || 'Not provided',
-      message,
-    }),
-  }).then(r => r.json()).catch(() => ({ success: false }))
+  // Input validation
+  const name    = sanitize(req.body?.name)
+  const email   = sanitize(req.body?.email)
+  const phone   = sanitize(req.body?.phone)
+  const message = sanitize(req.body?.message)
 
-  // ── SMS via Fast2SMS (fires if API key is set in Vercel env) ────
+  if (!name || name.length < 2)        return res.status(400).json({ error: 'Name is required' })
+  if (!isValidEmail(email))            return res.status(400).json({ error: 'Valid email is required' })
+  if (!message || message.length < 5)  return res.status(400).json({ error: 'Message is required' })
+
+  // SMS via Fast2SMS (optional — only fires if FAST2SMS_API_KEY is set)
   if (process.env.FAST2SMS_API_KEY) {
     fetch('https://www.fast2sms.com/dev/bulkV2', {
       method: 'POST',
@@ -32,10 +56,10 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         route: 'q', flash: 0, language: 'english',
         numbers: process.env.COMPANY_PHONE || '9876543210',
-        message: `El Shaddai: New enquiry from ${name} (${phone || email}). Message: ${message.slice(0, 80)}`,
+        message: `El Shaddai enquiry: ${name} (${phone || email}): ${message.slice(0, 80)}`,
       }),
     }).catch(() => {})
   }
 
-  return res.status(200).json({ ok: true, web3 })
+  return res.status(200).json({ ok: true })
 }
