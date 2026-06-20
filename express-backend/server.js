@@ -1,8 +1,9 @@
-const express = require('express')
-const cors    = require('cors')
-const bcrypt  = require('bcryptjs')
-const jwt     = require('jsonwebtoken')
-const db      = require('./db')
+const express    = require('express')
+const cors       = require('cors')
+const bcrypt     = require('bcryptjs')
+const jwt        = require('jsonwebtoken')
+const nodemailer = require('nodemailer')
+const db         = require('./db')
 
 const app = express()
 const JWT_SECRET = process.env.JWT_SECRET || 'elshaddai-super-secret-jwt-2026'
@@ -496,6 +497,44 @@ app.get('/api/dashboard/summary', auth, (req, res) => {
     employees:      db.prepare("SELECT COUNT(*) as c FROM employees WHERE status='ACTIVE'").get().c,
     open_tasks:     db.prepare("SELECT COUNT(*) as c FROM tasks WHERE status NOT IN ('COMPLETED')").get().c,
   })
+})
+
+// ── Contact form ─────────────────────────────────────────────
+app.post('/api/contact', async (req, res) => {
+  const { name, email, message } = req.body
+  if (!name || !email || !message) return res.status(400).json({ error: 'Name, email and message are required' })
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.SMTP_USER || 'contactus@divinemercyitsol.com',
+      pass: process.env.SMTP_PASS || '',
+    },
+  })
+
+  try {
+    await transporter.sendMail({
+      from: `"El Shaddai Contact" <${process.env.SMTP_USER || 'contactus@divinemercyitsol.com'}>`,
+      to: 'contactus@divinemercyitsol.com',
+      replyTo: email,
+      subject: `New enquiry from ${name} — El Shaddai`,
+      html: `
+        <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#f5ede8;">
+          <h2 style="font-family:Georgia,serif;font-weight:300;color:#2a0e14;margin:0 0 24px;">New Contact Enquiry</h2>
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.08);color:#9a8a82;font-size:12px;width:120px;">Name</td><td style="padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.08);color:#2e2e2c;font-size:14px;">${name}</td></tr>
+            <tr><td style="padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.08);color:#9a8a82;font-size:12px;">Email</td><td style="padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.08);color:#2e2e2c;font-size:14px;"><a href="mailto:${email}" style="color:#c4956a;">${email}</a></td></tr>
+            <tr><td style="padding:10px 0;color:#9a8a82;font-size:12px;vertical-align:top;">Message</td><td style="padding:10px 0;color:#2e2e2c;font-size:14px;line-height:1.7;">${message.replace(/\n/g,'<br/>')}</td></tr>
+          </table>
+          <p style="margin:32px 0 0;font-size:11px;color:#9a8a82;">Sent from elshaddai.in contact form</p>
+        </div>
+      `,
+    })
+    res.json({ ok: true })
+  } catch (err) {
+    console.error('Contact mail error:', err.message)
+    res.status(500).json({ error: 'Failed to send email. Please try again.' })
+  }
 })
 
 // ── START ─────────────────────────────────────────────────────

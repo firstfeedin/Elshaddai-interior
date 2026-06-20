@@ -215,17 +215,29 @@ function BeforeAfter() {
 
 /* ─── Contact Form ───────────────────────────────────────────────────────── */
 function ContactForm() {
-  const [form, setForm]   = useState({ name:'', email:'', phone:'', message:'' })
+  const [form, setForm]   = useState({ name:'', email:'', message:'' })
   const [status, setStatus] = useState('idle')
+  const [error, setError]   = useState('')
   const up = k => e => setForm(f => ({ ...f, [k]: e.target.value }))
   const inputStyle = { width:'100%', fontFamily:SS, fontSize:13, border:`1px solid rgba(0,0,0,0.13)`, padding:'12px 16px', background:CREAM, outline:'none', color:TEXT, boxSizing:'border-box', transition:'border-color 0.2s' }
   const labelStyle = { fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.22em', textTransform:'uppercase', color:MUTED, display:'block', marginBottom:8 }
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault()
     if (!form.name || !form.email || !form.message) return
-    setStatus('sending')
-    setTimeout(() => setStatus('sent'), 1400)
+    setStatus('sending'); setError('')
+    try {
+      const res = await fetch('http://localhost:3001/api/contact', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(form),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to send')
+      setStatus('sent')
+    } catch(err) {
+      setError(err.message)
+      setStatus('idle')
+    }
   }
 
   if (status === 'sent') return (
@@ -246,17 +258,11 @@ function ContactForm() {
         {[['name','Full Name','text','Your full name'],['email','Email Address','email','your@email.com']].map(([k,l,t,p])=>(
           <div key={k} style={{ marginBottom:22 }}>
             <label style={labelStyle}>{l}</label>
-            <input type={t} placeholder={p} value={form[k]} onChange={up(k)} required={k!=='phone'}
+            <input type={t} placeholder={p} value={form[k]} onChange={up(k)} required
               style={inputStyle}
               onFocus={e=>e.target.style.borderColor=DARK} onBlur={e=>e.target.style.borderColor='rgba(0,0,0,0.13)'} />
           </div>
         ))}
-      </div>
-      <div style={{ marginBottom:22 }}>
-        <label style={labelStyle}>Phone Number</label>
-        <input type="tel" placeholder="+91 98765 43210" value={form.phone} onChange={up('phone')}
-          style={inputStyle}
-          onFocus={e=>e.target.style.borderColor=DARK} onBlur={e=>e.target.style.borderColor='rgba(0,0,0,0.13)'} />
       </div>
       <div style={{ marginBottom:32 }}>
         <label style={labelStyle}>Your Message</label>
@@ -265,6 +271,7 @@ function ContactForm() {
           style={{ ...inputStyle, resize:'vertical' }}
           onFocus={e=>e.target.style.borderColor=DARK} onBlur={e=>e.target.style.borderColor='rgba(0,0,0,0.13)'} />
       </div>
+      {error && <p style={{ fontFamily:SS, fontSize:12, color:'#ef4444', marginBottom:16 }}>{error}</p>}
       <button type="submit" disabled={status==='sending'}
         style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:WHITE, background:DARK, border:'none', padding:'16px', cursor:'pointer', width:'100%', transition:'opacity 0.2s', opacity:status==='sending'?0.6:1 }}>
         {status==='sending' ? 'Sending…' : 'Send Message →'}
@@ -1051,8 +1058,7 @@ export default function HomePage() {
               </p>
               <div style={{ marginTop:52 }}>
                 {[
-                  ['✉','Email','hello@elshaddai.in'],
-                  ['✆','Phone','+91 98765 43210'],
+                  ['✉','Email','contactus@divinemercyitsol.com'],
                   ['⊕','Location','Hyderabad, Telangana, India'],
                 ].map(([icon,label,value]) => (
                   <div key={label} style={{ display:'flex', gap:20, alignItems:'flex-start', marginBottom:28, paddingBottom:28, borderBottom:`1px solid rgba(0,0,0,0.07)` }}>
