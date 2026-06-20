@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express    = require('express')
 const cors       = require('cors')
 const bcrypt     = require('bcryptjs')
@@ -504,37 +505,70 @@ app.post('/api/contact', async (req, res) => {
   const { name, email, message } = req.body
   if (!name || !email || !message) return res.status(400).json({ error: 'Name, email and message are required' })
 
+  // Always save to DB first — message is never lost even if email fails
+  const row = db.prepare(
+    'INSERT INTO contact_messages (name, email, message) VALUES (?, ?, ?)'
+  ).run(name, email, message)
+
+  const TO   = process.env.CONTACT_TO   || 'contactus@divinemercyitsol.com'
+  const USER = process.env.SMTP_USER
+  const PASS = process.env.SMTP_PASS
+
+  if (!USER || !PASS) {
+    // Credentials not configured yet — message saved to DB, respond OK
+    console.warn('⚠️  SMTP not configured. Message saved to DB (id=' + row.lastInsertRowid + ')')
+    return res.json({ ok: true, note: 'saved' })
+  }
+
   const transporter = nodemailer.createTransport({
     service: 'gmail',
-    auth: {
-      user: process.env.SMTP_USER || 'contactus@divinemercyitsol.com',
-      pass: process.env.SMTP_PASS || '',
-    },
+    auth: { user: USER, pass: PASS },
   })
 
   try {
     await transporter.sendMail({
-      from: `"El Shaddai Contact" <${process.env.SMTP_USER || 'contactus@divinemercyitsol.com'}>`,
-      to: 'contactus@divinemercyitsol.com',
+      from: `"El Shaddai Website" <${USER}>`,
+      to: TO,
       replyTo: email,
       subject: `New enquiry from ${name} — El Shaddai`,
       html: `
-        <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#f5ede8;">
-          <h2 style="font-family:Georgia,serif;font-weight:300;color:#2a0e14;margin:0 0 24px;">New Contact Enquiry</h2>
-          <table style="width:100%;border-collapse:collapse;">
-            <tr><td style="padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.08);color:#9a8a82;font-size:12px;width:120px;">Name</td><td style="padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.08);color:#2e2e2c;font-size:14px;">${name}</td></tr>
-            <tr><td style="padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.08);color:#9a8a82;font-size:12px;">Email</td><td style="padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.08);color:#2e2e2c;font-size:14px;"><a href="mailto:${email}" style="color:#c4956a;">${email}</a></td></tr>
-            <tr><td style="padding:10px 0;color:#9a8a82;font-size:12px;vertical-align:top;">Message</td><td style="padding:10px 0;color:#2e2e2c;font-size:14px;line-height:1.7;">${message.replace(/\n/g,'<br/>')}</td></tr>
+        <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:40px 32px;background:#f5ede8;border-top:4px solid #c4956a;">
+          <h2 style="font-family:Georgia,serif;font-weight:300;color:#2a0e14;margin:0 0 8px;font-size:28px;">New Contact Enquiry</h2>
+          <p style="color:#9a8a82;font-size:12px;margin:0 0 32px;">Received via elshaddai.in contact form</p>
+          <table style="width:100%;border-collapse:collapse;background:#fff;border:1px solid rgba(0,0,0,0.07);">
+            <tr>
+              <td style="padding:14px 20px;border-bottom:1px solid #f0ebe6;color:#9a8a82;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;width:100px;">Name</td>
+              <td style="padding:14px 20px;border-bottom:1px solid #f0ebe6;color:#2e2e2c;font-size:14px;">${name}</td>
+            </tr>
+            <tr>
+              <td style="padding:14px 20px;border-bottom:1px solid #f0ebe6;color:#9a8a82;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;">Email</td>
+              <td style="padding:14px 20px;border-bottom:1px solid #f0ebe6;font-size:14px;"><a href="mailto:${email}" style="color:#c4956a;text-decoration:none;">${email}</a></td>
+            </tr>
+            <tr>
+              <td style="padding:14px 20px;color:#9a8a82;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;vertical-align:top;">Message</td>
+              <td style="padding:14px 20px;color:#2e2e2c;font-size:14px;line-height:1.8;">${message.replace(/\n/g,'<br/>')}</td>
+            </tr>
           </table>
-          <p style="margin:32px 0 0;font-size:11px;color:#9a8a82;">Sent from elshaddai.in contact form</p>
+          <div style="margin-top:24px;padding:16px 20px;background:#2a0e14;display:inline-block;">
+            <a href="mailto:${email}" style="color:#c4956a;font-size:12px;font-weight:600;text-decoration:none;letter-spacing:0.1em;text-transform:uppercase;">Reply to ${name} →</a>
+          </div>
         </div>
       `,
     })
+    // Mark email as sent in DB
+    db.prepare('UPDATE contact_messages SET email_sent=1 WHERE id=?').run(row.lastInsertRowid)
     res.json({ ok: true })
   } catch (err) {
     console.error('Contact mail error:', err.message)
-    res.status(500).json({ error: 'Failed to send email. Please try again.' })
+    // Message already in DB — still respond OK to user, log the failure
+    res.json({ ok: true, note: 'saved' })
   }
+})
+
+// ── View contact messages (admin) ─────────────────────────────
+app.get('/api/contact-messages', auth, adminOnly, (req, res) => {
+  const msgs = db.prepare('SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 100').all()
+  res.json(msgs)
 })
 
 // ── START ─────────────────────────────────────────────────────
