@@ -1,9 +1,6 @@
 import { useState, useRef, useCallback, Suspense, lazy } from 'react'
 import { useNavigate } from 'react-router-dom'
-
-const FloorPlanEditor = lazy(() => import('../../features/designer/FloorPlanEditor'))
-const BabylonDesigner = lazy(() => import('../../features/designer/BabylonDesigner'))
-const DualStudio      = lazy(() => import('../../features/studio/DualStudio'))
+import WebGPUViewport from '../../features/designer/WebGPUViewport'
 
 const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY || ''
 
@@ -828,49 +825,66 @@ function RenderPanel({ settings, setSettings, onRender, rendering, renderProgres
   )
 }
 
-/* ─── Main Canvas Area ─── */
-function MainCanvas({ step, mode, floorPlanData, uploadedPlan, selectedRoom, appliedTemplate }) {
-  const navigate = useNavigate()
+/* ─── Step Progress Bar ─── */
+function StepBar({ step, setSideTab }) {
+  const steps = [
+    { n:1, label:'2D Draw',   tab:'build'    },
+    { n:2, label:'3D Design', tab:'decorate' },
+    { n:3, label:'Render',    tab:'render'   },
+  ]
+  return (
+    <div style={{ height:32, background:C.panel, borderBottom:`1px solid ${C.border}`,
+      display:'flex', alignItems:'center', justifyContent:'center', gap:0, flexShrink:0 }}>
+      {steps.map((s, i) => (
+        <div key={s.n} style={{ display:'flex', alignItems:'center' }}>
+          <button onClick={() => setSideTab(s.tab)} style={{
+            display:'flex', alignItems:'center', gap:6, padding:'4px 16px',
+            background: step===s.n ? 'rgba(201,162,39,0.12)' : 'transparent',
+            border:'none', cursor:'pointer',
+            borderBottom: step===s.n ? `2px solid ${C.gold}` : '2px solid transparent',
+          }}>
+            <span style={{ width:18, height:18, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center',
+              background: step===s.n ? C.gold : step>s.n ? 'rgba(201,162,39,0.4)' : C.border,
+              fontSize:8, fontWeight:800, color: step===s.n ? '#000' : step>s.n ? C.gold : C.muted }}>
+              {step > s.n ? '✓' : s.n}
+            </span>
+            <span style={{ fontSize:10, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase',
+              color: step===s.n ? C.gold : step>s.n ? 'rgba(201,162,39,0.6)' : C.muted }}>
+              {s.label}
+            </span>
+          </button>
+          {i < steps.length-1 && (
+            <div style={{ width:24, height:1, background: step>s.n ? C.gold : C.border }} />
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
 
-  /* ─── Step 1 & 2: Dual Studio (2D drafting + live 3D extraction) ─── */
-  if (step === 1 || step === 2) {
-    return (
-      <div style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column', position:'relative' }}>
-        <Suspense fallback={<Loading label="Loading Dual Studio…" sub="2D Drafting Engine · 3D Extraction Engine" />}>
-          <DualStudio />
-        </Suspense>
-        {/* Reference plan overlay if uploaded */}
-        {uploadedPlan && (
-          <div style={{ position:'absolute', bottom:40, right:16, width:180, background:'rgba(8,7,10,0.92)', border:`1px solid ${C.gold}`, padding:8, zIndex:30 }}>
-            <p style={{ color:C.gold, fontSize:9, fontWeight:700, margin:'0 0 6px', textTransform:'uppercase', letterSpacing:'0.2em' }}>📐 Reference Plan</p>
-            <img src={uploadedPlan} alt="reference" style={{ width:'100%', display:'block', opacity:0.8 }} />
+/* ─── Main Canvas Area ─── */
+function MainCanvas({ step, mode, uploadedPlan, addedItems, appliedTemplate, onSelectFurniture }) {
+  return (
+    <div style={{ flex:1, minWidth:0, overflow:'hidden', position:'relative', display:'flex', flexDirection:'column' }}>
+      {/* WebGPU PBR viewport */}
+      <div style={{ flex:1, minHeight:0, width:'100%', position:'relative' }}>
+        <WebGPUViewport
+          step={step}
+          addedItems={addedItems}
+          appliedTemplate={appliedTemplate}
+          onSelectFurniture={onSelectFurniture}
+        />
+
+        {/* Reference plan overlay */}
+        {uploadedPlan && step === 1 && (
+          <div style={{ position:'absolute', bottom:48, right:12, width:150, background:'rgba(8,7,10,0.92)', border:`1px solid ${C.gold}`, padding:8, zIndex:30, pointerEvents:'none' }}>
+            <p style={{ color:C.gold, fontSize:9, fontWeight:700, margin:'0 0 6px', textTransform:'uppercase', letterSpacing:'0.18em' }}>📐 Reference Plan</p>
+            <img src={uploadedPlan} alt="reference" style={{ width:'100%', display:'block', opacity:0.85 }} />
           </div>
         )}
       </div>
-    )
-  }
-
-  if (step === 3) {
-    return (
-      <div style={{ flex:1, background:'#0a0c12', overflow:'hidden', position:'relative', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:16 }}>
-        <img
-          src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&q=80"
-          alt="render preview"
-          style={{ width:'90%', maxHeight:'70%', objectFit:'cover', borderRadius:8, boxShadow:'0 20px 60px rgba(0,0,0,0.5)' }}
-        />
-        <div style={{ display:'flex', gap:8 }}>
-          {['Normal','Panorama','Aerial','Top View'].map(v => (
-            <button key={v} style={{ padding:'5px 14px', background:'rgba(255,255,255,0.1)', border:'1px solid rgba(255,255,255,0.15)', color:'rgba(255,255,255,0.7)', borderRadius:20, cursor:'pointer', fontSize:10, fontWeight:600 }}>{v}</button>
-          ))}
-        </div>
-        <div style={{ display:'flex', gap:8 }}>
-          <button style={{ padding:'8px 20px', background:C.gold, border:'none', color:'#000', borderRadius:4, cursor:'pointer', fontSize:11, fontWeight:700 }}>⬇ Download 4K</button>
-          <button style={{ padding:'8px 20px', background:'rgba(255,255,255,0.1)', border:'1px solid rgba(255,255,255,0.2)', color:'#fff', borderRadius:4, cursor:'pointer', fontSize:11 }}>🔗 Share Link</button>
-        </div>
-      </div>
-    )
-  }
-  return null
+    </div>
+  )
 }
 
 function Loading({ label, sub }) {
@@ -1113,6 +1127,8 @@ export default function StudioPage() {
         onClose={() => setShowLanding(true)}
       />
 
+      <StepBar step={step} setSideTab={setSideTab} />
+
       <div style={{ flex:1, display:'flex', overflow:'hidden' }}>
         {/* Icon sidebar */}
         <div style={{ width:64, background:C.panel2, borderRight:`1px solid ${C.border}`, flexShrink:0, display:'flex', flexDirection:'column', alignItems:'center', paddingTop:8, gap:2 }}>
@@ -1163,13 +1179,14 @@ export default function StudioPage() {
           )}
         </div>
 
-        {/* Main Canvas */}
+        {/* Main Canvas — Three.js WebGL */}
         <MainCanvas
-          step={step} mode={mode}
-          floorPlanData={null}
+          step={step}
+          mode={mode}
           uploadedPlan={uploadedPlan}
-          selectedRoom={selectedRoom}
+          addedItems={addedItems}
           appliedTemplate={appliedTemplate}
+          onSelectFurniture={(item) => item && console.info('[Studio] selected:', item?.name)}
         />
 
         {/* Right Panel */}

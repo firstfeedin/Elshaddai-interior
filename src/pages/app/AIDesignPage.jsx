@@ -173,7 +173,7 @@ export default function AIDesignPage() {
             <p style={{ ...sans, margin: '0 0 16px', fontSize: 9, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#a8a29e' }}>Recent Generations</p>
             {HISTORY.map((h, i) => (
               <button key={i} onClick={() => setResult(MOCK_RESULT)}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '12px 0', borderBottom: i < HISTORY.length - 1 ? `1px solid ${border}` : 'none', background: 'none', border: 'none', borderBottom: `1px solid ${i < HISTORY.length - 1 ? border : 'transparent'}`, cursor: 'pointer', textAlign: 'left', ...sans }}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '12px 0', borderBottom: `1px solid ${i < HISTORY.length - 1 ? border : 'transparent'}`, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', ...sans }}
                 onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
                 onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
                 <div>

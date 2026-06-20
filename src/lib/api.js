@@ -1,5 +1,5 @@
-// Central API client — all requests go through here
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+// Central API client — proxied through Vite in dev, served directly in prod
+const BASE = import.meta.env.VITE_API_URL || '/api'
 
 function getToken() {
   return localStorage.getItem('es_token')

@@ -3,14 +3,14 @@ import { Suspense, lazy, useState, useEffect } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { AuthProvider } from './context/AuthContext'
-
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { staleTime: 5 * 60 * 1000, retry: 1 } },
-})
 import AuthPage        from './pages/public/AuthPage'
 import ProtectedRoute  from './components/layout/ProtectedRoute'
 import ChatbotAssistant from './components/layout/ChatbotAssistant'
 import GlobalSearch     from './components/layout/GlobalSearch'
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { staleTime: 5 * 60 * 1000, retry: 1 } },
+})
 
 const DashboardPage      = lazy(() => import('./pages/app/DashboardPage'))
 const DesignerPage       = lazy(() => import('./pages/app/DesignerPage'))

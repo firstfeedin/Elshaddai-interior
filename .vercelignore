@@ -1,0 +1,6 @@
+spring-backend/
+express-backend/
+data/
+*.md
+.env*
+!.env.example
