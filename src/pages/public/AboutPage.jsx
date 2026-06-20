@@ -3,13 +3,13 @@ import Navbar from '../../components/layout/Navbar'
 
 const SF = "'Cormorant Garamond',Georgia,serif"
 const SS = "'DM Sans',system-ui,sans-serif"
-const CREAM = '#f5ede8'
-const DARK  = '#2a0e14'
-const DARK2 = '#1e0a0e'
+const CREAM = '#f8f6f3'
+const DARK  = '#0a0a0a'
+const DARK2 = '#111111'
 const WHITE = '#ffffff'
 const GOLD  = '#c4956a'
-const MUTED = '#9a8a82'
-const TEXT  = '#2e2e2c'
+const MUTED = '#888880'
+const TEXT  = '#1a1a1a'
 
 export default function AboutPage() {
   const nav = useNavigate()

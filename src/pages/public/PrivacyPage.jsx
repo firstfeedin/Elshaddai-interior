@@ -3,11 +3,11 @@ import Navbar from '../../components/layout/Navbar'
 
 const SF = "'Cormorant Garamond',Georgia,serif"
 const SS = "'DM Sans',system-ui,sans-serif"
-const CREAM = '#f5ede8'
-const DARK  = '#2a0e14'
+const CREAM = '#f8f6f3'
+const DARK  = '#0a0a0a'
 const WHITE = '#ffffff'
 const GOLD  = '#c4956a'
-const MUTED = '#9a8a82'
+const MUTED = '#888880'
 
 function Section({ title, children }) {
   return (

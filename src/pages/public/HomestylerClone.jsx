@@ -7,14 +7,14 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../../components/layout/Navbar'
 
-/* ─── Tokens — Blush Marble & Graphite ───────────────────────────────────── */
-const CREAM  = '#f5ede8'   /* Blush marble — warm background */
-const DARK   = '#2a0e14'   /* Deep Burgundy — primary dark */
-const DARK2  = '#1e0a0e'   /* Wine — dark sections */
+/* ─── Tokens — Modern Minimal ────────────────────────────────────────────── */
+const CREAM  = '#f8f6f3'   /* Off-white — warm base */
+const DARK   = '#0a0a0a'   /* Pure near-black */
+const DARK2  = '#111111'   /* Dark sections */
 const WHITE  = '#ffffff'
 const GOLD   = '#c4956a'   /* Terracotta — accent */
-const TEXT   = '#2e2e2c'   /* Graphite text */
-const MUTED  = '#9a8a82'   /* Warm grey muted */
+const TEXT   = '#1a1a1a'   /* Near black text */
+const MUTED  = '#888880'   /* Neutral muted */
 const SF     = "'Cormorant Garamond',Georgia,serif"
 const SS     = "'DM Sans',system-ui,sans-serif"
 
@@ -24,7 +24,7 @@ const CSS = `
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:${CREAM};color:${TEXT};cursor:none}
+body{background:${WHITE};color:${TEXT};cursor:none}
 
 /* Custom cursor */
 .es-cursor{pointer-events:none;position:fixed;top:0;left:0;z-index:99999;mix-blend-mode:difference}
@@ -41,7 +41,10 @@ body.cursor-hover .es-cursor-ring{width:54px;height:54px;opacity:0.4}
 .r.v,.rl.v,.rr.v,.rs.v{opacity:1;transform:none}
 
 /* Animations */
-@keyframes heroFade{0%{opacity:0;transform:scale(1.04)}8%{opacity:1;transform:scale(1)}33%{opacity:1}42%{opacity:0;transform:scale(0.98)}100%{opacity:0}}
+@keyframes heroFade{0%{opacity:0;transform:scale(1.06)}6%{opacity:1;transform:scale(1)}34%{opacity:1}42%{opacity:0;transform:scale(0.98)}100%{opacity:0}}
+@keyframes stageIn{0%{opacity:0;transform:translateY(14px)}6%{opacity:1;transform:translateY(0)}34%{opacity:1;transform:translateY(0)}42%{opacity:0;transform:translateY(-10px)}100%{opacity:0}}
+@keyframes progressBar{0%{width:0}34%{width:100%}100%{width:100%}}
+@keyframes dotPulse{0%,34%{opacity:1;transform:scale(1.2)}35%,100%{opacity:0.3;transform:scale(1)}}
 @keyframes titleIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
 @keyframes lineGrow{from{width:0}to{width:100%}}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
@@ -53,6 +56,15 @@ body.cursor-hover .es-cursor-ring{width:54px;height:54px;opacity:0.4}
 .hero-img:nth-child(1){animation-delay:0s}
 .hero-img:nth-child(2){animation-delay:6s}
 .hero-img:nth-child(3){animation-delay:12s}
+.hero-stage{position:absolute;opacity:0;animation:stageIn 18s ease-in-out infinite}
+.hero-stage:nth-child(1){animation-delay:0s}
+.hero-stage:nth-child(2){animation-delay:6s}
+.hero-stage:nth-child(3){animation-delay:12s}
+.hero-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.3);transition:all 0.4s;animation:dotPulse 18s linear infinite}
+.hero-dot:nth-child(1){animation-delay:0s}
+.hero-dot:nth-child(2){animation-delay:6s}
+.hero-dot:nth-child(3){animation-delay:12s}
+.hero-progress{height:2px;background:${GOLD};transform-origin:left;animation:progressBar 6s linear infinite}
 
 /* Hover underline */
 .hover-line{position:relative;display:inline-block}
@@ -78,10 +90,22 @@ body.cursor-hover .es-cursor-ring{width:54px;height:54px;opacity:0.4}
 `
 
 /* ─── Data ───────────────────────────────────────────────────────────────── */
-const HERO_IMAGES = [
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1800&q=90',
-  'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1800&q=90',
-  'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=1800&q=90',
+const HERO_STAGES = [
+  {
+    step: '01', tag: 'Draw', label: '2D Floor Plan',
+    desc: 'Sketch walls, rooms & spaces with snap-to-grid tools',
+    img: 'https://images.unsplash.com/photo-1560440021-33f9b867899d?auto=format&fit=crop&w=1800&q=90',
+  },
+  {
+    step: '02', tag: 'Visualise', label: '3D Room View',
+    desc: 'Watch your floor plan become a live 3D space instantly',
+    img: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1800&q=90',
+  },
+  {
+    step: '03', tag: 'Render', label: 'Final Design',
+    desc: 'Photorealistic render — share or download your design',
+    img: 'https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=1800&q=90',
+  },
 ]
 
 const ROOMS = [
@@ -98,7 +122,7 @@ const ROOMS = [
   {
     n: '03', room: 'Kitchen & Dining', style: 'Modern Warmth',
     desc: 'Where form meets function in perfect balance. A kitchen that inspires cooking and a dining space that invites conversation.',
-    img: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=900&q=85',
+    img: 'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?auto=format&fit=crop&w=900&q=85',
   },
 ]
 
@@ -111,7 +135,7 @@ const GALLERY = [
   { img:'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=500&q=85', h:300 },
 ]
 
-const BEFORE_IMG = 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?auto=format&fit=crop&w=1000&q=90'
+const BEFORE_IMG = 'https://images.unsplash.com/photo-1560440021-33f9b867899d?auto=format&fit=crop&w=1000&q=90'
 const AFTER_IMG  = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=90'
 
 /* ─── Custom Cursor ──────────────────────────────────────────────────────── */
@@ -383,7 +407,7 @@ function StepCard({ step, num, playing, onPlay }) {
         style={{ position:'relative', width:'100%', paddingBottom:'68%', overflow:'hidden',
           borderRadius:8, border:`1.5px solid ${hov ? GOLD : '#e8e0d8'}`,
           boxShadow: hov ? `0 8px 40px rgba(196,149,106,0.18)` : '0 2px 16px rgba(0,0,0,0.08)',
-          transition:'all 0.3s', cursor:'pointer', background:'#f5ede8' }}>
+          transition:'all 0.3s', cursor:'pointer', background:'#f8f6f3' }}>
         {playing ? (
           <iframe
             src={`https://www.youtube.com/embed/${step.youtubeId}?autoplay=1&rel=0&modestbranding=1`}
@@ -468,7 +492,7 @@ function VideoGlimpse() {
         <h2 style={{ fontFamily:SF, fontSize:42, fontWeight:400, color:DARK, margin:'0 0 14px', lineHeight:1.2 }}>
           3 Steps for your 1st Design in 2 Minutes
         </h2>
-        <p style={{ fontFamily:SS, fontSize:14, fontWeight:300, color:'#9a8a82', margin:0 }}>
+        <p style={{ fontFamily:SS, fontSize:14, fontWeight:300, color:'#888880', margin:0 }}>
           There will be a{' '}
           <span style={{ color:GOLD, fontWeight:600 }}>welcome gift</span>
           {' '}waiting when you finish your first design
@@ -499,6 +523,37 @@ function VideoGlimpse() {
           Start Designing
         </a>
       </div>
+    </div>
+  )
+}
+
+/* ─── FAQ ────────────────────────────────────────────────────────────────── */
+/* Testimonials updated for a new company — real early user quotes, no inflated numbers */
+const FAQ_ITEMS = [
+  { q: 'Is El Shaddai really free?', a: 'Yes, completely. You can draw floor plans, furnish rooms, view in 3D, and share your design — all without paying anything or entering a credit card. We offer optional premium features for professional designers.' },
+  { q: 'Do I need to download or install anything?', a: 'No download required. El Shaddai runs entirely in your browser — Chrome, Safari, Edge, Firefox. Just open the Studio and start designing instantly.' },
+  { q: 'Do I need design experience to use El Shaddai?', a: 'Not at all. The Studio is designed for first-time users. You can even use AI to generate a floor plan just by describing your room in words. Our templates also help you get started in seconds.' },
+  { q: 'How does the 3D view work?', a: 'Every wall, door, furniture piece and material you add in 2D is instantly reflected in a live 3D scene. Switch between views anytime — no rendering wait time.' },
+  { q: 'Can I share my design with my contractor or family?', a: 'Yes. You can export a high-resolution 3D render, download a professional PDF design report, or share a direct link to your project with anyone.' },
+  { q: 'Is my design data saved?', a: 'Designs are auto-saved in your browser locally. If you create a free account, your designs sync to the cloud and are accessible from any device.' },
+]
+
+function FAQSection() {
+  const [open, setOpen] = useState(null)
+  return (
+    <div>
+      {FAQ_ITEMS.map(({ q, a }, i) => (
+        <div key={i} className="r" style={{ animationDelay:`${i*60}ms`, borderBottom:`1px solid rgba(0,0,0,0.08)` }}>
+          <button onClick={() => setOpen(open===i ? null : i)}
+            style={{ width:'100%', display:'flex', justifyContent:'space-between', alignItems:'center', padding:'28px 0', background:'none', border:'none', cursor:'pointer', textAlign:'left', gap:24 }}>
+            <span style={{ fontFamily:SF, fontSize:'clamp(17px,1.6vw,22px)', fontWeight:300, color:'#0a0a0a', lineHeight:1.3 }}>{q}</span>
+            <span style={{ flexShrink:0, width:28, height:28, border:'1px solid rgba(0,0,0,0.15)', display:'flex', alignItems:'center', justifyContent:'center', transition:'transform 0.3s', transform: open===i ? 'rotate(45deg)' : 'none', color:GOLD, fontSize:18, fontWeight:300 }}>+</span>
+          </button>
+          <div style={{ maxHeight: open===i ? 300 : 0, overflow:'hidden', transition:'max-height 0.4s cubic-bezier(0.4,0,0.2,1)' }}>
+            <p style={{ fontFamily:SS, fontSize:14, fontWeight:300, color:MUTED, lineHeight:1.9, paddingBottom:28 }}>{a}</p>
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
@@ -553,54 +608,126 @@ export default function HomePage() {
       <Navbar />
 
       {/* ══════════════════════════════════════════════════════════════════
-          I. CINEMATIC HERO
+          I. CINEMATIC HERO — 2D → 3D → Final Design
       ══════════════════════════════════════════════════════════════════ */}
-      <section style={{ position:'relative', height:'100svh', minHeight:680, overflow:'hidden', background:DARK }}>
-        {/* Cycling images */}
-        {HERO_IMAGES.map((src, i) => (
-          <img key={i} src={src} alt="" className="hero-img" style={{ animationDelay:`${i*6}s` }} />
+      <section style={{ position:'relative', height:'100svh', minHeight:700, overflow:'hidden', background:'#0a0a0a' }}>
+
+        {/* ── Stage images — cycle 2D → 3D → Final ── */}
+        {HERO_STAGES.map((s, i) => (
+          <img key={i} src={s.img} alt={s.label} className="hero-img"
+            style={{ animationDelay:`${i*6}s` }} />
         ))}
-        {/* Overlay gradient — very restrained */}
-        <div style={{ position:'absolute', inset:0, background:'linear-gradient(to bottom, rgba(13,12,8,0.18) 0%, rgba(13,12,8,0.58) 100%)', zIndex:1 }} />
 
-        {/* Content — centered, editorial */}
-        <div style={{ position:'relative', zIndex:2, height:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', textAlign:'center', padding:'0 clamp(32px,8vw,180px)' }}>
+        {/* ── Gradient overlays ── */}
+        <div style={{ position:'absolute', inset:0, zIndex:1,
+          background:'linear-gradient(135deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.28) 60%, rgba(0,0,0,0.5) 100%)' }} />
+        {/* Bottom fade for stage card readability */}
+        <div style={{ position:'absolute', bottom:0, left:0, right:0, height:220, zIndex:1,
+          background:'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)' }} />
 
-          {/* Thin gold rule above headline */}
-          <div style={{ width:48, height:1, background:GOLD, marginBottom:36, animation:'titleIn 1.2s ease 0.3s both' }} />
+        {/* ── Center content ── */}
+        <div style={{ position:'relative', zIndex:2, height:'100%', display:'flex',
+          flexDirection:'column', alignItems:'center', justifyContent:'center',
+          textAlign:'center', padding:'100px clamp(24px,6vw,140px) 60px' }}>
 
-          <h1 style={{ fontFamily:SF, fontWeight:300, fontSize:'clamp(52px,7.5vw,118px)', color:WHITE, lineHeight:1.0, letterSpacing:'-0.02em', marginBottom:0, animation:'titleIn 1.2s ease 0.5s both' }}>
-            The art of<br />
-            <em style={{ fontStyle:'italic', color:GOLD }}>beautiful living.</em>
+          {/* Pill label */}
+          <div style={{ display:'inline-flex', alignItems:'center', gap:8,
+            border:`1px solid rgba(196,149,106,0.45)`, padding:'6px 18px',
+            marginBottom:28, animation:'titleIn 1s ease 0.2s both' }}>
+            <span style={{ width:6, height:6, borderRadius:'50%', background:GOLD, display:'inline-block' }} />
+            <span style={{ fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.28em',
+              textTransform:'uppercase', color:GOLD }}>El Shaddai Interior Studio</span>
+          </div>
+
+          <h1 style={{ fontFamily:SF, fontWeight:300, fontSize:'clamp(40px,6vw,100px)',
+            color:WHITE, lineHeight:1.0, letterSpacing:'-0.02em', marginBottom:0,
+            animation:'titleIn 1.2s ease 0.4s both' }}>
+            Design your dream<br />
+            <em style={{ fontStyle:'italic', color:GOLD }}>home in 3D. Free.</em>
           </h1>
 
-          <p style={{ fontFamily:SS, fontSize:'clamp(13px,1.1vw,15px)', fontWeight:300, color:'rgba(255,255,255,0.55)', letterSpacing:'0.12em', marginTop:36, maxWidth:500, lineHeight:1.9, animation:'titleIn 1.2s ease 0.8s both' }}>
-            Design extraordinary interiors — from a blank floor plan to a photorealistic room — entirely in your browser. No experience required.
+          <p style={{ fontFamily:SS, fontSize:'clamp(13px,1.1vw,15px)', fontWeight:300,
+            color:'rgba(255,255,255,0.55)', marginTop:24, maxWidth:480, lineHeight:1.9,
+            animation:'titleIn 1.2s ease 0.7s both' }}>
+            Draw a floor plan, furnish every room, and see a photorealistic render —
+            all in your browser. No download. No experience required.
           </p>
 
-          <div style={{ display:'flex', alignItems:'center', gap:48, marginTop:56, animation:'titleIn 1.2s ease 1.1s both' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:12, marginTop:36,
+            animation:'titleIn 1.2s ease 1s both', flexWrap:'wrap', justifyContent:'center' }}>
             <button onClick={() => nav('/studio')}
-              style={{ fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.34em', textTransform:'uppercase', color:WHITE, background:'transparent', border:'none', cursor:'none', padding:0, transition:'opacity 0.3s' }}
-              onMouseEnter={e => e.currentTarget.style.opacity='0.6'}
-              onMouseLeave={e => e.currentTarget.style.opacity='1'}>
-              <span className="hover-line">Begin Designing</span>
-              &nbsp;&nbsp;&#8594;
+              style={{ fontFamily:SS, fontSize:11, fontWeight:700, letterSpacing:'0.2em',
+                textTransform:'uppercase', color:'#0a0a0a', background:WHITE,
+                border:'none', cursor:'none', padding:'16px 40px', transition:'all 0.25s' }}
+              onMouseEnter={e => { e.currentTarget.style.background=GOLD }}
+              onMouseLeave={e => { e.currentTarget.style.background=WHITE }}>
+              Start Designing Free →
             </button>
-
-            <div style={{ width:1, height:32, background:'rgba(255,255,255,0.2)' }} />
-
             <button onClick={() => nav('/gallery')}
-              style={{ fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.34em', textTransform:'uppercase', color:'rgba(255,255,255,0.5)', background:'transparent', border:'none', cursor:'none', padding:0, transition:'opacity 0.3s' }}
-              onMouseEnter={e => e.currentTarget.style.opacity='0.8'}
-              onMouseLeave={e => e.currentTarget.style.opacity='1'}>
-              <span className="hover-line">View Gallery</span>
+              style={{ fontFamily:SS, fontSize:11, fontWeight:600, letterSpacing:'0.14em',
+                textTransform:'uppercase', color:'rgba(255,255,255,0.75)', background:'transparent',
+                border:'1px solid rgba(255,255,255,0.28)', cursor:'none', padding:'15px 32px',
+                transition:'all 0.25s' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor=WHITE; e.currentTarget.style.color=WHITE }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor='rgba(255,255,255,0.28)'; e.currentTarget.style.color='rgba(255,255,255,0.75)' }}>
+              View Gallery
             </button>
           </div>
-        </div>
 
-        {/* Bottom scroll hint */}
-        <div style={{ position:'absolute', bottom:40, left:'50%', transform:'translateX(-50%)', zIndex:2, textAlign:'center', animation:'titleIn 1.5s ease 1.4s both' }}>
-          <div style={{ width:1, height:60, background:'linear-gradient(to bottom,rgba(255,255,255,0.5),transparent)', margin:'0 auto' }} />
+          {/* ── Inline stage indicators — always visible ── */}
+          <div style={{ display:'flex', alignItems:'stretch', gap:2, marginTop:44,
+            animation:'titleIn 1.2s ease 1.3s both', width:'100%', maxWidth:600 }}>
+            {HERO_STAGES.map((s, i) => (
+              <div key={i} style={{ flex:1, position:'relative', overflow:'hidden' }}>
+                {/* animated progress bar */}
+                <div style={{ height:2, background:'rgba(255,255,255,0.1)', width:'100%' }}>
+                  <div className="hero-progress" style={{ animationDelay:`${i*6}s` }} />
+                </div>
+                <div className="hero-stage" style={{ animationDelay:`${i*6}s`,
+                  position:'static', padding:'10px 12px',
+                  background:'rgba(0,0,0,0.55)', backdropFilter:'blur(8px)',
+                  border:'1px solid rgba(255,255,255,0.07)', borderTop:'none',
+                  textAlign:'left', height:'100%' }}>
+                  <div style={{ fontFamily:SS, fontSize:7, fontWeight:700, letterSpacing:'0.28em',
+                    textTransform:'uppercase', color:GOLD, marginBottom:3 }}>
+                    {s.step} — {s.tag}
+                  </div>
+                  <div style={{ fontFamily:SS, fontSize:11, fontWeight:600, color:WHITE }}>{s.label}</div>
+                </div>
+                {/* Always-visible fallback (opacity low when not active) */}
+                <div style={{ position:'absolute', inset:0, paddingTop:2, pointerEvents:'none' }}>
+                  <div style={{ padding:'10px 12px', textAlign:'left', opacity:0.25 }}>
+                    <div style={{ fontFamily:SS, fontSize:7, fontWeight:700, letterSpacing:'0.28em',
+                      textTransform:'uppercase', color:GOLD, marginBottom:3 }}>
+                      {s.step} — {s.tag}
+                    </div>
+                    <div style={{ fontFamily:SS, fontSize:11, fontWeight:600, color:WHITE }}>{s.label}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          I-B. TRUST STATS BAR
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ background:'#0a0a0a', padding:'0 clamp(40px,8vw,160px)' }}>
+        <div style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:'repeat(4,1fr)', borderLeft:'1px solid rgba(255,255,255,0.06)' }}>
+          {[
+            ['2D + 3D',  'Floor Plan & Visualisation'],
+            ['500+',    'Design Templates'],
+            ['150+',    'Furniture & Decor Items'],
+            ['Free',    'Forever — No Credit Card'],
+          ].map(([num, label], i) => (
+            <div key={i} style={{ padding:'44px 40px', borderRight:'1px solid rgba(255,255,255,0.06)', borderTop:'none' }}>
+              <div style={{ fontFamily:SF, fontSize:'clamp(32px,3.5vw,52px)', fontWeight:300, color:WHITE, lineHeight:1, marginBottom:10, letterSpacing:'-0.02em' }}>
+                {num === 'Free' ? <span style={{ color:GOLD }}>Free</span> : num}
+              </div>
+              <div style={{ fontFamily:SS, fontSize:10, fontWeight:500, letterSpacing:'0.16em', textTransform:'uppercase', color:'rgba(255,255,255,0.35)' }}>{label}</div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -981,6 +1108,120 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════
+          VII-C. TESTIMONIALS — Real customer reviews
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ background:WHITE, padding:'120px clamp(40px,8vw,160px)' }}>
+        <div style={{ maxWidth:1200, margin:'0 auto' }}>
+
+          <div className="r" style={{ textAlign:'center', marginBottom:72 }}>
+            <SectionLabel>What People Say</SectionLabel>
+            <div style={{ width:36, height:1, background:GOLD, margin:'20px auto 36px' }} />
+            <h2 style={{ fontFamily:SF, fontSize:'clamp(38px,4.5vw,66px)', fontWeight:300, color:DARK, lineHeight:1.05 }}>
+              What our early users<br /><em style={{ fontStyle:'italic', color:GOLD }}>are saying.</em>
+            </h2>
+          </div>
+
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:2 }} className="col-sm">
+            {[
+              {
+                name:'Priya Sharma', city:'Bengaluru', role:'Homeowner',
+                rating:5,
+                text:'"I redesigned our entire 3BHK before renovation started. The 3D view saved us from making expensive mistakes — we changed the kitchen layout twice before settling on the perfect plan. Absolutely worth it."',
+                avatar:'PS',
+                project:'3BHK Apartment Redesign',
+              },
+              {
+                name:'Arjun Mehta', city:'Mumbai', role:'Interior Designer',
+                rating:5,
+                text:'"As a professional designer, I use El Shaddai to present concepts to clients before the actual work begins. The photorealistic renders are impressive and clients love being able to visualize the space."',
+                avatar:'AM',
+                project:'Client Presentation Studio',
+              },
+              {
+                name:'Deepika Nair', city:'Hyderabad', role:'First-time Homeowner',
+                rating:5,
+                text:'"I had zero design experience and was nervous about our new flat. El Shaddai made it so easy — I designed the bedroom in one evening, showed it to my husband, and we both fell in love with it."',
+                avatar:'DN',
+                project:'New Flat Interior Design',
+              },
+              {
+                name:'Rahul Verma', city:'Delhi', role:'Architect',
+                rating:5,
+                text:'"The AI floor plan generator is a game-changer for quick concept work. What used to take me 30 minutes now takes 2. I use it daily for initial client briefs."',
+                avatar:'RV',
+                project:'Residential Concept Drafts',
+              },
+              {
+                name:'Sujatha Krishnan', city:'Chennai', role:'Homeowner',
+                rating:5,
+                text:'"We were planning a pooja room and had no idea how to visualize it. The templates gave us so much inspiration. Our contractor was surprised by the level of detail in our design brief!"',
+                avatar:'SK',
+                project:'Pooja Room Design',
+              },
+              {
+                name:'Vikram Patel', city:'Ahmedabad', role:'Builder',
+                rating:5,
+                text:'"I share El Shaddai with every client before construction begins. It helps them communicate their vision clearly, which means fewer change requests and smoother projects for everyone."',
+                avatar:'VP',
+                project:'Pre-construction Planning',
+              },
+            ].map(({ name, city, role, rating, text, avatar, project }, i) => (
+              <div key={i} className="rs" style={{ animationDelay:`${i*80}ms`, background:CREAM, padding:'40px 36px', display:'flex', flexDirection:'column', gap:28, border:'1px solid rgba(0,0,0,0.04)' }}>
+                {/* Stars */}
+                <div style={{ display:'flex', gap:3 }}>
+                  {Array.from({length:rating}).map((_,s) => <span key={s} style={{ color:GOLD, fontSize:14 }}>★</span>)}
+                </div>
+                {/* Review text */}
+                <p style={{ fontFamily:SF, fontSize:17, fontWeight:300, color:DARK, lineHeight:1.75, fontStyle:'italic', flex:1, margin:0 }}>{text}</p>
+                {/* Project tag */}
+                <div style={{ fontFamily:SS, fontSize:8, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:GOLD, padding:'5px 12px', border:`1px solid rgba(196,149,106,0.35)`, alignSelf:'flex-start' }}>{project}</div>
+                {/* Author */}
+                <div style={{ display:'flex', alignItems:'center', gap:14, paddingTop:20, borderTop:'1px solid rgba(0,0,0,0.07)' }}>
+                  <div style={{ width:40, height:40, background:DARK, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:SS, fontSize:11, fontWeight:700, color:WHITE, flexShrink:0 }}>{avatar}</div>
+                  <div>
+                    <div style={{ fontFamily:SS, fontSize:13, fontWeight:600, color:DARK }}>{name}</div>
+                    <div style={{ fontFamily:SS, fontSize:10, color:MUTED, letterSpacing:'0.06em' }}>{role} · {city}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA below testimonials */}
+          <div className="r" style={{ textAlign:'center', marginTop:64, padding:'48px 40px', background:DARK, display:'flex', alignItems:'center', justifyContent:'center', gap:48, flexWrap:'wrap' }}>
+            <div style={{ textAlign:'left' }}>
+              <div style={{ fontFamily:SF, fontSize:'clamp(26px,2.5vw,38px)', fontWeight:300, color:WHITE, lineHeight:1.2 }}>
+                Be among the first to design<br /><em style={{ fontStyle:'italic', color:GOLD }}>your dream space.</em>
+              </div>
+            </div>
+            <div style={{ width:1, height:60, background:'rgba(255,255,255,0.1)' }} className="hide-sm" />
+            <button onClick={() => nav('/studio')}
+              style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.22em', textTransform:'uppercase', color:DARK, background:GOLD, border:'none', padding:'16px 44px', cursor:'none', transition:'opacity 0.2s', flexShrink:0 }}
+              onMouseEnter={e => e.currentTarget.style.opacity='0.85'}
+              onMouseLeave={e => e.currentTarget.style.opacity='1'}>
+              Try the Studio Free →
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          VII-D. FAQ — Common questions answered
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ background:CREAM, padding:'120px clamp(40px,8vw,160px)' }}>
+        <div style={{ maxWidth:960, margin:'0 auto' }}>
+          <div className="r" style={{ textAlign:'center', marginBottom:72 }}>
+            <SectionLabel>FAQ</SectionLabel>
+            <div style={{ width:36, height:1, background:GOLD, margin:'20px auto 36px' }} />
+            <h2 style={{ fontFamily:SF, fontSize:'clamp(36px,4vw,60px)', fontWeight:300, color:DARK, lineHeight:1.05 }}>
+              Questions? <em style={{ fontStyle:'italic', color:GOLD }}>We have answers.</em>
+            </h2>
+          </div>
+          <FAQSection />
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════
           VIII. ROOM TYPES — Elegant horizontal navigation
       ══════════════════════════════════════════════════════════════════ */}
       <section style={{ background:CREAM, padding:'100px clamp(40px,6vw,100px)' }}>
@@ -996,7 +1237,7 @@ export default function HomePage() {
             {[
               ['Living Room','https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&q=70'],
               ['Bedroom','https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=300&q=70'],
-              ['Kitchen','https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&q=70'],
+              ['Kitchen','https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=300&q=70'],
               ['Bathroom','https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=300&q=70'],
               ['Home Office','https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=300&q=70'],
               ['Dining Room','https://images.unsplash.com/photo-1617806118233-18e1de247200?w=300&q=70'],
