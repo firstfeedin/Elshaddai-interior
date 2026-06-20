@@ -241,76 +241,173 @@ async function analyzeFloorPlan(base64, mimeType) {
   } catch { return null }
 }
 
-function TopBar({ step, setStep, mode, setMode, onSave, onExport }) {
-  const navigate = useNavigate()
-  const steps = [
-    { id:1, label:'Draw',     icon:'✏️' },
-    { id:2, label:'Decorate', icon:'🎨' },
-    { id:3, label:'Render',   icon:'✨' },
+/* ─── Studio Landing ─── */
+const LANDING_TEMPLATES = [
+  { id:'t1', label:"Modern Living Room",   author:"El Shaddai Studio", img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=400&q=70', type:'Project' },
+  { id:'t2', label:"Nordic Bedroom",       author:"El Shaddai Studio", img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=400&q=70', type:'Project' },
+  { id:'t3', label:"Japandi Calm",         author:"El Shaddai Studio", img:'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=400&q=70', type:'Project' },
+  { id:'t4', label:"Industrial Loft",      author:"El Shaddai Studio", img:'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=400&q=70', type:'Project' },
+  { id:'t5', label:"Bohemian Bliss",       author:"Design Studio",     img:'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=400&q=70', type:'Room' },
+  { id:'t6', label:"Vastu Modern Home",    author:"Vastu Expert",      img:'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=400&q=70', type:'Room' },
+  { id:'t7', label:"Royal Luxury Suite",   author:"Luxury Designs",    img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=400&q=70', type:'Room' },
+  { id:'t8', label:"Minimal White Space",  author:"Minimal Studio",    img:'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=400&q=70', type:'Room' },
+  { id:'t9', label:"Modular Kitchen Pro",  author:"Kitchen Expert",    img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=400&q=70', type:'Project' },
+  { id:'t10',label:"Kids Fun Room",        author:"Kids Design",       img:'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?auto=format&fit=crop&w=400&q=70', type:'Room' },
+]
+
+function StudioLanding({ onStart, fileInputRef, onUpload }) {
+  const [tab, setTab] = useState('Project')
+  const filtered = LANDING_TEMPLATES.filter(t => t.type === tab)
+  const actions = [
+    { label:'Import Image',  icon:'🖼', desc:'Upload a floor plan photo',     onClick: () => fileInputRef.current?.click() },
+    { label:'Import CAD',    icon:'📐', desc:'Import .dwg or .dxf file',      onClick: () => alert('CAD import: upload your .dwg file') },
+    { label:'New Design',    icon:'✏️', desc:'Start with a blank canvas',     onClick: () => onStart('new') },
+    { label:'My Designs',    icon:'📁', desc:'Continue a saved design',       onClick: () => onStart('my') },
+    { label:'AI Planner',    icon:'✨', desc:'Let AI plan your room',         isNew:true, onClick: () => onStart('ai') },
   ]
   return (
-    <div style={{ height:52, background:C.panel, borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', padding:'0 16px', gap:12, flexShrink:0, zIndex:100, position:'relative' }}>
-      {/* Logo */}
-      <div style={{ display:'flex', alignItems:'center', gap:8, marginRight:8, flexShrink:0 }}>
-        <div style={{ width:30, height:30, background:C.gold, display:'flex', alignItems:'center', justifyContent:'center' }}>
-          <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M10 2L18 8.5V18H13V12.5H7V18H2V8.5L10 2Z" fill="white"/></svg>
+    <div style={{ flex:1, overflowY:'auto', background:'#f7f5f2', fontFamily:"'DM Sans',system-ui,sans-serif" }}>
+      <div style={{ maxWidth:1100, margin:'0 auto', padding:'48px 40px 64px' }}>
+        {/* Heading */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:36 }}>
+          <h1 style={{ fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:34, fontWeight:400, color:C.bg, margin:0 }}>
+            Create a Floor Plan
+          </h1>
+          <button style={{ background:'none', border:'none', cursor:'pointer', fontSize:13, color:'#888', display:'flex', alignItems:'center', gap:4 }}>
+            Beginner's Guide ›
+          </button>
         </div>
+
+        {/* Action buttons */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:12, marginBottom:48 }}>
+          {actions.map(a => (
+            <button key={a.label} onClick={a.onClick}
+              style={{ position:'relative', background:'#fff', border:'1.5px solid #e8e0d8', borderRadius:10, padding:'22px 16px', cursor:'pointer', textAlign:'center', transition:'all 0.2s', display:'flex', flexDirection:'column', alignItems:'center', gap:10 }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor=C.gold; e.currentTarget.style.boxShadow=`0 4px 20px rgba(196,149,106,0.2)` }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor='#e8e0d8'; e.currentTarget.style.boxShadow='none' }}>
+              {a.isNew && (
+                <span style={{ position:'absolute', top:10, right:10, background:'#ef4444', color:'#fff', fontSize:8, fontWeight:800, padding:'2px 6px', borderRadius:3, letterSpacing:'0.1em' }}>NEW</span>
+              )}
+              <span style={{ fontSize:28 }}>{a.icon}</span>
+              <div>
+                <div style={{ fontWeight:700, fontSize:12, color:C.bg, marginBottom:2 }}>{a.label}</div>
+                <div style={{ fontSize:10, color:'#9a8a82' }}>{a.desc}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Template section */}
         <div>
-          <div style={{ color:'#fff', fontWeight:700, fontSize:13, lineHeight:1 }}>El Shaddai</div>
-          <div style={{ color:C.gold, fontSize:9, letterSpacing:'0.15em', textTransform:'uppercase' }}>Design Studio</div>
+          <h2 style={{ fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:22, fontWeight:400, color:C.bg, margin:'0 0 20px' }}>
+            Quickly start with a template
+          </h2>
+
+          {/* Tabs */}
+          <div style={{ display:'flex', gap:0, marginBottom:24, borderBottom:'1px solid #e8e0d8' }}>
+            {['Project','Room'].map(t => (
+              <button key={t} onClick={() => setTab(t)}
+                style={{ padding:'8px 20px', background: tab===t ? C.bg : 'transparent', color: tab===t ? '#fff' : '#888',
+                  border:'none', cursor:'pointer', fontSize:12, fontWeight:700, borderRadius: tab===t ? '6px 6px 0 0' : 0, transition:'all 0.15s' }}>
+                {t} Templates
+              </button>
+            ))}
+          </div>
+
+          {/* Template grid */}
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:14 }}>
+            {filtered.map(t => (
+              <div key={t.id} onClick={() => onStart('template', t)}
+                style={{ cursor:'pointer', borderRadius:8, overflow:'hidden', border:'1.5px solid #e8e0d8', background:'#fff', transition:'all 0.2s' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor=C.gold; e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow=`0 6px 24px rgba(0,0,0,0.1)` }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor='#e8e0d8'; e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='none' }}>
+                <div style={{ position:'relative', height:150 }}>
+                  <img src={t.img} alt={t.label} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                  <span style={{ position:'absolute', top:8, left:8, background:'#22c55e', color:'#fff', fontSize:9, fontWeight:800, padding:'2px 7px', borderRadius:3 }}>Free</span>
+                </div>
+                <div style={{ padding:'10px 12px' }}>
+                  <p style={{ margin:'0 0 4px', fontSize:11, fontWeight:600, color:C.bg, lineHeight:1.3 }}>{t.label}</p>
+                  <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+                    <div style={{ width:14, height:14, borderRadius:'50%', background:C.gold, display:'flex', alignItems:'center', justifyContent:'center', fontSize:7, color:'#fff', fontWeight:700 }}>ES</div>
+                    <span style={{ fontSize:9, color:'#9a8a82' }}>{t.author}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
+    </div>
+  )
+}
 
-      <div style={{ width:1, height:28, background:C.border, marginRight:4 }} />
+/* ─── Top Bar ─── */
+function TopBar({ onSave, onExport, onClose, mode, setMode }) {
+  const TOOLS = [
+    { label:'File',         icon:'📄', onClick: () => {} },
+    { label:'Save',         icon:'💾', onClick: onSave },
+    { label:'Undo',         icon:'↩',  onClick: () => {} },
+    { label:'Redo',         icon:'↪',  onClick: () => {} },
+    { label:'Clear',        icon:'🗑',  onClick: () => {} },
+    null,
+    { label:'Construction', icon:'🔧', onClick: () => {} },
+    { label:'Tools',        icon:'⚙️', onClick: () => {} },
+    { label:'View',         icon:'👁',  onClick: () => {} },
+    { label:'AI Tools',     icon:'✨',  isNew:true, onClick: () => {} },
+    null,
+    { label:'Export',       icon:'⬆', onClick: onExport },
+    { label:'Images',       icon:'🖼', onClick: () => {} },
+    { label:'Render',       icon:'🎬', isHighlight:true, onClick: () => {} },
+  ]
+  return (
+    <div style={{ height:52, background:C.panel2, borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', padding:'0 16px', gap:0, flexShrink:0, zIndex:100 }}>
+      {/* Logo */}
+      <div style={{ display:'flex', alignItems:'center', gap:8, marginRight:16, flexShrink:0 }}>
+        <div style={{ width:28, height:28, background:C.gold, display:'flex', alignItems:'center', justifyContent:'center' }}>
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M10 2L18 8.5V18H13V12.5H7V18H2V8.5L10 2Z" fill="white"/></svg>
+        </div>
+        <div>
+          <div style={{ color:'#fff', fontWeight:700, fontSize:12, lineHeight:1 }}>El Shaddai</div>
+          <div style={{ color:C.gold, fontSize:8, letterSpacing:'0.12em', textTransform:'uppercase' }}>Design Studio</div>
+        </div>
+      </div>
+      <div style={{ width:1, height:28, background:C.border, marginRight:12 }} />
 
-      {/* Step tabs */}
-      <div style={{ display:'flex', gap:2 }}>
-        {steps.map(s => (
-          <button key={s.id} onClick={() => setStep(s.id)} style={{
-            display:'flex', alignItems:'center', gap:6, padding:'5px 14px',
-            background: step===s.id ? C.gold : 'transparent',
-            color: step===s.id ? '#000' : C.muted,
-            border:'none', cursor:'pointer', borderRadius:4, fontSize:12, fontWeight:700,
-            transition:'all 0.15s',
-          }}>
-            <span>{s.icon}</span> {s.label}
-          </button>
+      {/* Toolbar buttons */}
+      <div style={{ display:'flex', alignItems:'center', gap:1, flex:1 }}>
+        {TOOLS.map((t, i) =>
+          t === null ? (
+            <div key={i} style={{ width:1, height:28, background:C.border, margin:'0 8px' }} />
+          ) : (
+            <button key={t.label} onClick={t.onClick} title={t.label}
+              style={{ position:'relative', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:1,
+                padding:'4px 10px', background: t.isHighlight ? C.gold : 'transparent',
+                border:'none', borderRadius:4, cursor:'pointer', transition:'background 0.15s', minWidth:48 }}
+              onMouseEnter={e => { if (!t.isHighlight) e.currentTarget.style.background='rgba(255,255,255,0.08)' }}
+              onMouseLeave={e => { if (!t.isHighlight) e.currentTarget.style.background='transparent' }}>
+              {t.isNew && (
+                <span style={{ position:'absolute', top:2, right:2, background:'#ef4444', color:'#fff', fontSize:6, fontWeight:800, padding:'1px 3px', borderRadius:2 }}>NEW</span>
+              )}
+              <span style={{ fontSize:13 }}>{t.icon}</span>
+              <span style={{ fontSize:8, fontWeight:600, color: t.isHighlight ? '#000' : C.muted, letterSpacing:'0.05em' }}>{t.label}</span>
+            </button>
+          )
+        )}
+      </div>
+
+      {/* 2D/3D toggle */}
+      <div style={{ display:'flex', background:C.bg, borderRadius:6, padding:2, gap:1, marginLeft:8 }}>
+        {['2D','3D'].map(m => (
+          <button key={m} onClick={() => setMode(m.toLowerCase())} style={{
+            padding:'4px 14px', background: mode===m.toLowerCase() ? '#fff' : 'transparent',
+            color: mode===m.toLowerCase() ? '#000' : C.muted,
+            border:'none', cursor:'pointer', borderRadius:4, fontSize:11, fontWeight:700,
+          }}>{m}</button>
         ))}
       </div>
 
-      {step === 2 && (
-        <>
-          <div style={{ width:1, height:28, background:C.border }} />
-          <div style={{ display:'flex', background:C.bg, borderRadius:6, padding:2, gap:1 }}>
-            {[['2D','Floor Plan'],['3D','Room View']].map(([id,lb]) => (
-              <button key={id} onClick={() => setMode(id.toLowerCase())} style={{
-                padding:'4px 12px', background: mode===id.toLowerCase() ? '#fff' : 'transparent',
-                color: mode===id.toLowerCase() ? '#000' : C.muted,
-                border:'none', cursor:'pointer', borderRadius:4, fontSize:11, fontWeight:700,
-              }}>{id} {lb}</button>
-            ))}
-          </div>
-        </>
-      )}
-
-      <div style={{ flex:1 }} />
-
-      {/* Toolbar */}
-      {[
-        { icon:'↩', tip:'Undo' }, { icon:'↪', tip:'Redo' },
-      ].map(({ icon, tip }) => (
-        <button key={tip} title={tip} style={{ width:30, height:30, background:C.bg, border:`1px solid ${C.border}`, color:C.text, borderRadius:4, cursor:'pointer', fontSize:14, display:'flex', alignItems:'center', justifyContent:'center' }}>{icon}</button>
-      ))}
-
-      <div style={{ width:1, height:28, background:C.border }} />
-
-      <button onClick={onSave} style={{ padding:'6px 16px', background:'transparent', border:`1px solid ${C.border}`, color:C.text, borderRadius:4, cursor:'pointer', fontSize:11, fontWeight:600 }}>
-        💾 Save
-      </button>
-      <button onClick={onExport} style={{ padding:'6px 16px', background:C.gold, border:'none', color:'#000', borderRadius:4, cursor:'pointer', fontSize:11, fontWeight:700 }}>
-        ⬆ Export
-      </button>
-      <button onClick={() => navigate('/')} style={{ padding:'6px 12px', background:'transparent', border:`1px solid ${C.border}`, color:C.muted, borderRadius:4, cursor:'pointer', fontSize:11 }}>
+      <div style={{ width:1, height:28, background:C.border, margin:'0 12px' }} />
+      <button onClick={onClose} style={{ padding:'5px 12px', background:'transparent', border:`1px solid ${C.border}`, color:C.muted, borderRadius:4, cursor:'pointer', fontSize:11 }}>
         ✕ Close
       </button>
     </div>
@@ -856,30 +953,49 @@ function RightPanel({ step, selectedRoom, appliedTemplate, addedItems = [] }) {
   return null
 }
 
+/* ─── Sidebar Icons ─── */
+const SIDEBAR_TABS = [
+  { id:'build',     label:'Build',     icon:'🏗' },
+  { id:'decorate',  label:'Decorate',  icon:'🎨' },
+  { id:'ai',        label:'AI Decor',  icon:'✨' },
+  { id:'templates', label:'Templates', icon:'📋' },
+  { id:'mine',      label:'Mine',      icon:'📁' },
+  { id:'render',    label:'Render',    icon:'🎬' },
+  { id:'my',        label:'My',        icon:'👤' },
+]
+
 /* ─── Main Export ─── */
 export default function StudioPage() {
-  const [step, setStep]                     = useState(1)
-  const [mode, setMode]                     = useState('3d')
-  const [templateScope, setTemplateScope]   = useState('Single Room')
+  const navigate                              = useNavigate()
+  const [showLanding, setShowLanding]         = useState(true)
+  const [sideTab, setSideTab]                 = useState('build')
+  const [mode, setMode]                       = useState('3d')
+  const [templateScope, setTemplateScope]     = useState('Single Room')
   const [appliedTemplate, setAppliedTemplate] = useState(null)
-  const [activeCat, setActiveCat]           = useState('all')
-  const [selectedRoom, setSelectedRoom]     = useState(null)
-  const [uploadedPlan, setUploadedPlan]     = useState(null)
-  const [aiAnalysis, setAiAnalysis]         = useState(null)
-  const [analyzing, setAnalyzing]           = useState(false)
-  const [floorPlanData, setFloorPlanData]   = useState(null)
-  const [rendering, setRendering]           = useState(false)
-  const [renderProgress, setRenderProgress] = useState(0)
-  const [renderSettings, setRenderSettings] = useState({
+  const [activeCat, setActiveCat]             = useState('all')
+  const [selectedRoom, setSelectedRoom]       = useState(null)
+  const [uploadedPlan, setUploadedPlan]       = useState(null)
+  const [aiAnalysis, setAiAnalysis]           = useState(null)
+  const [analyzing, setAnalyzing]             = useState(false)
+  const [rendering, setRendering]             = useState(false)
+  const [renderProgress, setRenderProgress]   = useState(0)
+  const [renderSettings, setRenderSettings]   = useState({
     camera:'Normal', style:'Photorealistic', resolution:'4K (2160p)', lighting:'Daylight',
   })
-  const [aiCatalog, setAiCatalog]           = useState(null)
-  const [catalogLoading, setCatalogLoading] = useState(false)
-  const [addedItems, setAddedItems]         = useState([])
+  const [aiCatalog, setAiCatalog]             = useState(null)
+  const [catalogLoading, setCatalogLoading]   = useState(false)
+  const [addedItems, setAddedItems]           = useState([])
+  const fileInputRef                          = useRef()
+
+  // Map sidebar tab → step
+  const step = sideTab === 'build' || sideTab === 'templates' || sideTab === 'mine' ? 1
+    : sideTab === 'decorate' || sideTab === 'ai' || sideTab === 'my' ? 2
+    : 3
 
   const handleUpload = useCallback(async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
+    setShowLanding(false)
     const reader = new FileReader()
     reader.onload = async (ev) => {
       const dataUrl = ev.target.result
@@ -889,11 +1005,8 @@ export default function StudioPage() {
       const mimeType = file.type || 'image/jpeg'
       const result = await analyzeFloorPlan(base64, mimeType)
       setAiAnalysis(result || {
-        rooms: [{ name:'Living Room', area:320 }, { name:'Bedroom', area:200 }, { name:'Kitchen', area:150 }, { name:'Bathroom', area:80 }],
-        totalArea: 1100,
-        style: 'Modern Indian',
-        estimatedCost: '₹8–12 Lakhs',
-        suggestions: ['Use light colors to make space feel larger', 'Add statement lighting'],
+        rooms:[{name:'Living Room',area:320},{name:'Bedroom',area:200},{name:'Kitchen',area:150},{name:'Bathroom',area:80}],
+        totalArea:1100, style:'Modern Indian', estimatedCost:'₹8–12 Lakhs',
       })
       setAnalyzing(false)
     }
@@ -901,56 +1014,92 @@ export default function StudioPage() {
   }, [])
 
   const handleRender = useCallback(() => {
-    setRendering(true)
-    setRenderProgress(0)
-    const interval = setInterval(() => {
-      setRenderProgress(p => {
-        if (p >= 100) { clearInterval(interval); setRendering(false); return 100 }
-        return p + 3
-      })
-    }, 150)
+    setRendering(true); setRenderProgress(0)
+    const iv = setInterval(() => setRenderProgress(p => {
+      if (p >= 100) { clearInterval(iv); setRendering(false); return 100 }
+      return p + 3
+    }), 150)
   }, [])
 
   const handleAddItem = useCallback((item) => {
-    setAddedItems(prev =>
-      prev.some(a => a.id === item.id) ? prev.filter(a => a.id !== item.id) : [...prev, item]
-    )
+    setAddedItems(prev => prev.some(a=>a.id===item.id) ? prev.filter(a=>a.id!==item.id) : [...prev,item])
   }, [])
 
   const handleApplyTemplate = useCallback(async (t) => {
-    setAppliedTemplate(t)
-    setMode('3d')
-    setStep(2)
+    setAppliedTemplate(t); setSideTab('decorate')
     setCatalogLoading(true)
     const result = await getAISuggestedCatalog(selectedRoom, t.style)
-    setAiCatalog(result)
-    setCatalogLoading(false)
+    setAiCatalog(result); setCatalogLoading(false)
   }, [selectedRoom])
 
   const handleSelectRoom = useCallback(async (r) => {
-    setSelectedRoom(r)
-    setStep(2)
+    setSelectedRoom(r); setSideTab('decorate')
     setCatalogLoading(true)
     const result = await getAISuggestedCatalog(r, appliedTemplate?.style)
-    setAiCatalog(result)
-    setCatalogLoading(false)
+    setAiCatalog(result); setCatalogLoading(false)
   }, [appliedTemplate])
 
-  return (
-    <div style={{ height:'100vh', display:'flex', flexDirection:'column', overflow:'hidden', background:C.bg, fontFamily:"'DM Sans', system-ui, sans-serif" }}>
+  const handleLandingStart = useCallback((type, template) => {
+    setShowLanding(false)
+    if (type === 'template' && template) handleApplyTemplate({ label:template.label, style:'Modern', img:template.img })
+    if (type === 'ai') setSideTab('ai')
+    if (type === 'my') setSideTab('mine')
+  }, [handleApplyTemplate])
+
+  if (showLanding) return (
+    <div style={{ height:'100vh', display:'flex', flexDirection:'column', overflow:'hidden', fontFamily:"'DM Sans',system-ui,sans-serif" }}>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      {/* Landing top bar */}
+      <div style={{ height:52, background:C.panel, borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', padding:'0 20px', gap:12, flexShrink:0 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+          <div style={{ width:28, height:28, background:C.gold, display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M10 2L18 8.5V18H13V12.5H7V18H2V8.5L10 2Z" fill="white"/></svg>
+          </div>
+          <div>
+            <div style={{ color:'#fff', fontWeight:700, fontSize:12 }}>El Shaddai</div>
+            <div style={{ color:C.gold, fontSize:8, letterSpacing:'0.12em', textTransform:'uppercase' }}>Design Studio</div>
+          </div>
+        </div>
+        <div style={{ flex:1 }} />
+        <button onClick={() => navigate('/')} style={{ background:'transparent', border:`1px solid ${C.border}`, color:C.muted, borderRadius:4, padding:'5px 14px', cursor:'pointer', fontSize:11 }}>
+          ✕ Exit Studio
+        </button>
+      </div>
+      <input ref={fileInputRef} type="file" accept="image/*" style={{ display:'none' }} onChange={handleUpload} />
+      <StudioLanding onStart={handleLandingStart} fileInputRef={fileInputRef} onUpload={handleUpload} />
+    </div>
+  )
+
+  return (
+    <div style={{ height:'100vh', display:'flex', flexDirection:'column', overflow:'hidden', background:C.bg, fontFamily:"'DM Sans',system-ui,sans-serif" }}>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      <input ref={fileInputRef} type="file" accept="image/*" style={{ display:'none' }} onChange={handleUpload} />
 
       <TopBar
-        step={step} setStep={setStep}
         mode={mode} setMode={setMode}
         onSave={() => alert('Design saved!')}
         onExport={() => alert('Exporting…')}
+        onClose={() => setShowLanding(true)}
       />
 
       <div style={{ flex:1, display:'flex', overflow:'hidden' }}>
-        {/* Left Sidebar */}
-        <div style={{ width:260, background:C.panel, borderRight:`1px solid ${C.border}`, flexShrink:0, overflow:'hidden', display:'flex', flexDirection:'column' }}>
-          {step === 1 && (
+        {/* Icon sidebar */}
+        <div style={{ width:64, background:C.panel2, borderRight:`1px solid ${C.border}`, flexShrink:0, display:'flex', flexDirection:'column', alignItems:'center', paddingTop:8, gap:2 }}>
+          {SIDEBAR_TABS.map(t => (
+            <button key={t.id} onClick={() => setSideTab(t.id)} title={t.label}
+              style={{ width:54, display:'flex', flexDirection:'column', alignItems:'center', gap:3, padding:'8px 4px', borderRadius:6,
+                background: sideTab===t.id ? 'rgba(196,149,106,0.18)' : 'transparent',
+                border: sideTab===t.id ? `1px solid rgba(196,149,106,0.4)` : '1px solid transparent',
+                cursor:'pointer', transition:'all 0.15s' }}>
+              <span style={{ fontSize:18 }}>{t.icon}</span>
+              <span style={{ fontSize:8, fontWeight:600, color: sideTab===t.id ? C.gold : C.muted, letterSpacing:'0.06em', textTransform:'uppercase' }}>{t.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Panel */}
+        <div style={{ width:252, background:C.panel, borderRight:`1px solid ${C.border}`, flexShrink:0, overflow:'hidden', display:'flex', flexDirection:'column' }}>
+          {(sideTab==='build'||sideTab==='templates'||sideTab==='mine') && (
             <DrawPanel
               onSelectRoom={handleSelectRoom}
               uploadedPlan={uploadedPlan}
@@ -959,7 +1108,7 @@ export default function StudioPage() {
               analyzing={analyzing}
             />
           )}
-          {step === 2 && (
+          {(sideTab==='decorate'||sideTab==='ai'||sideTab==='my') && (
             <DecoratePanel
               templateScope={templateScope}
               setTemplateScope={setTemplateScope}
@@ -972,7 +1121,7 @@ export default function StudioPage() {
               onAddItem={handleAddItem}
             />
           )}
-          {step === 3 && (
+          {sideTab==='render' && (
             <RenderPanel
               settings={renderSettings}
               setSettings={setRenderSettings}
@@ -985,9 +1134,8 @@ export default function StudioPage() {
 
         {/* Main Canvas */}
         <MainCanvas
-          step={step}
-          mode={mode}
-          floorPlanData={floorPlanData}
+          step={step} mode={mode}
+          floorPlanData={null}
           uploadedPlan={uploadedPlan}
           selectedRoom={selectedRoom}
           appliedTemplate={appliedTemplate}
@@ -1006,9 +1154,9 @@ export default function StudioPage() {
       <div style={{ height:28, background:C.panel, borderTop:`1px solid ${C.border}`, display:'flex', alignItems:'center', padding:'0 16px', gap:16 }}>
         {[
           { label:'Walls', val:'8' },
-          { label:'Rooms', val: aiAnalysis ? aiAnalysis.rooms?.length || 4 : '4' },
+          { label:'Rooms', val: aiAnalysis ? aiAnalysis.rooms?.length||4 : '4' },
           { label:'Area', val: aiAnalysis ? `${aiAnalysis.totalArea} ft²` : '560 ft²' },
-          { label:'Furniture', val:'12' },
+          { label:'Furniture', val: addedItems.length||'12' },
         ].map(({ label, val }) => (
           <div key={label} style={{ display:'flex', gap:4 }}>
             <span style={{ color:C.muted, fontSize:9, textTransform:'uppercase', letterSpacing:'0.1em' }}>{label}:</span>
@@ -1016,7 +1164,14 @@ export default function StudioPage() {
           </div>
         ))}
         <div style={{ flex:1 }} />
-        <span style={{ color:C.muted, fontSize:9 }}>Step {step}/3 · {['Draw Floor Plan','Decorate Your Space','Render & Export'][step-1]}</span>
+        <div style={{ display:'flex', background:'rgba(0,0,0,0.3)', borderRadius:4, overflow:'hidden' }}>
+          {['2D 1','3D 3'].map(v => (
+            <button key={v} style={{ padding:'2px 10px', background: v.startsWith('3D') ? C.gold : 'transparent', border:'none', color: v.startsWith('3D') ? '#000' : C.muted, fontSize:9, fontWeight:700, cursor:'pointer' }}>
+              {v}
+            </button>
+          ))}
+        </div>
+        <span style={{ color:C.muted, fontSize:9, marginLeft:8 }}>Floor 1 of 1</span>
       </div>
     </div>
   )

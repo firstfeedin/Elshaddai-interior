@@ -366,123 +366,137 @@ function StyleTemplates() {
 }
 
 /* ─── Video Glimpse ──────────────────────────────────────────────────────── */
-function VideoGlimpse() {
-  const [active, setActive] = useState(0)
-  const [playing, setPlaying] = useState(false)
+function StepCard({ step, num, playing, onPlay }) {
+  const [hov, setHov] = useState(false)
+  return (
+    <div style={{ flex:1, minWidth:0 }}>
+      {/* Step label */}
+      <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:18, flexWrap:'nowrap', whiteSpace:'nowrap' }}>
+        <span style={{ fontFamily:SS, fontSize:12, fontWeight:700, color:'#888', flexShrink:0 }}>Step {num}</span>
+        <span style={{ width:1, height:14, background:'#ccc', flexShrink:0 }} />
+        <span style={{ fontFamily:SF, fontSize:17, fontWeight:400, color:DARK }}>{step.tag}</span>
+      </div>
+      {/* Image / video box */}
+      <div
+        onMouseEnter={() => setHov(true)}
+        onMouseLeave={() => setHov(false)}
+        style={{ position:'relative', width:'100%', paddingBottom:'68%', overflow:'hidden',
+          borderRadius:8, border:`1.5px solid ${hov ? GOLD : '#e8e0d8'}`,
+          boxShadow: hov ? `0 8px 40px rgba(196,149,106,0.18)` : '0 2px 16px rgba(0,0,0,0.08)',
+          transition:'all 0.3s', cursor:'pointer', background:'#f5ede8' }}>
+        {playing ? (
+          <iframe
+            src={`https://www.youtube.com/embed/${step.youtubeId}?autoplay=1&rel=0&modestbranding=1`}
+            allow="autoplay; fullscreen"
+            allowFullScreen
+            style={{ position:'absolute', inset:0, width:'100%', height:'100%', border:'none', borderRadius:8 }}
+            title={step.label}
+          />
+        ) : (
+          <>
+            <img src={step.thumb} alt={step.label}
+              style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', borderRadius:8,
+                transform: hov ? 'scale(1.03)' : 'scale(1)', transition:'transform 0.4s' }} />
+            {/* subtle overlay on hover */}
+            <div style={{ position:'absolute', inset:0, background: hov ? 'rgba(42,14,20,0.35)' : 'rgba(42,14,20,0.08)', transition:'background 0.3s', borderRadius:8 }} />
+            {/* Play button — only on hover */}
+            {hov && (
+              <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:12 }}>
+                <button onClick={onPlay}
+                  style={{ width:68, height:68, borderRadius:'50%', background:GOLD,
+                    border:'none', display:'flex', alignItems:'center', justifyContent:'center',
+                    cursor:'pointer', boxShadow:'0 4px 24px rgba(196,149,106,0.5)' }}>
+                  <div style={{ width:0, height:0, borderTop:'12px solid transparent', borderBottom:'12px solid transparent', borderLeft:`20px solid #fff`, marginLeft:6 }} />
+                </button>
+                <span style={{ fontFamily:SS, fontSize:9, fontWeight:800, letterSpacing:'0.28em', textTransform:'uppercase', color:'#fff' }}>
+                  Watch Demo
+                </span>
+              </div>
+            )}
+            {/* Step number badge */}
+            <div style={{ position:'absolute', top:14, right:14,
+              width:32, height:32, borderRadius:'50%', background:GOLD,
+              display:'flex', alignItems:'center', justifyContent:'center',
+              fontFamily:SS, fontSize:13, fontWeight:800, color:'#fff' }}>
+              {num}
+            </div>
+          </>
+        )}
+      </div>
+      {/* Description */}
+      <p style={{ fontFamily:SS, fontSize:12, fontWeight:300, color:'#6b5c54', margin:'14px 0 0', lineHeight:1.8 }}>
+        {step.desc}
+      </p>
+    </div>
+  )
+}
 
-  const VIDEOS = [
+function VideoGlimpse() {
+  const [playingIdx, setPlayingIdx] = useState(null)
+
+  const STEPS = [
     {
       id: '2D',
       label: '2D Floor Plan',
-      icon: '◻',
-      tag: 'Draw Your Space',
-      desc: 'Drag walls, place doors and windows — see measurements update live. Start from scratch or pick a template.',
-      thumb: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
+      tag: 'Draw',
+      desc: 'Drag walls, place doors and windows — see measurements update live. Start from a template or blank canvas.',
+      thumb: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=900&q=80',
       youtubeId: 'pNYlIsgPGTk',
     },
     {
       id: '3D',
       label: '3D Visualisation',
-      icon: '◈',
-      tag: 'See It In 3D',
-      desc: 'Every furniture piece and material choice appears instantly in a photorealistic 3D view. No rendering wait.',
-      thumb: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+      tag: 'Decorate',
+      desc: 'Drop in furniture, swap finishes and materials — every choice appears instantly in a photorealistic 3D view.',
+      thumb: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80',
       youtubeId: 'kMNyMVANJxg',
     },
     {
-      id: 'custom',
-      label: 'Custom Design',
-      icon: '✦',
-      tag: 'Make It Yours',
-      desc: 'Choose from 500+ templates, swap styles, mix materials and colours until the space feels perfectly you.',
-      thumb: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80',
+      id: 'render',
+      label: 'Rendering',
+      tag: 'Render',
+      desc: 'Export a studio-quality render in seconds. Share with clients or download for your portfolio.',
+      thumb: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=900&q=80',
       youtubeId: 'ASVYkzBc81U',
     },
   ]
 
-  const cur = VIDEOS[active]
-
   return (
-    <div style={{ background: DARK2 }}>
-      {/* Tab strip */}
-      <div style={{ display:'flex', borderBottom:`1px solid rgba(255,255,255,0.08)` }}>
-        {VIDEOS.map((v, i) => (
-          <button key={v.id} onClick={() => { setActive(i); setPlaying(false) }}
-            style={{
-              flex:1, fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.22em',
-              textTransform:'uppercase', padding:'20px 12px',
-              color: active===i ? GOLD : 'rgba(255,255,255,0.4)',
-              background:'none', border:'none', cursor:'pointer',
-              borderBottom: active===i ? `2px solid ${GOLD}` : '2px solid transparent',
-              transition:'all 0.25s', display:'flex', alignItems:'center', justifyContent:'center', gap:10,
-            }}>
-            <span style={{ fontSize:16 }}>{v.icon}</span>
-            {v.label}
-          </button>
+    <div style={{ background:'#fff', padding:'72px 56px 64px' }}>
+      {/* Heading */}
+      <div style={{ textAlign:'center', marginBottom:56 }}>
+        <h2 style={{ fontFamily:SF, fontSize:42, fontWeight:400, color:DARK, margin:'0 0 14px', lineHeight:1.2 }}>
+          3 Steps for your 1st Design in 2 Minutes
+        </h2>
+        <p style={{ fontFamily:SS, fontSize:14, fontWeight:300, color:'#9a8a82', margin:0 }}>
+          There will be a{' '}
+          <span style={{ color:GOLD, fontWeight:600 }}>welcome gift</span>
+          {' '}waiting when you finish your first design
+        </p>
+      </div>
+
+      {/* 3 step cards */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:36 }}>
+        {STEPS.map((step, i) => (
+          <StepCard
+            key={step.id}
+            step={step}
+            num={i + 1}
+            playing={playingIdx === i}
+            onPlay={() => setPlayingIdx(i)}
+          />
         ))}
       </div>
 
-      {/* Video / thumbnail area */}
-      <div style={{ position:'relative', width:'100%', paddingBottom:'52%', background:'#0a0704', overflow:'hidden' }}>
-        {playing ? (
-          <iframe
-            key={cur.youtubeId}
-            src={`https://www.youtube.com/embed/${cur.youtubeId}?autoplay=1&rel=0&modestbranding=1&color=white`}
-            allow="autoplay; fullscreen"
-            allowFullScreen
-            style={{ position:'absolute', inset:0, width:'100%', height:'100%', border:'none' }}
-            title={cur.label}
-          />
-        ) : (
-          <>
-            {/* Thumbnail */}
-            <img src={cur.thumb} alt={cur.label}
-              style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', transition:'opacity 0.5s' }} />
-            {/* Dark overlay */}
-            <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(10,7,4,0.85) 0%, rgba(10,7,4,0.25) 60%, transparent 100%)' }} />
-            {/* Play button */}
-            <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:20 }}>
-              <button onClick={() => setPlaying(true)}
-                style={{
-                  width:88, height:88, borderRadius:'50%',
-                  background:'rgba(196,149,106,0.15)',
-                  border:`2px solid ${GOLD}`,
-                  display:'flex', alignItems:'center', justifyContent:'center',
-                  cursor:'pointer', transition:'all 0.3s', backdropFilter:'blur(8px)',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background=GOLD; e.currentTarget.style.transform='scale(1.08)' }}
-                onMouseLeave={e => { e.currentTarget.style.background='rgba(196,149,106,0.15)'; e.currentTarget.style.transform='scale(1)' }}>
-                <div style={{ width:0, height:0, borderTop:'15px solid transparent', borderBottom:'15px solid transparent', borderLeft:`24px solid ${GOLD}`, marginLeft:8 }} />
-              </button>
-              <span style={{ fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.3em', textTransform:'uppercase', color:GOLD }}>
-                Watch {cur.label} Demo
-              </span>
-            </div>
-            {/* Bottom tag */}
-            <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'32px 40px' }}>
-              <span style={{ fontFamily:SS, fontSize:8, fontWeight:800, letterSpacing:'0.3em', textTransform:'uppercase', color:GOLD, background:'rgba(196,149,106,0.15)', padding:'6px 14px', border:`1px solid rgba(196,149,106,0.3)` }}>
-                {cur.tag}
-              </span>
-              <p style={{ fontFamily:SS, fontSize:15, fontWeight:300, color:'rgba(255,255,255,0.85)', margin:'14px 0 0', lineHeight:1.7, maxWidth:560 }}>
-                {cur.desc}
-              </p>
-            </div>
-          </>
-        )}
-      </div>
-
       {/* CTA */}
-      <div style={{ padding:'36px 40px', display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:20, borderTop:`1px solid rgba(255,255,255,0.06)` }}>
-        <p style={{ fontFamily:SS, fontSize:13, fontWeight:300, color:'rgba(255,255,255,0.45)', margin:0 }}>
-          No signup needed — open the studio and start right now.
-        </p>
-        <a href="/studio" style={{
-          fontFamily:SS, fontSize:10, fontWeight:800, letterSpacing:'0.22em', textTransform:'uppercase',
-          color:DARK, background:GOLD, padding:'13px 32px', textDecoration:'none', transition:'opacity 0.2s',
-        }}
-          onMouseEnter={e=>e.currentTarget.style.opacity='0.85'}
-          onMouseLeave={e=>e.currentTarget.style.opacity='1'}>
-          ✦ Try It Free →
+      <div style={{ textAlign:'center', marginTop:56 }}>
+        <a href="/studio"
+          style={{ display:'inline-block', fontFamily:SS, fontSize:13, fontWeight:700, letterSpacing:'0.12em',
+            color:'#fff', background:DARK, padding:'16px 52px', textDecoration:'none',
+            borderRadius:40, transition:'all 0.25s' }}
+          onMouseEnter={e => { e.currentTarget.style.background=GOLD; e.currentTarget.style.color=DARK }}
+          onMouseLeave={e => { e.currentTarget.style.background=DARK; e.currentTarget.style.color='#fff' }}>
+          Start Designing
         </a>
       </div>
     </div>
