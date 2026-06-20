@@ -243,27 +243,58 @@ async function analyzeFloorPlan(base64, mimeType) {
 
 /* ─── Studio Landing ─── */
 const LANDING_TEMPLATES = [
-  { id:'t1', label:"Modern Living Room",   author:"El Shaddai Studio", img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=400&q=70', type:'Project' },
-  { id:'t2', label:"Nordic Bedroom",       author:"El Shaddai Studio", img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=400&q=70', type:'Project' },
-  { id:'t3', label:"Japandi Calm",         author:"El Shaddai Studio", img:'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=400&q=70', type:'Project' },
-  { id:'t4', label:"Industrial Loft",      author:"El Shaddai Studio", img:'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=400&q=70', type:'Project' },
-  { id:'t5', label:"Bohemian Bliss",       author:"Design Studio",     img:'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=400&q=70', type:'Room' },
-  { id:'t6', label:"Vastu Modern Home",    author:"Vastu Expert",      img:'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=400&q=70', type:'Room' },
-  { id:'t7', label:"Royal Luxury Suite",   author:"Luxury Designs",    img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=400&q=70', type:'Room' },
-  { id:'t8', label:"Minimal White Space",  author:"Minimal Studio",    img:'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=400&q=70', type:'Room' },
-  { id:'t9', label:"Modular Kitchen Pro",  author:"Kitchen Expert",    img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=400&q=70', type:'Project' },
-  { id:'t10',label:"Kids Fun Room",        author:"Kids Design",       img:'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?auto=format&fit=crop&w=400&q=70', type:'Room' },
+  { id:'t1', label:"Modern Luxury Living",    author:"El Shaddai Studio", img:'https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=500&q=80', type:'Project' },
+  { id:'t2', label:"Scandinavian Bedroom",    author:"El Shaddai Studio", img:'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=500&q=80', type:'Project' },
+  { id:'t3', label:"Japandi Living Room",     author:"El Shaddai Studio", img:'https://images.unsplash.com/photo-1571508601891-ca5e7a713859?auto=format&fit=crop&w=500&q=80', type:'Project' },
+  { id:'t4', label:"Dark Industrial Loft",    author:"El Shaddai Studio", img:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=500&q=80', type:'Project' },
+  { id:'t5', label:"Warm Boho Bedroom",       author:"Design Studio",     img:'https://images.unsplash.com/photo-1617104551722-3b2d51366400?auto=format&fit=crop&w=500&q=80', type:'Room' },
+  { id:'t6', label:"Vastu-Friendly Home",     author:"Vastu Expert",      img:'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=500&q=80', type:'Room' },
+  { id:'t7', label:"Royal Luxury Suite",      author:"Luxury Designs",    img:'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=500&q=80', type:'Room' },
+  { id:'t8', label:"Minimal White Interior",  author:"Minimal Studio",    img:'https://images.unsplash.com/photo-1567016526105-22da7c13161a?auto=format&fit=crop&w=500&q=80', type:'Room' },
+  { id:'t9', label:"Modular Kitchen",         author:"Kitchen Expert",    img:'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?auto=format&fit=crop&w=500&q=80', type:'Project' },
+  { id:'t10',label:"Kids Creative Room",      author:"Kids Design",       img:'https://images.unsplash.com/photo-1555816851-2b56c89bbc27?auto=format&fit=crop&w=500&q=80', type:'Room' },
 ]
+
+const ACTION_ICONS = {
+  'Import Image': (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+      <path d="M21 15l-5-5L5 21"/>
+    </svg>
+  ),
+  'Import CAD': (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/>
+      <line x1="8" y1="17" x2="16" y2="17"/><line x1="8" y1="9" x2="10" y2="9"/>
+    </svg>
+  ),
+  'New Design': (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+    </svg>
+  ),
+  'My Designs': (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+    </svg>
+  ),
+  'AI Planner': (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+    </svg>
+  ),
+}
 
 function StudioLanding({ onStart, fileInputRef, onUpload }) {
   const [tab, setTab] = useState('Project')
   const filtered = LANDING_TEMPLATES.filter(t => t.type === tab)
   const actions = [
-    { label:'Import Image',  icon:'🖼', desc:'Upload a floor plan photo',     onClick: () => fileInputRef.current?.click() },
-    { label:'Import CAD',    icon:'📐', desc:'Import .dwg or .dxf file',      onClick: () => alert('CAD import: upload your .dwg file') },
-    { label:'New Design',    icon:'✏️', desc:'Start with a blank canvas',     onClick: () => onStart('new') },
-    { label:'My Designs',    icon:'📁', desc:'Continue a saved design',       onClick: () => onStart('my') },
-    { label:'AI Planner',    icon:'✨', desc:'Let AI plan your room',         isNew:true, onClick: () => onStart('ai') },
+    { label:'Import Image', desc:'Upload a floor plan photo',   onClick: () => fileInputRef.current?.click() },
+    { label:'Import CAD',   desc:'Import .dwg or .dxf file',   onClick: () => alert('CAD import: upload your .dwg file') },
+    { label:'New Design',   desc:'Start with a blank canvas',   onClick: () => onStart('new') },
+    { label:'My Designs',   desc:'Continue a saved design',     onClick: () => onStart('my') },
+    { label:'AI Planner',   desc:'Let AI plan your room',       isNew:true, onClick: () => onStart('ai') },
   ]
   return (
     <div style={{ flex:1, overflowY:'auto', background:'#f7f5f2', fontFamily:"'DM Sans',system-ui,sans-serif" }}>
@@ -288,7 +319,7 @@ function StudioLanding({ onStart, fileInputRef, onUpload }) {
               {a.isNew && (
                 <span style={{ position:'absolute', top:10, right:10, background:'#ef4444', color:'#fff', fontSize:8, fontWeight:800, padding:'2px 6px', borderRadius:3, letterSpacing:'0.1em' }}>NEW</span>
               )}
-              <span style={{ fontSize:28 }}>{a.icon}</span>
+              <span style={{ color: C.gold }}>{ACTION_ICONS[a.label]}</span>
               <div>
                 <div style={{ fontWeight:700, fontSize:12, color:C.bg, marginBottom:2 }}>{a.label}</div>
                 <div style={{ fontSize:10, color:'#9a8a82' }}>{a.desc}</div>
