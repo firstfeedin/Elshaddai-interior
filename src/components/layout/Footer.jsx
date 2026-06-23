@@ -13,7 +13,7 @@ const legalLinks = [
   { label: 'Privacy Policy',   href: '/privacy-policy' },
   { label: 'Terms of Service', href: '/terms-of-service' },
   { label: 'Refund Policy',    href: '/refund-policy' },
-  { label: 'Careers',          href: 'mailto:contactus@divinemercyitsol.com?subject=Career Enquiry — El Shaddai' },
+  { label: 'Careers',          href: 'mailto:contactus@elshaddai.in?subject=Career Enquiry — El Shaddai' },
 ]
 
 const cities = ['Hyderabad', 'Secunderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Khammam', 'Nalgonda', 'Kukatpally']

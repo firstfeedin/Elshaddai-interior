@@ -66,7 +66,7 @@ function PlanCard({ plan, billing }) {
           </div>
         )}
         {billing === 'yearly' && price > 0 && (
-          <p style={{ ...sans, margin: '4px 0 0', fontSize: 11, color: gold }}>Save ₹{((( plan.price.monthly - plan.price.yearly) * 12)).toLocaleString()}/yr</p>
+          <p style={{ ...sans, margin: '4px 0 0', fontSize: 11, color: gold }}>Save ₹{((plan.price.monthly - plan.price.yearly) * 12).toLocaleString()}/yr</p>
         )}
       </div>
       <p style={{ ...sans, margin: '0 0 24px', fontSize: 13, color: plan.featured ? 'rgba(255,255,255,0.5)' : stone, lineHeight: 1.7, fontWeight: 300 }}>{plan.desc}</p>

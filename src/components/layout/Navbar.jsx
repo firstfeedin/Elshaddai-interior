@@ -175,7 +175,7 @@ export default function Navbar() {
         transition:'transform 0.4s cubic-bezier(0.4,0,0.2,1)',
       }}>
         <span style={{ fontFamily:F, fontSize:10, fontWeight:500, letterSpacing:'0.18em', textTransform:'uppercase', color:'rgba(255,255,255,0.6)' }}>
-          Free Design Consultation — Limited slots this week
+          Free Design Consultation — No signup required
         </span>
         <a href="/#contact" style={{
           fontFamily:F, fontSize:9, fontWeight:700, color:GOLD,

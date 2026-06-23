@@ -19,7 +19,7 @@ const POSTS = [
   { id:2, tag:'Vastu', readMin:4, date:'Jun 8, 2026', featured:false,
     title:'10 Vastu-Compliant Interior Ideas That Actually Look Modern',
     excerpt:"Pooja room in the north-east, master bedroom in the south-west, kitchen in the south-east — modern design and Vastu Shastra can co-exist beautifully. Here's how we do it.",
-    img:'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=800&q=80',
+    img:'https://images.unsplash.com/photo-1565538810643-b5bdb714032a?auto=format&fit=crop&w=800&q=80',
     author:{ name:'Arjun Mehta', role:'Senior Interior Designer', avatar:'AM' },
     body:['Vastu Shastra guides the placement of rooms, furniture, and entrances to align with natural energy flows. Many clients assume they must choose between Vastu compliance and modern aesthetics — that is simply not true.','Our top Vastu-aligned design tips: place the main door facing north or east to invite positive energy; use the north-east corner for the Pooja room with white or cream tones; keep the south-west corner for the master bedroom, using heavier furniture to "ground" the space; and position the kitchen in the south-east, with the cook facing east.','Modern materials work perfectly with Vastu. A north-east Pooja room can have a sleek teak wood finish with LED niches. A south-west bedroom can have a low-profile platform bed in warm sheesham with textured wallpaper. Vastu is about direction, not decoration.'] },
   { id:3, tag:'Modular Kitchen', readMin:5, date:'Jun 5, 2026', featured:false,
@@ -37,7 +37,7 @@ const POSTS = [
   { id:5, tag:'Trends 2025', readMin:5, date:'May 24, 2026', featured:false,
     title:'Interior Design Trends in Hyderabad 2026 — What Telangana Homeowners Are Choosing',
     excerpt:'Warm terracotta tones, sheesham wood accents, Rajasthan marble, traditional jaali partitions and biophilic elements — the top design trends sweeping Hyderabad homes this year.',
-    img:'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=800&q=80',
+    img:'https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?auto=format&fit=crop&w=800&q=80',
     author:{ name:'Suresh Venkat', role:'Design Director', avatar:'SV' },
     body:['2026 is the year Hyderabad homeowners are embracing "Warm Minimalism" — clean lines and uncluttered spaces, but with rich natural materials instead of cold whites. Terracotta tiles, jute rugs, rattan pendants, and linen curtains are everywhere.','Traditional Indian craft elements are making a comeback in modern contexts: Bidriware inlay on a TV unit, Kalamkari-print cushions on a contemporary sofa, or a brass Ganesha in a backlit niche on an otherwise minimal accent wall. The key is using one statement piece, not ten.','Biophilic design — bringing nature indoors — is the biggest shift we are seeing in high-end Hyderabad apartments. Green walls, large-format planters, bamboo screens, and natural light maximisation (removing unnecessary partitions near windows) are all in high demand.'] },
   { id:6, tag:'Cost Guide', readMin:8, date:'May 18, 2026', featured:false,
@@ -121,8 +121,8 @@ export default function BlogPage() {
     return matchTag && matchSearch
   })
 
-  const featured = filtered.find(p => p.featured)
-  const rest     = filtered.filter(p => !p.featured || activeTag !== 'All' || search)
+  const featured = activeTag === 'All' && !search ? filtered.find(p => p.featured) : null
+  const rest     = featured ? filtered.filter(p => !p.featured) : filtered
 
   return (
     <div style={{ ...sans, background: light, minHeight: '100vh' }}>

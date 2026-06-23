@@ -25,9 +25,9 @@ const GALLERY = [
   { id:13, title:'Wabi-Sabi Bedroom',          style:'Japandi',      room:'Bedroom',      author:'Kiran J.',   likes:231, img:'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=600&q=75' },
   { id:14, title:'Open-Plan Scandi Kitchen',   style:'Scandinavian', room:'Kitchen',      author:'Nisha C.',   likes:167, img:'https://images.unsplash.com/photo-1495433324511-bf8e92934d90?auto=format&fit=crop&w=600&q=75' },
   { id:15, title:'Terracotta Boho Dining',     style:'Bohemian',     room:'Dining Room',  author:'Arun T.',    likes:289, img:'https://images.unsplash.com/photo-1556020685-ae41abfc9365?auto=format&fit=crop&w=600&q=75' },
-  { id:16, title:'Midnight Blue Bedroom',      style:'Modern',       room:'Bedroom',      author:'Lakshmi P.', likes:334, img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=600&q=75' },
+  { id:16, title:'Midnight Blue Bedroom',      style:'Modern',       room:'Bedroom',      author:'Lakshmi P.', likes:334, img:'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=600&q=75' },
   { id:17, title:'Warm Minimal Living',        style:'Minimalist',   room:'Living Room',  author:'Dev S.',     likes:212, img:'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=600&q=75' },
-  { id:18, title:'Industrial Brick Kitchen',   style:'Industrial',   room:'Kitchen',      author:'Asha M.',    likes:178, img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=600&q=75' },
+  { id:18, title:'Industrial Brick Kitchen',   style:'Industrial',   room:'Kitchen',      author:'Asha M.',    likes:178, img:'https://images.unsplash.com/photo-1495433324511-bf8e92934d90?auto=format&fit=crop&w=600&q=75' },
 ]
 
 function GalleryCard({ item, featured }) {
@@ -120,12 +120,12 @@ export default function GalleryPage() {
     <div style={{ minHeight:'100vh', background:T.bg, paddingTop:80, fontFamily:T.F }}>
       {/* Hero */}
       <div style={{ background:`linear-gradient(180deg, #100f18 0%, ${T.bg} 100%)`, padding:'64px 32px 48px', textAlign:'center' }}>
-        <p style={{ fontFamily:T.F, fontSize:10, fontWeight:700, letterSpacing:'0.3em', textTransform:'uppercase', color:T.gold, margin:'0 0 12px' }}>◈ Community Designs</p>
+        <p style={{ fontFamily:T.F, fontSize:10, fontWeight:700, letterSpacing:'0.3em', textTransform:'uppercase', color:T.gold, margin:'0 0 12px' }}>◈ Design Inspirations</p>
         <h1 style={{ fontFamily:T.S, fontSize:'clamp(36px,5vw,64px)', color:T.text, margin:'0 0 16px', fontWeight:400, lineHeight:1.1 }}>
           Design Gallery
         </h1>
         <p style={{ fontFamily:T.F, fontSize:14, color:T.muted, margin:'0 auto 32px', maxWidth:560, lineHeight:1.7 }}>
-          Explore beautiful interiors created by our community. Click any design to open it in the studio and make it your own.
+          Explore beautiful interior styles curated by El Shaddai designers. Click any design to open it in the studio and make it your own.
         </p>
         {/* Search */}
         <div style={{ maxWidth:480, margin:'0 auto', display:'flex', gap:8 }}>
@@ -188,7 +188,7 @@ export default function GalleryPage() {
         {/* Masonry grid */}
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:20 }}>
           {filtered.map(item=>(
-            <GalleryCard key={item.id} item={item} featured={false} />
+            <GalleryCard key={item.id} item={item} featured={item.featured ?? false} />
           ))}
         </div>
 

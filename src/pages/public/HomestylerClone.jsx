@@ -117,12 +117,12 @@ const ROOMS = [
   {
     n: '02', room: 'Master Bedroom', style: 'Serene Minimalism',
     desc: 'The bedroom is not merely a place to sleep, but a sanctuary for restoration. Every surface, every fabric, every light deliberate.',
-    img: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=900&q=85',
+    img: 'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=900&q=85',
   },
   {
     n: '03', room: 'Kitchen & Dining', style: 'Modern Warmth',
     desc: 'Where form meets function in perfect balance. A kitchen that inspires cooking and a dining space that invites conversation.',
-    img: 'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?auto=format&fit=crop&w=900&q=85',
+    img: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=900&q=85',
   },
 ]
 
@@ -718,9 +718,9 @@ export default function HomePage() {
         <div style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:'repeat(4,1fr)', borderLeft:'1px solid rgba(255,255,255,0.06)' }}>
           {[
             ['2D + 3D',  'Floor Plan & Visualisation'],
-            ['500+',    'Design Templates'],
-            ['150+',    'Furniture & Decor Items'],
-            ['Free',    'Forever — No Credit Card'],
+            ['8',        'Design Style Templates'],
+            ['30+',      'Furniture & Decor Items'],
+            ['Free',     'Forever — No Credit Card'],
           ].map(([num, label], i) => (
             <div key={i} style={{ padding:'44px 40px', borderRight:'1px solid rgba(255,255,255,0.06)', borderTop:'none' }}>
               <div style={{ fontFamily:SF, fontSize:'clamp(32px,3.5vw,52px)', fontWeight:300, color:WHITE, lineHeight:1, marginBottom:10, letterSpacing:'-0.02em' }}>

@@ -122,6 +122,7 @@ export default function App() {
             <Route path="/about"          element={<AboutPage />} />
             <Route path="/privacy-policy" element={<PrivacyPage />} />
             <Route path="/terms-of-service" element={<TermsPage />} />
+            <Route path="/refund-policy" element={<TermsPage />} />
             <Route path="/my-projects"    element={<ProjectsPage />} />
 
             {/* ── Protected — all authenticated users ── */}
