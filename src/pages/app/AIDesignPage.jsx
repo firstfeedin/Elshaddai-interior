@@ -223,8 +223,8 @@ export default function AIDesignPage() {
                     <h3 style={{ ...serif, margin: '10px 0 0', fontSize: 28, fontWeight: 300, color: dark }}>{result.style}</h3>
                   </div>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button onClick={() => window.location.href = '/designer'} style={{ ...sans, padding: '10px 18px', background: dark, border: 'none', color: '#fff', cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' }}>Open in Designer →</button>
-                    <button style={{ ...sans, padding: '10px 14px', background: 'transparent', border: `1px solid ${border}`, color: stone, cursor: 'pointer', fontSize: 10, fontWeight: 600 }}>Save</button>
+                    <button onClick={() => window.location.href = '/studio'} style={{ ...sans, padding: '10px 18px', background: dark, border: 'none', color: '#fff', cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' }}>Open in Designer →</button>
+                    <button onClick={() => { localStorage.setItem('ai_design_result', JSON.stringify(result)); alert('Design saved! Open the Studio to continue.') }} style={{ ...sans, padding: '10px 14px', background: 'transparent', border: `1px solid ${border}`, color: stone, cursor: 'pointer', fontSize: 10, fontWeight: 600 }}>Save</button>
                   </div>
                 </div>
                 <p style={{ ...sans, margin: 0, fontSize: 13, color: stone, lineHeight: 1.85, fontWeight: 300 }}>{result.desc}</p>

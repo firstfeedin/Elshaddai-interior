@@ -23,14 +23,14 @@ const B = {
 
 // ─── Room types ───────────────────────────────────────────────────────────────
 const ROOMS = [
-  { id:'living',   label:'Living Room',  icon:'🛋',  w:500, h:400, color:'#dbeafe' },
-  { id:'bedroom',  label:'Bedroom',      icon:'🛏',  w:400, h:360, color:'#ede9fe' },
-  { id:'kitchen',  label:'Kitchen',      icon:'🍳',  w:360, h:300, color:'#fef3c7' },
-  { id:'dining',   label:'Dining Room',  icon:'🍽',  w:360, h:320, color:'#fce7f3' },
-  { id:'office',   label:'Home Office',  icon:'💼',  w:320, h:300, color:'#d1fae5' },
-  { id:'kids',     label:'Kids Room',    icon:'🧸',  w:380, h:320, color:'#fef9c3' },
-  { id:'bathroom', label:'Bathroom',     icon:'🚿',  w:200, h:250, color:'#cffafe' },
-  { id:'pooja',    label:'Pooja Room',   icon:'🪔',  w:200, h:200, color:'#ffe4e6' },
+  { id:'living',   label:'Living Room',  icon:'🛋',  area:'300–500 sq ft', w:500, h:400, color:'#dbeafe' },
+  { id:'bedroom',  label:'Bedroom',      icon:'🛏',  area:'150–250 sq ft', w:400, h:360, color:'#ede9fe' },
+  { id:'kitchen',  label:'Kitchen',      icon:'🍳',  area:'100–200 sq ft', w:360, h:300, color:'#fef3c7' },
+  { id:'dining',   label:'Dining Room',  icon:'🍽',  area:'120–200 sq ft', w:360, h:320, color:'#fce7f3' },
+  { id:'office',   label:'Home Office',  icon:'💼',  area:'100–200 sq ft', w:320, h:300, color:'#d1fae5' },
+  { id:'kids',     label:'Kids Room',    icon:'🧸',  area:'120–200 sq ft', w:380, h:320, color:'#fef9c3' },
+  { id:'bathroom', label:'Bathroom',     icon:'🚿',  area:'60–100 sq ft',  w:200, h:250, color:'#cffafe' },
+  { id:'pooja',    label:'Pooja Room',   icon:'🪔',  area:'40–80 sq ft',   w:200, h:200, color:'#ffe4e6' },
 ]
 
 // ─── Style themes ─────────────────────────────────────────────────────────────

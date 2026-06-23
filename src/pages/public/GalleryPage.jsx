@@ -201,7 +201,7 @@ export default function GalleryPage() {
         )}
 
         {/* CTA */}
-        <div style={{ marginTop:64, textAlign:'center', padding:'48px', background:T.panel2, border:`1px solid ${T.borderG}` }}>
+        <div style={{ marginTop:64, textAlign:'center', padding:'48px', background:T.panel2, border:`1px solid ${T.gold}` }}>
           <p style={{ fontFamily:T.F, fontSize:10, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:T.gold, margin:'0 0 12px' }}>◈ Share Your Vision</p>
           <h2 style={{ fontFamily:T.S, fontSize:36, color:T.text, margin:'0 0 16px', fontWeight:400 }}>Create Your Design Today</h2>
           <p style={{ fontFamily:T.F, fontSize:13, color:T.muted, margin:'0 0 28px' }}>Use our 2D + 3D dual studio — no sign-up needed to start.</p>

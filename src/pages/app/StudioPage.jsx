@@ -291,7 +291,7 @@ function StudioLanding({ onStart, fileInputRef, onUpload }) {
   const filtered = LANDING_TEMPLATES.filter(t => t.type === tab)
   const actions = [
     { label:'Import Image', desc:'Upload a floor plan photo',   onClick: () => fileInputRef.current?.click() },
-    { label:'Import CAD',   desc:'Import .dwg or .dxf file',   onClick: () => alert('CAD import: upload your .dwg file') },
+    { label:'Import CAD',   desc:'Import .dwg or .dxf file',   onClick: () => alert('CAD import supports .dwg and .dxf files. Feature available in Studio Pro — contact us at contactus@divinemercyitsol.com to enable.') },
     { label:'New Design',   desc:'Start with a blank canvas',   onClick: () => onStart('new') },
     { label:'My Designs',   desc:'Continue a saved design',     onClick: () => onStart('my') },
     { label:'AI Planner',   desc:'Let AI plan your room',       isNew:true, onClick: () => onStart('ai') },
@@ -304,7 +304,7 @@ function StudioLanding({ onStart, fileInputRef, onUpload }) {
           <h1 style={{ fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:34, fontWeight:400, color:C.bg, margin:0 }}>
             Create a Floor Plan
           </h1>
-          <button style={{ background:'none', border:'none', cursor:'pointer', fontSize:13, color:'#888', display:'flex', alignItems:'center', gap:4 }}>
+          <button onClick={() => window.open('https://www.youtube.com/results?search_query=interior+design+floor+plan+tutorial', '_blank')} style={{ background:'none', border:'none', cursor:'pointer', fontSize:13, color:'#888', display:'flex', alignItems:'center', gap:4 }}>
             Beginner's Guide ›
           </button>
         </div>
@@ -373,22 +373,22 @@ function StudioLanding({ onStart, fileInputRef, onUpload }) {
 }
 
 /* ─── Top Bar ─── */
-function TopBar({ onSave, onExport, onClose, mode, setMode }) {
+function TopBar({ onSave, onExport, onClose, mode, setMode, onUndo, onClear, onFile, onSwitchTab, onTriggerRender }) {
   const TOOLS = [
-    { label:'File',         icon:'📄', onClick: () => {} },
+    { label:'File',         icon:'📄', onClick: onFile },
     { label:'Save',         icon:'💾', onClick: onSave },
-    { label:'Undo',         icon:'↩',  onClick: () => {} },
+    { label:'Undo',         icon:'↩',  onClick: onUndo },
     { label:'Redo',         icon:'↪',  onClick: () => {} },
-    { label:'Clear',        icon:'🗑',  onClick: () => {} },
+    { label:'Clear',        icon:'🗑',  onClick: onClear },
     null,
-    { label:'Construction', icon:'🔧', onClick: () => {} },
-    { label:'Tools',        icon:'⚙️', onClick: () => {} },
-    { label:'View',         icon:'👁',  onClick: () => {} },
-    { label:'AI Tools',     icon:'✨',  isNew:true, onClick: () => {} },
+    { label:'Construction', icon:'🔧', onClick: () => onSwitchTab('build') },
+    { label:'Tools',        icon:'⚙️', onClick: () => setMode(m => m==='2d'?'3d':'2d') },
+    { label:'View',         icon:'👁',  onClick: () => onSwitchTab('render') },
+    { label:'AI Tools',     icon:'✨',  isNew:true, onClick: () => onSwitchTab('ai') },
     null,
     { label:'Export',       icon:'⬆', onClick: onExport },
-    { label:'Images',       icon:'🖼', onClick: () => {} },
-    { label:'Render',       icon:'🎬', isHighlight:true, onClick: () => {} },
+    { label:'Images',       icon:'🖼', onClick: onFile },
+    { label:'Render',       icon:'🎬', isHighlight:true, onClick: onTriggerRender },
   ]
   return (
     <div style={{ height:52, background:C.panel2, borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', padding:'0 16px', gap:0, flexShrink:0, zIndex:100 }}>
@@ -447,6 +447,7 @@ function TopBar({ onSave, onExport, onClose, mode, setMode }) {
 
 /* ─── Step 1: Draw Panel ─── */
 function DrawPanel({ onSelectRoom, uploadedPlan, onUpload, aiAnalysis, analyzing }) {
+  const [activeTool, setActiveTool] = useState(null)
   const fileRef = useRef()
   return (
     <div style={{ height:'100%', overflowY:'auto', padding:'16px 12px', display:'flex', flexDirection:'column', gap:16 }}>
@@ -520,13 +521,15 @@ function DrawPanel({ onSelectRoom, uploadedPlan, onUpload, aiAnalysis, analyzing
           { icon:'🪟', label:'Window' }, { icon:'⬛', label:'Room' },
           { icon:'📐', label:'Measure' }, { icon:'🗑', label:'Erase' },
         ].map(t => (
-          <button key={t.label} style={{
+          <button key={t.label} onClick={() => setActiveTool(at => at===t.label ? null : t.label)} style={{
             width:'100%', display:'flex', alignItems:'center', gap:8, padding:'7px 10px',
-            background:'transparent', border:'none', color:C.text, cursor:'pointer', borderRadius:4, fontSize:11, marginBottom:2,
-          }}
-            onMouseEnter={e => e.currentTarget.style.background = C.border}
-            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+            background: activeTool===t.label ? `rgba(201,162,39,0.18)` : 'transparent',
+            border: activeTool===t.label ? `1px solid ${C.gold}` : '1px solid transparent',
+            color: activeTool===t.label ? C.gold : C.text,
+            cursor:'pointer', borderRadius:4, fontSize:11, marginBottom:2, transition:'all 0.15s',
+          }}>
             <span style={{ fontSize:14 }}>{t.icon}</span> {t.label}
+            {activeTool===t.label && <span style={{ marginLeft:'auto', fontSize:8, color:C.gold, fontWeight:700 }}>ACTIVE</span>}
           </button>
         ))}
       </div>
@@ -800,12 +803,32 @@ function RenderPanel({ settings, setSettings, onRender, rendering, renderProgres
         )}
 
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:6, marginTop:8 }}>
-          {[{ label:'Export Image', icon:'🖼' }, { label:'Construction Drawings', icon:'📐' }, { label:'Bill of Quantities', icon:'📋' }, { label:'Share Design', icon:'🔗' }].map(a => (
-            <button key={a.label} style={{
+          {[
+            { label:'Export Image', icon:'🖼', action: () => {
+              const canvas = document.querySelector('canvas')
+              if (canvas) { const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='elshaddai-render.png'; a.click() }
+              else alert('Render your scene first, then export.')
+            }},
+            { label:'Construction Drawings', icon:'📐', action: () => alert('Construction PDF will be available in the Studio Pro plan. Contact us to upgrade.') },
+            { label:'Bill of Quantities', icon:'📋', action: () => {
+              const items = JSON.parse(localStorage.getItem('elshaddai_studio_design') || '{}')?.addedItems || []
+              if (!items.length) return alert('Add furniture to your design first.')
+              const lines = items.map(i=>`${i.name} (${i.sku}) — ₹${i.price.toLocaleString()}`).join('\n')
+              const total = items.reduce((s,i)=>s+i.price,0)
+              alert(`Bill of Quantities:\n\n${lines}\n\nTotal: ₹${total.toLocaleString()}`)
+            }},
+            { label:'Share Design', icon:'🔗', action: () => {
+              navigator.clipboard.writeText(window.location.href).then(()=>alert('Studio link copied to clipboard!'))
+            }},
+          ].map(a => (
+            <button key={a.label} onClick={a.action} style={{
               padding:'8px 6px', background:C.bg, border:`1px solid ${C.border}`,
               color:C.text, borderRadius:4, cursor:'pointer', fontSize:9, fontWeight:600,
               display:'flex', flexDirection:'column', alignItems:'center', gap:4,
-            }}>
+              transition:'border-color 0.15s',
+            }}
+              onMouseEnter={e=>e.currentTarget.style.borderColor=C.gold}
+              onMouseLeave={e=>e.currentTarget.style.borderColor=C.border}>
               <span style={{ fontSize:16 }}>{a.icon}</span>
               <span>{a.label}</span>
             </button>
@@ -817,11 +840,23 @@ function RenderPanel({ settings, setSettings, onRender, rendering, renderProgres
       <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:12 }}>
         <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Recent Renders</p>
         {[
-          'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=200&q=60',
-          'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=200&q=60',
-          'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=200&q=60',
-        ].map((img, i) => (
-          <img key={i} src={img} alt={`render ${i}`} style={{ width:'100%', borderRadius:4, marginBottom:6, display:'block', cursor:'pointer' }} />
+          { url:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=200&q=60', label:'Modern Living' },
+          { url:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=200&q=60', label:'Kitchen Design' },
+          { url:'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=200&q=60', label:'Bedroom Suite' },
+        ].map((r, i) => (
+          <div key={i} style={{ position:'relative', marginBottom:6, cursor:'pointer' }}
+            onClick={() => window.open(r.url.replace('w=200','w=1200'), '_blank')}>
+            <img src={r.url} alt={r.label} style={{ width:'100%', borderRadius:4, display:'block' }} />
+            <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0)', transition:'background 0.2s', borderRadius:4, display:'flex', alignItems:'center', justifyContent:'center' }}
+              onMouseEnter={e=>{e.currentTarget.style.background='rgba(0,0,0,0.4)'}}
+              onMouseLeave={e=>{e.currentTarget.style.background='rgba(0,0,0,0)'}}>
+              <span style={{ color:'#fff', fontSize:9, fontWeight:700, opacity:0, transition:'opacity 0.2s' }}
+                onMouseEnter={e=>e.currentTarget.style.opacity='1'}
+                onMouseLeave={e=>e.currentTarget.style.opacity='0'}>
+                View Full ↗
+              </span>
+            </div>
+          </div>
         ))}
       </div>
     </div>
@@ -912,6 +947,9 @@ function Loading({ label, sub }) {
 
 /* ─── Right Properties Panel ─── */
 function RightPanel({ step, selectedRoom, appliedTemplate, addedItems = [] }) {
+  const [wallsLocked, setWallsLocked] = useState(false)
+  const [activeView, setActiveView] = useState('Front')
+
   if (step === 1) return (
     <div style={{ width:220, background:C.panel, borderLeft:`1px solid ${C.border}`, padding:16, overflowY:'auto' }}>
       <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 12px' }}>Layer Settings</p>
@@ -934,7 +972,10 @@ function RightPanel({ step, selectedRoom, appliedTemplate, addedItems = [] }) {
         <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Wall Settings</p>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
           <span style={{ color:C.muted, fontSize:10 }}>Lock Walls</span>
-          <div style={{ width:28, height:16, background:C.border, borderRadius:8, cursor:'pointer' }} />
+          <div onClick={() => setWallsLocked(v=>!v)}
+            style={{ width:28, height:16, background: wallsLocked ? C.gold : C.border, borderRadius:8, cursor:'pointer', transition:'background 0.2s', position:'relative' }}>
+            <div style={{ width:12, height:12, borderRadius:'50%', background:'#fff', position:'absolute', top:2, transition:'left 0.2s', left: wallsLocked ? 14 : 2 }} />
+          </div>
         </div>
       </div>
     </div>
@@ -981,7 +1022,7 @@ function RightPanel({ step, selectedRoom, appliedTemplate, addedItems = [] }) {
             <span style={{ color:C.text, fontSize:10, fontWeight:700 }}>Total</span>
             <span style={{ color:C.gold, fontSize:11, fontWeight:700 }}>₹{addedItems.reduce((s,i)=>s+i.price,0).toLocaleString()}</span>
           </div>
-          <button style={{ width:'100%', marginTop:8, padding:'8px', background:C.gold, border:'none', color:'#000', borderRadius:4, cursor:'pointer', fontSize:10, fontWeight:700 }}>
+          <button onClick={() => window.location.href='/?quote=1#contact'} style={{ width:'100%', marginTop:8, padding:'8px', background:C.gold, border:'none', color:'#000', borderRadius:4, cursor:'pointer', fontSize:10, fontWeight:700 }}>
             Request Quote →
           </button>
         </div>
@@ -1001,7 +1042,12 @@ function RightPanel({ step, selectedRoom, appliedTemplate, addedItems = [] }) {
       <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:12, marginTop:4 }}>
         <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Views</p>
         {['Front','Left','Right','Top'].map(v => (
-          <button key={v} style={{ width:'100%', padding:'6px 10px', background:C.bg, border:`1px solid ${C.border}`, color:C.text, borderRadius:4, marginBottom:4, cursor:'pointer', fontSize:10, textAlign:'left' }}>{v} View</button>
+          <button key={v} onClick={() => setActiveView(v)} style={{ width:'100%', padding:'6px 10px',
+            background: activeView===v ? 'rgba(201,162,39,0.15)' : C.bg,
+            border:`1px solid ${activeView===v ? C.gold : C.border}`,
+            color: activeView===v ? C.gold : C.text, borderRadius:4, marginBottom:4, cursor:'pointer', fontSize:10, textAlign:'left', transition:'all 0.15s' }}>
+            {activeView===v ? '▶ ' : ''}{v} View
+          </button>
         ))}
       </div>
     </div>
@@ -1042,6 +1088,8 @@ export default function StudioPage() {
   const [aiCatalog, setAiCatalog]             = useState(null)
   const [catalogLoading, setCatalogLoading]   = useState(false)
   const [addedItems, setAddedItems]           = useState([])
+  const [savedToast, setSavedToast]           = useState(false)
+  const [selectedFurnitureItem, setSelectedFurnitureItem] = useState(null)
   const fileInputRef                          = useRef()
 
   // Map sidebar tab → step
@@ -1081,6 +1129,31 @@ export default function StudioPage() {
   const handleAddItem = useCallback((item) => {
     setAddedItems(prev => prev.some(a=>a.id===item.id) ? prev.filter(a=>a.id!==item.id) : [...prev,item])
   }, [])
+
+  const handleSave = useCallback(() => {
+    const design = { addedItems, appliedTemplate, selectedRoom, savedAt: new Date().toISOString() }
+    localStorage.setItem('elshaddai_studio_design', JSON.stringify(design))
+    setSavedToast(true)
+    setTimeout(() => setSavedToast(false), 2500)
+  }, [addedItems, appliedTemplate, selectedRoom])
+
+  const handleExport = useCallback(() => {
+    const design = { addedItems, appliedTemplate, selectedRoom, exportedAt: new Date().toISOString() }
+    const blob = new Blob([JSON.stringify(design, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = 'elshaddai-design.json'; a.click()
+    URL.revokeObjectURL(url)
+  }, [addedItems, appliedTemplate, selectedRoom])
+
+  const handleUndo = useCallback(() => {
+    setAddedItems(prev => prev.slice(0, -1))
+  }, [])
+
+  const handleClear = useCallback(() => {
+    if (addedItems.length === 0) return
+    if (window.confirm('Remove all furniture from the design?')) setAddedItems([])
+  }, [addedItems])
 
   const handleApplyTemplate = useCallback(async (t) => {
     setAppliedTemplate(t); setSideTab('decorate')
@@ -1132,11 +1205,21 @@ export default function StudioPage() {
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
       <input ref={fileInputRef} type="file" accept="image/*" style={{ display:'none' }} onChange={handleUpload} />
 
+      {savedToast && (
+        <div style={{ position:'fixed', top:64, right:24, zIndex:9999, background:'#22c55e', color:'#fff', padding:'10px 20px', borderRadius:6, fontWeight:700, fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.3)' }}>
+          ✓ Design saved!
+        </div>
+      )}
       <TopBar
         mode={mode} setMode={setMode}
-        onSave={() => alert('Design saved!')}
-        onExport={() => alert('Exporting…')}
+        onSave={handleSave}
+        onExport={handleExport}
         onClose={() => setShowLanding(true)}
+        onUndo={handleUndo}
+        onClear={handleClear}
+        onFile={() => fileInputRef.current?.click()}
+        onSwitchTab={setSideTab}
+        onTriggerRender={() => { setSideTab('render'); handleRender() }}
       />
 
       <StepBar step={step} setSideTab={setSideTab} />
@@ -1198,7 +1281,7 @@ export default function StudioPage() {
           uploadedPlan={uploadedPlan}
           addedItems={addedItems}
           appliedTemplate={appliedTemplate}
-          onSelectFurniture={(item) => item && console.info('[Studio] selected:', item?.name)}
+          onSelectFurniture={(item) => item && setSelectedFurnitureItem(item)}
         />
 
         {/* Right Panel */}
@@ -1225,9 +1308,9 @@ export default function StudioPage() {
         ))}
         <div style={{ flex:1 }} />
         <div style={{ display:'flex', background:'rgba(0,0,0,0.3)', borderRadius:4, overflow:'hidden' }}>
-          {['2D 1','3D 3'].map(v => (
-            <button key={v} style={{ padding:'2px 10px', background: v.startsWith('3D') ? C.gold : 'transparent', border:'none', color: v.startsWith('3D') ? '#000' : C.muted, fontSize:9, fontWeight:700, cursor:'pointer' }}>
-              {v}
+          {[['2D','2d'],['3D','3d']].map(([label, val]) => (
+            <button key={val} onClick={() => setMode(val)} style={{ padding:'2px 10px', background: mode===val ? C.gold : 'transparent', border:'none', color: mode===val ? '#000' : C.muted, fontSize:9, fontWeight:700, cursor:'pointer' }}>
+              {label}
             </button>
           ))}
         </div>
