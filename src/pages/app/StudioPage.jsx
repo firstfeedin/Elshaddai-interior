@@ -1,6 +1,9 @@
 import { useState, useRef, useCallback, Suspense, lazy } from 'react'
 import { useNavigate } from 'react-router-dom'
 import WebGPUViewport from '../../features/designer/WebGPUViewport'
+import ThreeViewport from '../../features/designer/ThreeViewport'
+
+const supportsWebGPU = typeof navigator !== 'undefined' && !!navigator.gpu
 
 const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY || ''
 
@@ -866,14 +869,23 @@ function StepBar({ step, setSideTab }) {
 function MainCanvas({ step, mode, uploadedPlan, addedItems, appliedTemplate, onSelectFurniture }) {
   return (
     <div style={{ flex:1, minWidth:0, overflow:'hidden', position:'relative', display:'flex', flexDirection:'column' }}>
-      {/* WebGPU PBR viewport */}
+      {/* 3D viewport — WebGPU when available, Three.js fallback */}
       <div style={{ flex:1, minHeight:0, width:'100%', position:'relative' }}>
-        <WebGPUViewport
-          step={step}
-          addedItems={addedItems}
-          appliedTemplate={appliedTemplate}
-          onSelectFurniture={onSelectFurniture}
-        />
+        {supportsWebGPU ? (
+          <WebGPUViewport
+            step={step}
+            addedItems={addedItems}
+            appliedTemplate={appliedTemplate}
+            onSelectFurniture={onSelectFurniture}
+          />
+        ) : (
+          <ThreeViewport
+            step={step}
+            addedItems={addedItems}
+            appliedTemplate={appliedTemplate}
+            onSelectFurniture={onSelectFurniture}
+          />
+        )}
 
         {/* Reference plan overlay */}
         {uploadedPlan && step === 1 && (
