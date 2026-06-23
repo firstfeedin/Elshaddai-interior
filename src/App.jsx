@@ -57,6 +57,7 @@ const MaterialSpecPage   = lazy(() => import('./pages/app/MaterialSpecPage'))
 const NotFoundPage       = lazy(() => import('./pages/public/NotFoundPage'))
 const StudioPage         = lazy(() => import('./pages/app/StudioPage'))
 const GalleryPage        = lazy(() => import('./pages/public/GalleryPage'))
+const MyDesignPage       = lazy(() => import('./pages/public/MyDesignPage'))
 const AboutPage          = lazy(() => import('./pages/public/AboutPage'))
 const PrivacyPage        = lazy(() => import('./pages/public/PrivacyPage'))
 const TermsPage          = lazy(() => import('./pages/public/TermsPage'))
@@ -116,6 +117,7 @@ export default function App() {
             <Route path="/portfolio"   element={<PortfolioPage />} />
             <Route path="/blog"        element={<BlogPage />} />
             <Route path="/studio"      element={<StudioPage />} />
+            <Route path="/my-design"   element={<MyDesignPage />} />
             <Route path="/gallery"        element={<GalleryPage />} />
             <Route path="/about"          element={<AboutPage />} />
             <Route path="/privacy-policy" element={<PrivacyPage />} />

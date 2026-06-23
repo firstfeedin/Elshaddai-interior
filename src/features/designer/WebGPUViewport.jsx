@@ -672,9 +672,14 @@ export default function WebGPUViewport({ step=1, addedItems=[], appliedTemplate=
     ro.observe(canvas.parentElement)
 
     ;(async () => {
-      await init(canvas)
-      buildScene()
-      startLoop()
+      try {
+        await init(canvas)
+        buildScene()
+        startLoop()
+      } catch (e) {
+        console.warn('WebGPU init failed:', e)
+        stateRef.current.noGPU = true
+      }
     })()
 
     return () => {
