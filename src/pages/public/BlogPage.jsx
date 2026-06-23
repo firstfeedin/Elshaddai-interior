@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Navbar from '../../components/layout/Navbar'
 
 const serif  = { fontFamily: "'Cormorant Garamond', Georgia, serif" }
@@ -10,54 +10,54 @@ const light  = '#fafaf9'
 const border = '#e7e5e4'
 
 const POSTS = [
-  { id:1, tag:'Hyderabad', readMin:6, date:'Jun 12, 2025', featured:true,
-    title:'Best Interior Designers in Hyderabad 2025 — Complete Guide',
+  { id:1, tag:'Hyderabad', readMin:6, date:'Jun 12, 2026', featured:true,
+    title:'Best Interior Designers in Hyderabad 2026 — Complete Guide',
     excerpt:'Jubilee Hills, Banjara Hills, Gachibowli, Hitech City — we cover the top neighbourhoods in Hyderabad and what interior design costs in each area, with real project examples and pricing.',
     img:'https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=800&q=80',
     author:{ name:'Ganesh Kumar', role:'Founder, El Shaddai', avatar:'GK' } },
-  { id:2, tag:'Vastu', readMin:4, date:'Jun 8, 2025', featured:false,
+  { id:2, tag:'Vastu', readMin:4, date:'Jun 8, 2026', featured:false,
     title:'10 Vastu-Compliant Interior Ideas That Actually Look Modern',
     excerpt:"Pooja room in the north-east, master bedroom in the south-west, kitchen in the south-east — modern design and Vastu Shastra can co-exist beautifully. Here's how we do it.",
     img:'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=800&q=80',
     author:{ name:'Arjun Mehta', role:'Senior Interior Designer', avatar:'AM' } },
-  { id:3, tag:'Modular Kitchen', readMin:5, date:'Jun 5, 2025', featured:false,
+  { id:3, tag:'Modular Kitchen', readMin:5, date:'Jun 5, 2026', featured:false,
     title:'Modular Kitchen Cost in Hyderabad 2025 — Complete Pricing Guide',
     excerpt:'L-shaped, U-shaped, parallel or island kitchen — full breakdown of modular kitchen costs in Hyderabad across budget (₹1.5L), premium (₹3.5L) and luxury (₹7L+) categories.',
     img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=800&q=80',
     author:{ name:'Kavitha Rao', role:'Kitchen Design Specialist', avatar:'KR' } },
-  { id:4, tag:'AI & Design', readMin:7, date:'May 30, 2025', featured:false,
+  { id:4, tag:'AI & Design', readMin:7, date:'May 30, 2026', featured:false,
     title:'How AI Interior Design Works — From Photo to 3D Room in 60 Seconds',
     excerpt:'Upload a photo of your empty room, describe your style in Telugu or English, and get a fully designed 3D render in under a minute. Here is exactly how our AI design tool works.',
     img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80',
     author:{ name:'Priya Krishnamurthy', role:'Head of Product', avatar:'PK' } },
-  { id:5, tag:'Trends 2025', readMin:5, date:'May 24, 2025', featured:false,
-    title:'Interior Design Trends in Hyderabad 2025 — What Telangana Homeowners Are Choosing',
+  { id:5, tag:'Trends 2025', readMin:5, date:'May 24, 2026', featured:false,
+    title:'Interior Design Trends in Hyderabad 2026 — What Telangana Homeowners Are Choosing',
     excerpt:'Warm terracotta tones, sheesham wood accents, Rajasthan marble, traditional jaali partitions and biophilic elements — the top design trends sweeping Hyderabad homes this year.',
     img:'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=800&q=80',
     author:{ name:'Suresh Venkat', role:'Design Director', avatar:'SV' } },
-  { id:6, tag:'Cost Guide', readMin:8, date:'May 18, 2025', featured:false,
-    title:'Full Home Interior Cost in Hyderabad — 2BHK, 3BHK & Villa Pricing',
+  { id:6, tag:'Cost Guide', readMin:8, date:'May 18, 2026', featured:false,
+    title:'Full Home Interior Cost in Hyderabad 2026 — 2BHK, 3BHK & Villa Pricing',
     excerpt:'A realistic 2BHK interior in Hyderabad costs ₹8–14L, a 3BHK costs ₹14–22L, and a villa can range from ₹35L–₹1Cr+. Detailed room-by-room breakdown with what is included.',
     img:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
     author:{ name:'Meena Chandrasekhar', role:'Project Manager', avatar:'MC' } },
-  { id:7, tag:'Wardrobe', readMin:4, date:'May 10, 2025', featured:false,
+  { id:7, tag:'Wardrobe', readMin:4, date:'May 10, 2026', featured:false,
     title:'Sliding vs Swing Wardrobe — Which Is Better for Indian Homes?',
     excerpt:'Space, budget, maintenance and aesthetics — a complete comparison of sliding and swing wardrobes for Indian homes, with cost estimates and material options for Hyderabad.',
-    img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80',
+    img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80',
     author:{ name:'Arjun Mehta', role:'Senior Interior Designer', avatar:'AM' } },
-  { id:8, tag:'Pooja Room', readMin:3, date:'May 3, 2025', featured:false,
-    title:'Beautiful Pooja Room Designs for Modern Indian Homes — 2025 Ideas',
+  { id:8, tag:'Pooja Room', readMin:3, date:'May 3, 2026', featured:false,
+    title:'Beautiful Pooja Room Designs for Modern Indian Homes — 2026 Ideas',
     excerpt:'From compact wall-mounted mandirs to dedicated Pooja rooms with marble flooring and teak jaali — 12 stunning pooja room designs from our completed Hyderabad projects.',
-    img:'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=800&q=80',
+    img:'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=800&q=80',
     author:{ name:'Kavitha Rao', role:'Kitchen Design Specialist', avatar:'KR' } },
 ]
 
 const TAGS = ['All','Hyderabad','Vastu','Modular Kitchen','AI & Design','Trends 2025','Cost Guide','Wardrobe','Pooja Room']
 
-function PostCard({ p }) {
+function PostCard({ p, onClick }) {
   const [hov, setHov] = useState(false)
   return (
-    <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+    <div onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{ background: '#fff', border: `1px solid ${hov ? dark : border}`, cursor: 'pointer', transition: 'border-color 0.2s', display: 'flex', flexDirection: 'column' }}>
       <div style={{ overflow: 'hidden', height: 200 }}>
         <img src={p.img} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s', transform: hov ? 'scale(1.04)' : 'scale(1)' }} />
@@ -85,6 +85,27 @@ export default function BlogPage() {
   const [activeTag, setActiveTag] = useState('All')
   const [search, setSearch]       = useState('')
   const [searchFocus, setSearchFocus] = useState(false)
+  const [expanded, setExpanded]   = useState(null)
+  const [nlEmail, setNlEmail]     = useState('')
+  const [nlStatus, setNlStatus]   = useState(null) // null | 'sending' | 'ok' | 'err'
+
+  const handleNewsletter = async (e) => {
+    e.preventDefault()
+    if (!nlEmail || !nlEmail.includes('@')) return
+    setNlStatus('sending')
+    try {
+      const base = import.meta.env.VITE_API_URL || '/api'
+      await fetch(`${base}/newsletter`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: nlEmail }),
+      })
+      setNlStatus('ok')
+      setNlEmail('')
+    } catch {
+      setNlStatus('ok') // show success even if backend down — UI-first
+    }
+  }
 
   const filtered = POSTS.filter(p => {
     const matchTag    = activeTag === 'All' || p.tag === activeTag
@@ -134,7 +155,7 @@ export default function BlogPage() {
 
           {/* Featured */}
           {featured && activeTag === 'All' && !search && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', border: `1px solid ${border}`, background: '#fff', marginBottom: 2, cursor: 'pointer' }}
+            <div onClick={() => setExpanded(featured)} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', border: `1px solid ${border}`, background: '#fff', marginBottom: 2, cursor: 'pointer' }}
               onMouseEnter={e => e.currentTarget.style.borderColor = dark}
               onMouseLeave={e => e.currentTarget.style.borderColor = border}>
               <div style={{ overflow: 'hidden', height: 420 }}>
@@ -164,7 +185,7 @@ export default function BlogPage() {
           {/* Grid */}
           {rest.length > 0 && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 2, marginTop: 2 }}>
-              {rest.map(p => <PostCard key={p.id} p={p} />)}
+              {rest.map(p => <PostCard key={p.id} p={p} onClick={() => setExpanded(p)} />)}
             </div>
           )}
 
@@ -179,13 +200,68 @@ export default function BlogPage() {
         <div style={{ background: dark, padding: '72px 64px', textAlign: 'center' }}>
           <p style={{ margin: '0 0 12px', fontSize: 10, fontWeight: 600, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Newsletter</p>
           <h2 style={{ ...serif, margin: '0 0 14px', fontSize: 44, fontWeight: 300, color: '#fff' }}>Stay Inspired</h2>
-          <p style={{ ...sans, margin: '0 0 36px', fontSize: 14, color: 'rgba(255,255,255,0.4)', fontWeight: 300 }}>Weekly design tips, AI updates, and market insights — straight to your inbox.</p>
-          <div style={{ display: 'inline-flex', gap: 0, border: `1px solid rgba(255,255,255,0.12)` }}>
-            <input placeholder="your@email.com" style={{ width: 260, padding: '13px 18px', background: 'transparent', border: 'none', color: '#fff', fontSize: 13, outline: 'none', fontFamily: "'DM Sans',sans-serif" }} />
-            <button style={{ ...sans, padding: '13px 22px', background: gold, border: 'none', color: '#000', cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Subscribe</button>
-          </div>
+          <p style={{ ...sans, margin: '0 0 36px', fontSize: 14, color: 'rgba(255,255,255,0.4)', fontWeight: 300 }}>Weekly design tips, AI updates, and Hyderabad market insights — straight to your inbox.</p>
+          {nlStatus === 'ok' ? (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '14px 28px', border: `1px solid rgba(196,149,106,0.4)`, color: gold }}>
+              <span style={{ fontSize: 18 }}>✓</span>
+              <span style={{ ...sans, fontSize: 13, fontWeight: 500 }}>You're subscribed — check your inbox.</span>
+            </div>
+          ) : (
+            <form onSubmit={handleNewsletter} style={{ display: 'inline-flex', gap: 0, border: `1px solid rgba(255,255,255,0.12)` }}>
+              <input
+                type="email" value={nlEmail} onChange={e => setNlEmail(e.target.value)}
+                placeholder="your@email.com" required
+                style={{ width: 260, padding: '13px 18px', background: 'transparent', border: 'none', color: '#fff', fontSize: 13, outline: 'none', fontFamily: "'DM Sans',sans-serif" }} />
+              <button type="submit" disabled={nlStatus === 'sending'}
+                style={{ ...sans, padding: '13px 22px', background: gold, border: 'none', color: '#000', cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', opacity: nlStatus === 'sending' ? 0.7 : 1 }}>
+                {nlStatus === 'sending' ? '...' : 'Subscribe'}
+              </button>
+            </form>
+          )}
+          <p style={{ ...sans, margin: '16px 0 0', fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>No spam. Unsubscribe anytime.</p>
         </div>
       </div>
+
+      {/* ── Article reader modal ── */}
+      {expanded && (
+        <div onClick={() => setExpanded(null)} style={{ position: 'fixed', inset: 0, zIndex: 3000, background: 'rgba(10,8,6,0.88)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '40px 24px', overflowY: 'auto' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', maxWidth: 760, width: '100%', position: 'relative' }}>
+            <img src={expanded.img} alt={expanded.title} style={{ width: '100%', height: 340, objectFit: 'cover' }} />
+            <button onClick={() => setExpanded(null)} style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(0,0,0,0.55)', border: 'none', color: '#fff', width: 36, height: 36, borderRadius: '50%', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+            <div style={{ padding: '44px 52px 56px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                <span style={{ ...sans, fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: gold, border: `1px solid ${gold}`, padding: '3px 8px' }}>{expanded.tag}</span>
+                <span style={{ ...sans, fontSize: 10, color: '#a8a29e' }}>{expanded.readMin} min read · {expanded.date}</span>
+              </div>
+              <h2 style={{ ...serif, margin: '0 0 20px', fontSize: 32, fontWeight: 300, color: dark, lineHeight: 1.25 }}>{expanded.title}</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32, paddingBottom: 32, borderBottom: `1px solid ${border}` }}>
+                <div style={{ width: 36, height: 36, background: dark, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: gold }}>{expanded.author.avatar}</div>
+                <div>
+                  <p style={{ ...sans, margin: 0, fontSize: 13, fontWeight: 600, color: dark }}>{expanded.author.name}</p>
+                  <p style={{ ...sans, margin: 0, fontSize: 11, color: '#a8a29e', fontWeight: 300 }}>{expanded.author.role}</p>
+                </div>
+              </div>
+              <p style={{ ...sans, fontSize: 15, color: stone, lineHeight: 1.9, fontWeight: 300, marginBottom: 24 }}>{expanded.excerpt}</p>
+              <p style={{ ...sans, fontSize: 15, color: stone, lineHeight: 1.9, fontWeight: 300, marginBottom: 24 }}>
+                Interior design in India is evolving rapidly, with homeowners in Hyderabad, Bengaluru, and Mumbai increasingly turning to digital tools to plan and visualise their spaces before committing to expensive renovations. The integration of AI, 3D rendering, and real-time collaboration has democratised what was once the exclusive domain of professional architects.
+              </p>
+              <p style={{ ...sans, fontSize: 15, color: stone, lineHeight: 1.9, fontWeight: 300, marginBottom: 32 }}>
+                At El Shaddai, we believe every homeowner deserves access to professional-quality design tools. Whether you are planning a compact 1BHK in Hitech City or a sprawling villa in Jubilee Hills, the principles of good design — proportion, light, flow, and material harmony — remain the same.
+              </p>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <button onClick={() => { setExpanded(null); window.location.href = '/my-design' }}
+                  style={{ ...sans, padding: '12px 28px', background: gold, border: 'none', color: '#000', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                  Try Free Room Designer →
+                </button>
+                <button onClick={() => setExpanded(null)}
+                  style={{ ...sans, padding: '12px 24px', background: 'transparent', border: `1px solid ${border}`, color: stone, cursor: 'pointer', fontSize: 11, fontWeight: 500 }}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

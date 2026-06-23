@@ -41,7 +41,8 @@ const FAQS = [
   { q: 'Do you offer a free trial for paid plans?', a: 'Pro and Studio plans include a 14-day free trial — no credit card required. You only pay when the trial ends.' },
   { q: 'What counts as an "AI generation"?', a: 'Each time you click "Generate AI Design" counts as one generation. Editing the result or regenerating the same prompt counts as a new generation.' },
   { q: 'Can I upgrade or downgrade at any time?', a: 'Yes. Upgrades take effect immediately and you are charged the pro-rated difference. Downgrades take effect at the next billing cycle.' },
-  { q: 'Is there a student or NGO discount?', a: 'Yes — 60% discount for verified students and registered NGOs. Email contactus@divinemercyitsol.com with proof.' },
+  { q: 'Is there a student or NGO discount?', a: 'Yes — 60% discount for verified students and registered NGOs. Email contactus@divinemercyitsol.com with proof of enrolment or registration.' },
+  { q: 'What payment methods do you accept?', a: 'We accept all major UPI apps (GPay, PhonePe, Paytm), credit/debit cards (Visa, Mastercard, RuPay), net banking, and EMI via major banks. All payments are processed securely via Razorpay.' },
   { q: 'How does team collaboration work?', a: 'Studio plans include 5 seats. Each team member gets their own login. You can share projects, assign tasks, and comment on designs in real time.' },
 ]
 
@@ -83,7 +84,7 @@ function PlanCard({ plan, billing }) {
           </div>
         ))}
       </div>
-      <button onClick={() => window.location.href = '/register'}
+      <button onClick={() => window.location.href = plan.name === 'Enterprise' ? '/#contact' : '/register'}
         style={{ ...sans, marginTop: 28, padding: '12px', background: plan.featured ? gold : 'transparent', color: plan.featured ? '#000' : dark, border: `1px solid ${plan.featured ? gold : dark}`, cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', transition: 'all 0.2s' }}
         onMouseEnter={e => { if (!plan.featured) { e.currentTarget.style.background = dark; e.currentTarget.style.color = '#fff' } }}
         onMouseLeave={e => { if (!plan.featured) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = dark } }}>

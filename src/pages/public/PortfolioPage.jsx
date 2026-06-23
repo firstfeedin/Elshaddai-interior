@@ -13,7 +13,7 @@ const CATEGORIES = ['All','Living Room','Bedroom','Kitchen','Office','Commercial
 
 const PROJECTS = [
   { id:1, title:'Sharma Residence — Full Interior',      cat:'Living Room', style:'Modern Luxury',    sqft:3200, city:'Hyderabad', img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=800&q=80', designer:'Priya K.', year:2024, tag:'Featured' },
-  { id:2, title:'Gupta Villa — Master Bedroom Suite',    cat:'Bedroom',     style:'Scandinavian',     sqft:420,  city:'Hitech City', img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=800&q=80', designer:'Arjun M.', year:2024, tag:null },
+  { id:2, title:'Gupta Villa — Master Bedroom Suite',    cat:'Bedroom',     style:'Scandinavian',     sqft:420,  city:'Hitech City', img:'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=800&q=80', designer:'Arjun M.', year:2024, tag:null },
   { id:3, title:'Kapoor Kitchen Remodel',                cat:'Kitchen',     style:'Contemporary',     sqft:280,  city:'Mumbai',    img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=800&q=80', designer:'Sneha R.', year:2023, tag:'Featured' },
   { id:4, title:'TechPark Co-Working Space',             cat:'Commercial',  style:'Industrial',       sqft:8000, city:'Pune',      img:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80', designer:'Raj S.',  year:2024, tag:null },
   { id:5, title:'Mehta Home Office',                     cat:'Office',      style:'Minimalist',       sqft:160,  city:'Jubilee Hills',   img:'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=800&q=80', designer:'Priya K.', year:2023, tag:null },
@@ -119,9 +119,9 @@ export default function PortfolioPage() {
                     </div>
                   ))}
                 </div>
-                <button onClick={() => window.location.href = '/register'}
+                <button onClick={() => window.location.href = `/?project=${encodeURIComponent(selected.title)}#contact`}
                   style={{ ...sans, padding: '12px', background: dark, border: 'none', color: '#fff', cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-                  Inquire About This Project →
+                  Enquire About This Style →
                 </button>
               </div>
             </div>
@@ -133,10 +133,16 @@ export default function PortfolioPage() {
           <p style={{ margin: '0 0 12px', fontSize: 10, fontWeight: 600, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#a8a29e' }}>Start Your Project</p>
           <h2 style={{ ...serif, margin: '0 0 20px', fontSize: 44, fontWeight: 300, color: dark }}>Ready to transform your space?</h2>
           <p style={{ ...sans, margin: '0 0 36px', fontSize: 14, color: stone, fontWeight: 300 }}>Design your space free — no experience needed, no cost to start.</p>
-          <button onClick={() => window.location.href = '/ai-design'}
-            style={{ ...sans, padding: '13px 36px', background: gold, border: 'none', color: '#000', cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
-            Start AI Design →
-          </button>
+          <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button onClick={() => window.location.href = '/my-design'}
+              style={{ ...sans, padding: '13px 36px', background: gold, border: 'none', color: '#000', cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+              Design Your Room Free →
+            </button>
+            <button onClick={() => window.location.href = '/#contact'}
+              style={{ ...sans, padding: '13px 36px', background: 'transparent', border: `1px solid ${dark}`, color: dark, cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+              Hire a Designer
+            </button>
+          </div>
         </div>
       </div>
     </div>

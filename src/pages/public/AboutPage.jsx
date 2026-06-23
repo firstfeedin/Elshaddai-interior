@@ -120,7 +120,7 @@ export default function AboutPage() {
               onMouseLeave={e=>e.currentTarget.style.opacity='1'}>
               Open Studio — Free →
             </button>
-            <button onClick={() => nav('/#contact')}
+            <button onClick={() => window.location.href = '/#contact'}
               style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:MUTED, background:'transparent', border:'none', cursor:'pointer', padding:0 }}>
               Contact Us →
             </button>
@@ -129,7 +129,7 @@ export default function AboutPage() {
 
         {/* Footer strip */}
         <div style={{ background:'#0a0905', padding:'32px clamp(40px,8vw,160px)', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:16 }}>
-          <p style={{ fontFamily:SS, fontSize:11, color:'rgba(255,255,255,0.3)', margin:0 }}>© 2025 El Shaddai Interior Design</p>
+          <p style={{ fontFamily:SS, fontSize:11, color:'rgba(255,255,255,0.3)', margin:0 }}>© 2026 El Shaddai Interior Design</p>
           <div style={{ display:'flex', gap:24 }}>
             {[['Home','/'],['Studio','/studio'],['Gallery','/gallery'],['Pricing','/pricing'],['Contact','/#contact']].map(([l,h])=>(
               <a key={l} href={h} style={{ fontFamily:SS, fontSize:10, color:'rgba(255,255,255,0.35)', textDecoration:'none', letterSpacing:'0.1em', textTransform:'uppercase' }}

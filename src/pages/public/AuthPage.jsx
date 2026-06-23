@@ -234,6 +234,9 @@ export default function AuthPage() {
               <form onSubmit={handleLogin}>
                 <Field label="Email Address" type="email" placeholder="you@example.com" value={form.email||''} onChange={set('email')} required autoComplete="email" />
                 <Field label="Password" type="password" placeholder="Your password" value={form.password||''} onChange={set('password')} required autoComplete="current-password" />
+                <div style={{ textAlign:'right', marginBottom:20, marginTop:-10 }}>
+                  <a href="mailto:contactus@divinemercyitsol.com?subject=Password+Reset+Request" style={{ fontSize:10, color:'rgba(201,162,39,0.6)', textDecoration:'none', letterSpacing:'0.05em' }}>Forgot password?</a>
+                </div>
                 <SubmitBtn loading={loading} label="Sign In →" />
               </form>
               <div style={{ display:'flex', alignItems:'center', gap:12, margin:'24px 0 16px' }}>
@@ -356,8 +359,11 @@ export default function AuthPage() {
             </div>
           )}
 
-          <p style={{ textAlign:'center', fontSize:10, color:'#2d2926', marginTop:28, letterSpacing:'0.05em' }}>
-            By continuing you agree to our Terms of Service &amp; Privacy Policy
+          <p style={{ textAlign:'center', fontSize:10, color:'rgba(255,255,255,0.3)', marginTop:28, letterSpacing:'0.05em' }}>
+            By continuing you agree to our{' '}
+            <a href="/terms-of-service" style={{ color:'rgba(201,162,39,0.7)', textDecoration:'none' }}>Terms of Service</a>
+            {' '}&amp;{' '}
+            <a href="/privacy-policy" style={{ color:'rgba(201,162,39,0.7)', textDecoration:'none' }}>Privacy Policy</a>
           </p>
         </div>
       </div>

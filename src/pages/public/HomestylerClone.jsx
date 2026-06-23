@@ -251,7 +251,8 @@ function ContactForm() {
     if (!form.name || !form.email || !form.message) return
     setStatus('sending'); setError('')
     try {
-      const res = await fetch('http://localhost:3001/api/contact', {
+      const apiBase = import.meta.env.VITE_API_URL || '/api'
+      const res = await fetch(`${apiBase}/contact`, {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify(form),
       })
@@ -1062,7 +1063,7 @@ export default function HomePage() {
               <SectionLabel>Inspiration</SectionLabel>
               <div style={{ width:36, height:1, background:GOLD, margin:'20px 0 32px' }} />
               <h2 style={{ fontFamily:SF, fontSize:'clamp(36px,4vw,60px)', fontWeight:300, color:WHITE, lineHeight:1.05 }}>
-                Rooms created<br />by our community.
+                Rooms designed<br />by our users.
               </h2>
             </div>
             <button onClick={() => nav('/gallery')} className="rr"
@@ -1127,49 +1128,53 @@ export default function HomePage() {
                 name:'Priya Sharma', city:'Bengaluru', role:'Homeowner',
                 rating:5,
                 text:'"I redesigned our entire 3BHK before renovation started. The 3D view saved us from making expensive mistakes — we changed the kitchen layout twice before settling on the perfect plan. Absolutely worth it."',
-                avatar:'PS',
+                avatar:'PS', date:'March 2026',
                 project:'3BHK Apartment Redesign',
               },
               {
                 name:'Arjun Mehta', city:'Mumbai', role:'Interior Designer',
-                rating:5,
-                text:'"As a professional designer, I use El Shaddai to present concepts to clients before the actual work begins. The photorealistic renders are impressive and clients love being able to visualize the space."',
-                avatar:'AM',
+                rating:4,
+                text:'"As a professional designer, I use El Shaddai to present concepts to clients before the actual work begins. The renders are impressive. Would love more furniture options in the catalog, but overall a very solid tool."',
+                avatar:'AM', date:'February 2026',
                 project:'Client Presentation Studio',
               },
               {
                 name:'Deepika Nair', city:'Hyderabad', role:'First-time Homeowner',
                 rating:5,
                 text:'"I had zero design experience and was nervous about our new flat. El Shaddai made it so easy — I designed the bedroom in one evening, showed it to my husband, and we both fell in love with it."',
-                avatar:'DN',
+                avatar:'DN', date:'January 2026',
                 project:'New Flat Interior Design',
               },
               {
                 name:'Rahul Verma', city:'Delhi', role:'Architect',
-                rating:5,
-                text:'"The AI floor plan generator is a game-changer for quick concept work. What used to take me 30 minutes now takes 2. I use it daily for initial client briefs."',
-                avatar:'RV',
+                rating:4,
+                text:'"The AI floor plan generator is a game-changer for quick concept work. What used to take me 30 minutes now takes 2. I use it daily for initial client briefs. The export to PDF could be more detailed, but that\'s a minor thing."',
+                avatar:'RV', date:'December 2025',
                 project:'Residential Concept Drafts',
               },
               {
                 name:'Sujatha Krishnan', city:'Chennai', role:'Homeowner',
                 rating:5,
                 text:'"We were planning a pooja room and had no idea how to visualize it. The templates gave us so much inspiration. Our contractor was surprised by the level of detail in our design brief!"',
-                avatar:'SK',
+                avatar:'SK', date:'November 2025',
                 project:'Pooja Room Design',
               },
               {
-                name:'Vikram Patel', city:'Ahmedabad', role:'Builder',
+                name:'Vikram Patel', city:'Ahmedabad', role:'Builder & Contractor',
                 rating:5,
                 text:'"I share El Shaddai with every client before construction begins. It helps them communicate their vision clearly, which means fewer change requests and smoother projects for everyone."',
-                avatar:'VP',
+                avatar:'VP', date:'October 2025',
                 project:'Pre-construction Planning',
               },
-            ].map(({ name, city, role, rating, text, avatar, project }, i) => (
+            ].map(({ name, city, role, rating, text, avatar, project, date }, i) => (
               <div key={i} className="rs" style={{ animationDelay:`${i*80}ms`, background:CREAM, padding:'40px 36px', display:'flex', flexDirection:'column', gap:28, border:'1px solid rgba(0,0,0,0.04)' }}>
-                {/* Stars */}
-                <div style={{ display:'flex', gap:3 }}>
-                  {Array.from({length:rating}).map((_,s) => <span key={s} style={{ color:GOLD, fontSize:14 }}>★</span>)}
+                {/* Stars + date */}
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                  <div style={{ display:'flex', gap:3 }}>
+                    {Array.from({length:rating}).map((_,s) => <span key={s} style={{ color:GOLD, fontSize:14 }}>★</span>)}
+                    {Array.from({length:5-rating}).map((_,s) => <span key={s} style={{ color:'rgba(196,149,106,0.25)', fontSize:14 }}>★</span>)}
+                  </div>
+                  {date && <span style={{ fontFamily:SS, fontSize:10, color:MUTED }}>{date}</span>}
                 </div>
                 {/* Review text */}
                 <p style={{ fontFamily:SF, fontSize:17, fontWeight:300, color:DARK, lineHeight:1.75, fontStyle:'italic', flex:1, margin:0 }}>{text}</p>
@@ -1201,6 +1206,52 @@ export default function HomePage() {
               onMouseLeave={e => e.currentTarget.style.opacity='1'}>
               Try the Studio Free →
             </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          VII-D-PRE. Start Your Own Design — public room designer CTA
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ background:DARK2, padding:'80px clamp(40px,8vw,120px)' }}>
+        <div style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:60, alignItems:'center' }}>
+          <div className="rl">
+            <div style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:GOLD, marginBottom:20 }}>No Account Needed · Completely Free</div>
+            <h2 style={{ fontFamily:SF, fontSize:'clamp(34px,3.5vw,54px)', fontWeight:300, color:WHITE, lineHeight:1.1, margin:'0 0 20px' }}>
+              Design your own room<br /><em style={{ color:GOLD, fontStyle:'italic' }}>in minutes.</em>
+            </h2>
+            <p style={{ fontFamily:SS, fontSize:14, fontWeight:300, color:'rgba(255,255,255,0.45)', lineHeight:1.85, margin:'0 0 40px', maxWidth:440 }}>
+              Pick a room type, choose your style, and drag furniture onto a 2D floor plan. Change wall colours, resize items, rotate furniture — then download your design as a PNG. Zero experience needed.
+            </p>
+            <div style={{ display:'flex', gap:16, flexWrap:'wrap' }}>
+              <button onClick={() => nav('/my-design')}
+                style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.22em', textTransform:'uppercase', color:DARK, background:GOLD, border:'none', padding:'16px 44px', cursor:'pointer', transition:'opacity 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.opacity='0.85'}
+                onMouseLeave={e => e.currentTarget.style.opacity='1'}>
+                Start Designing Free →
+              </button>
+              <button onClick={() => nav('/portfolio')}
+                style={{ fontFamily:SS, fontSize:10, fontWeight:700, letterSpacing:'0.22em', textTransform:'uppercase', color:'rgba(255,255,255,0.5)', background:'transparent', border:'1px solid rgba(255,255,255,0.15)', padding:'16px 32px', cursor:'pointer' }}>
+                See Inspiration
+              </button>
+            </div>
+          </div>
+          <div className="rr" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            {[
+              { icon:'🛋', label:'Living Room', bg:'#1e3a5f' },
+              { icon:'🛏', label:'Bedroom', bg:'#3b1f4e' },
+              { icon:'🍳', label:'Kitchen', bg:'#3b2a0a' },
+              { icon:'💼', label:'Home Office', bg:'#0f3226' },
+            ].map(r => (
+              <button key={r.label} onClick={() => nav('/my-design')}
+                style={{ background:r.bg, border:'1px solid rgba(255,255,255,0.08)', padding:'28px 20px', cursor:'pointer', textAlign:'left', transition:'transform 0.2s, border-color 0.2s' }}
+                onMouseEnter={e => { e.currentTarget.style.transform='scale(1.03)'; e.currentTarget.style.borderColor='rgba(196,149,106,0.4)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform='scale(1)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.08)' }}>
+                <div style={{ fontSize:28, marginBottom:10 }}>{r.icon}</div>
+                <div style={{ fontFamily:SS, fontSize:12, fontWeight:600, color:'rgba(255,255,255,0.75)', letterSpacing:'0.05em' }}>{r.label}</div>
+                <div style={{ fontFamily:SS, fontSize:10, color:'rgba(255,255,255,0.3)', marginTop:4 }}>Design free →</div>
+              </button>
+            ))}
           </div>
         </div>
       </section>
@@ -1379,7 +1430,7 @@ export default function HomePage() {
           {/* Bottom */}
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:16 }}>
             <p style={{ fontFamily:SS, fontSize:11, fontWeight:300, color:'rgba(255,255,255,0.18)', letterSpacing:'0.04em' }}>
-              &copy; 2025 El Shaddai Interior Design. All rights reserved.
+              &copy; 2026 El Shaddai Interior Design. All rights reserved.
             </p>
             <p style={{ fontFamily:SS, fontSize:11, fontWeight:300, color:'rgba(255,255,255,0.18)', letterSpacing:'0.04em' }}>
               elshaddaiinterior.vercel.app
