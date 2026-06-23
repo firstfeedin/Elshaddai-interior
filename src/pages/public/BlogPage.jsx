@@ -14,7 +14,7 @@ const POSTS = [
     title:'Best Interior Designers in Hyderabad 2026 — Complete Guide',
     excerpt:'Jubilee Hills, Banjara Hills, Gachibowli, Hitech City — we cover the top neighbourhoods in Hyderabad and what interior design costs in each area, with real project examples and pricing.',
     img:'https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=800&q=80',
-    author:{ name:'Ganesh Kumar', role:'Founder, El Shaddai', avatar:'GK' },
+    author:{ name:'Manozkumar Reddy Venna', role:'Founder, El Shaddai', avatar:'MV' },
     body:['Hyderabad has emerged as one of India\'s fastest-growing markets for interior design. With a tech-boom driving premium apartment purchases in Gachibowli and Hitech City, demand for quality interiors has risen sharply since 2023.','Top areas like Jubilee Hills and Banjara Hills host clients who expect high-end finishes — marble, custom joinery, smart lighting. Budget in these zones starts at ₹2,500/sq ft for a mid-range finish and can go to ₹6,000+ for luxury. Gachibowli and Kondapur cater to a younger IT professional demographic that prefers modular furniture and Scandinavian aesthetics at ₹1,200–₹2,000/sq ft.','When choosing a designer in Hyderabad, ask for RERA-registered contractor references, a clear BOQ (Bill of Quantities) before work begins, and a warranty period for electrical and plumbing work. El Shaddai provides all three on every project.'] },
   { id:2, tag:'Vastu', readMin:4, date:'Jun 8, 2026', featured:false,
     title:'10 Vastu-Compliant Interior Ideas That Actually Look Modern',

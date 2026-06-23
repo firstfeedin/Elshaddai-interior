@@ -19,8 +19,7 @@ export default function FloatingActions() {
         <div className={`flex flex-col items-end gap-2.5 transition-all duration-300 ${expanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
 
           {/* WhatsApp */}
-          <a href="https://wa.me/919876543210?text=Hi%20El%20Shaddai%2C%20I%27m%20interested%20in%20interior%20design%20for%20my%20home."
-            target="_blank" rel="noopener noreferrer"
+          <a href="mailto:contactus@divinemercyitsol.com?subject=WhatsApp%20Enquiry%20—%20El%20Shaddai%20Interior"
             className="flex items-center gap-3 bg-white shadow-xl shadow-black/15 border border-stone-100 rounded-full pl-4 pr-5 py-2.5 hover:shadow-2xl transition-all duration-200 group">
             <span className="text-xl">💬</span>
             <span className="font-body text-sm font-semibold text-stone-700 group-hover:text-green-600">WhatsApp Us</span>
@@ -46,10 +45,9 @@ export default function FloatingActions() {
       {/* Mobile sticky bottom bar */}
       <div className={`fixed bottom-0 left-0 right-0 z-50 lg:hidden transition-all duration-500 ${visible ? 'translate-y-0' : 'translate-y-full'}`}>
         <div className="bg-white border-t border-stone-200 shadow-2xl px-4 py-3 flex gap-2">
-          <a href="https://wa.me/919876543210?text=Hi%20El%20Shaddai%2C%20I%27m%20interested%20in%20interior%20design."
-            target="_blank" rel="noopener noreferrer"
+          <a href="mailto:contactus@divinemercyitsol.com?subject=WhatsApp%20Enquiry%20—%20El%20Shaddai"
             className="flex-1 flex items-center justify-center gap-2 border border-stone-300 rounded-sm py-3 text-xs font-body font-semibold text-stone-700 hover:bg-stone-50 active:bg-stone-100 transition-colors">
-            💬 WhatsApp
+            💬 Contact Us
           </a>
           <a href="#design-wizard"
             className="flex-[1.5] flex items-center justify-center gap-1.5 bg-gold-500 text-white rounded-sm py-3 text-xs font-body font-bold hover:bg-gold-600 active:bg-gold-700 transition-colors">

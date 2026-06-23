@@ -238,9 +238,9 @@ function DesignResult({ form, onReset }) {
             ✦ Book Free Site Visit & Exact Quote
           </a>
           <div className="flex gap-3">
-            <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer"
+            <a href="mailto:contactus@divinemercyitsol.com?subject=Designer%20Enquiry%20—%20El%20Shaddai"
               className="flex-1 py-3 border border-stone-200 rounded-sm text-xs font-body font-semibold text-stone-600 text-center hover:bg-stone-50 transition-colors">
-              💬 WhatsApp Designer
+              💬 Contact Designer
             </a>
             <button onClick={onReset}
               className="flex-1 py-3 border border-stone-200 rounded-sm text-xs font-body font-semibold text-stone-600 hover:bg-stone-50 transition-colors">
