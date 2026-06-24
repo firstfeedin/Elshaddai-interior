@@ -10,7 +10,17 @@ const app = express()
 const JWT_SECRET = process.env.JWT_SECRET || 'elshaddai-super-secret-jwt-2026'
 const PORT = process.env.PORT || 3001
 
-app.use(cors({ origin: ['http://localhost:5173','http://localhost:5174','http://localhost:4173'], credentials: true }))
+const ALLOWED_ORIGINS = [
+  'http://localhost:5173','http://localhost:5174','http://localhost:4173',
+  ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : []),
+]
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin) || /\.vercel\.app$/.test(origin)) return cb(null, true)
+    cb(new Error('CORS'))
+  },
+  credentials: true,
+}))
 app.use(express.json())
 
 // ── Auth middleware ───────────────────────────────────────────
@@ -23,8 +33,10 @@ function auth(req, res, next) {
   } catch { res.status(401).json({ error: 'Invalid token' }) }
 }
 
+const TEAM_ROLES = ['PM_UX','FRONTEND_LEAD','FRONTEND_UI','BACKEND_ENG','DEVOPS','QA_ENGINEER']
+
 function adminOnly(req, res, next) {
-  if (!['ADMIN','SUPER_ADMIN'].includes(req.user?.role)) return res.status(403).json({ error: 'Forbidden' })
+  if (!['ADMIN','SUPER_ADMIN',...TEAM_ROLES].includes(req.user?.role)) return res.status(403).json({ error: 'Forbidden' })
   next()
 }
 
@@ -32,13 +44,16 @@ function makeToken(user) {
   return jwt.sign({ id: user.id, email: user.email, role: user.role, name: user.name }, JWT_SECRET, { expiresIn: '7d' })
 }
 
+// ── Health check (Railway / Render / uptime monitors) ─────────
+app.get('/api/health', (req, res) => res.json({ status: 'ok', ts: new Date().toISOString() }))
+
 // ── REGISTER ─────────────────────────────────────────────────
 app.post('/api/auth/register', (req, res) => {
   const { name, email, password, phone, role, city, organisation_name, years_experience, specialisation } = req.body
   if (!name || !email || !password) return res.status(400).json({ error: 'Name, email and password are required' })
   if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' })
 
-  const validRoles = ['CLIENT','DESIGNER','BUILDER','WORKSHOP_WORKER','ADMIN','SUPER_ADMIN']
+  const validRoles = ['CLIENT','DESIGNER','BUILDER','WORKSHOP_WORKER','ADMIN','SUPER_ADMIN','PM_UX','FRONTEND_LEAD','FRONTEND_UI','BACKEND_ENG','DEVOPS','QA_ENGINEER']
   const userRole = validRoles.includes(role) ? role : 'CLIENT'
 
   try {
@@ -98,7 +113,7 @@ app.post('/api/auth/google', (req, res) => {
 
     if (!email_verified) return res.status(400).json({ error: 'Google email not verified' })
 
-    const validRoles = ['CLIENT','DESIGNER','BUILDER','WORKSHOP_WORKER','ADMIN','SUPER_ADMIN']
+    const validRoles = ['CLIENT','DESIGNER','BUILDER','WORKSHOP_WORKER','ADMIN','SUPER_ADMIN','PM_UX','FRONTEND_LEAD','FRONTEND_UI','BACKEND_ENG','DEVOPS','QA_ENGINEER']
     const userRole = validRoles.includes(role) ? role : 'CLIENT'
 
     let user = db.prepare('SELECT id,name,email,role,phone,city,organisation_name,created_at FROM users WHERE email=?').get(email.toLowerCase())
@@ -571,10 +586,225 @@ app.get('/api/contact-messages', auth, adminOnly, (req, res) => {
   res.json(msgs)
 })
 
+// ═══════════════════════════════════════════════════════════════
+//  SCENE / STUDIO PROJECT CRUD
+// ═══════════════════════════════════════════════════════════════
+
+// Ensure scenes table exists
+db.exec(`
+  CREATE TABLE IF NOT EXISTS scenes (
+    id          TEXT PRIMARY KEY,
+    user_id     INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    name        TEXT    NOT NULL DEFAULT 'Untitled Project',
+    scene_json  TEXT    NOT NULL,
+    thumbnail   TEXT,
+    is_public   INTEGER NOT NULL DEFAULT 0,
+    created_at  TEXT    NOT NULL DEFAULT (datetime('now')),
+    updated_at  TEXT    NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_scenes_user ON scenes(user_id);
+`)
+
+// List user's scenes
+app.get('/api/scenes', auth, (req, res) => {
+  const scenes = db.prepare(
+    `SELECT id, name, thumbnail, is_public, created_at, updated_at
+     FROM scenes WHERE user_id=? ORDER BY updated_at DESC LIMIT 50`
+  ).all(req.user.id)
+  res.json(scenes)
+})
+
+// Get a single scene (owner or public)
+app.get('/api/scenes/:id', auth, (req, res) => {
+  const scene = db.prepare('SELECT * FROM scenes WHERE id=?').get(req.params.id)
+  if (!scene) return res.status(404).json({ error: 'Scene not found' })
+  if (scene.user_id !== req.user.id && !scene.is_public) {
+    return res.status(403).json({ error: 'Access denied' })
+  }
+  res.json({ ...scene, scene_json: JSON.parse(scene.scene_json) })
+})
+
+// Create scene
+app.post('/api/scenes', auth, (req, res) => {
+  const { id, name, scene_json } = req.body
+  if (!id || !scene_json) return res.status(400).json({ error: 'id and scene_json required' })
+  try {
+    const json = typeof scene_json === 'string' ? scene_json : JSON.stringify(scene_json)
+    db.prepare(
+      `INSERT INTO scenes (id, user_id, name, scene_json) VALUES (?,?,?,?)`
+    ).run(id, req.user.id, name || 'Untitled Project', json)
+    res.status(201).json({ id, name })
+  } catch (e) {
+    if (e.message.includes('UNIQUE')) return res.status(409).json({ error: 'Scene already exists' })
+    res.status(500).json({ error: e.message })
+  }
+})
+
+// Update scene (upsert)
+app.put('/api/scenes/:id', auth, (req, res) => {
+  const { name, scene_json, thumbnail } = req.body
+  const existing = db.prepare('SELECT user_id FROM scenes WHERE id=?').get(req.params.id)
+  if (existing && existing.user_id !== req.user.id) {
+    return res.status(403).json({ error: 'Access denied' })
+  }
+  const json = typeof scene_json === 'string' ? scene_json : JSON.stringify(scene_json)
+  if (!existing) {
+    db.prepare(
+      `INSERT INTO scenes (id,user_id,name,scene_json,thumbnail) VALUES (?,?,?,?,?)`
+    ).run(req.params.id, req.user.id, name ?? 'Untitled Project', json, thumbnail ?? null)
+  } else {
+    db.prepare(
+      `UPDATE scenes SET name=COALESCE(?,name), scene_json=?, thumbnail=COALESCE(?,thumbnail), updated_at=datetime('now') WHERE id=?`
+    ).run(name ?? null, json, thumbnail ?? null, req.params.id)
+  }
+  res.json({ ok: true })
+})
+
+// Delete scene
+app.delete('/api/scenes/:id', auth, (req, res) => {
+  const existing = db.prepare('SELECT user_id FROM scenes WHERE id=?').get(req.params.id)
+  if (!existing) return res.status(404).json({ error: 'Not found' })
+  if (existing.user_id !== req.user.id) return res.status(403).json({ error: 'Access denied' })
+  db.prepare('DELETE FROM scenes WHERE id=?').run(req.params.id)
+  res.json({ ok: true })
+})
+
+// Duplicate scene
+app.post('/api/scenes/:id/duplicate', auth, (req, res) => {
+  const src = db.prepare('SELECT * FROM scenes WHERE id=?').get(req.params.id)
+  if (!src) return res.status(404).json({ error: 'Not found' })
+  if (src.user_id !== req.user.id && !src.is_public) return res.status(403).json({ error: 'Access denied' })
+  const newId   = require('crypto').randomUUID()
+  const newName = `${src.name} (copy)`
+  // Update the id in the scene JSON too
+  let json = src.scene_json
+  try { const obj = JSON.parse(json); obj.id = newId; json = JSON.stringify(obj) } catch {}
+  db.prepare(
+    `INSERT INTO scenes (id,user_id,name,scene_json) VALUES (?,?,?,?)`
+  ).run(newId, req.user.id, newName, json)
+  res.status(201).json({ id: newId, name: newName })
+})
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDER JOB QUEUE
+//  Phase 2: swap the in-memory queue for BullMQ + Redis
+//           and point workers at a Blender GPU instance.
+// ═══════════════════════════════════════════════════════════════
+
+// Ensure render_jobs table exists
+db.exec(`
+  CREATE TABLE IF NOT EXISTS render_jobs (
+    id           TEXT PRIMARY KEY,
+    user_id      INTEGER REFERENCES users(id),
+    scene_id     TEXT,
+    status       TEXT NOT NULL DEFAULT 'queued',
+    resolution   TEXT NOT NULL DEFAULT '1920x1080',
+    samples      INTEGER NOT NULL DEFAULT 128,
+    format       TEXT NOT NULL DEFAULT 'png',
+    type         TEXT NOT NULL DEFAULT 'still',
+    result_url   TEXT,
+    error        TEXT,
+    credits_used INTEGER NOT NULL DEFAULT 1,
+    queued_at    TEXT NOT NULL DEFAULT (datetime('now')),
+    started_at   TEXT,
+    finished_at  TEXT
+  );
+  CREATE INDEX IF NOT EXISTS idx_render_jobs_user ON render_jobs(user_id);
+`)
+
+// Render credits per resolution
+const RENDER_CREDITS = { '1280x720': 1, '1920x1080': 2, '2560x1440': 4, '3840x2160': 8, '8192x4096': 16 }
+
+// Submit a render job
+app.post('/api/render/jobs', auth, (req, res) => {
+  const { sceneId, resolution = '1920x1080', samples = 128, format = 'png', type = 'still' } = req.body
+  if (!sceneId) return res.status(400).json({ error: 'sceneId required' })
+
+  const credits = RENDER_CREDITS[resolution] ?? 2
+
+  // TODO Phase 3: check user render credit balance
+  const jobId = require('crypto').randomUUID()
+  db.prepare(
+    `INSERT INTO render_jobs (id,user_id,scene_id,status,resolution,samples,format,type,credits_used)
+     VALUES (?,?,?,?,?,?,?,?,?)`
+  ).run(jobId, req.user.id, sceneId, 'queued', resolution, samples, format, type, credits)
+
+  // Simulate async processing (replace with real Blender worker call in Phase 2)
+  const estSeconds = { '1280x720': 15, '1920x1080': 30, '2560x1440': 90, '3840x2160': 240 }[resolution] ?? 60
+  simulateRender(jobId, estSeconds)
+
+  res.status(201).json({ id: jobId, status: 'queued', estimatedSeconds: estSeconds, creditsUsed: credits })
+})
+
+// Get job status
+app.get('/api/render/jobs/:id', auth, (req, res) => {
+  const job = db.prepare('SELECT * FROM render_jobs WHERE id=?').get(req.params.id)
+  if (!job) return res.status(404).json({ error: 'Job not found' })
+  if (job.user_id !== req.user.id) return res.status(403).json({ error: 'Access denied' })
+  res.json(job)
+})
+
+// List user's render jobs
+app.get('/api/render/jobs', auth, (req, res) => {
+  const jobs = db.prepare(
+    `SELECT id,scene_id,status,resolution,type,result_url,credits_used,queued_at,finished_at
+     FROM render_jobs WHERE user_id=? ORDER BY queued_at DESC LIMIT 20`
+  ).all(req.user.id)
+  res.json(jobs)
+})
+
+// Cancel a queued job
+app.delete('/api/render/jobs/:id', auth, (req, res) => {
+  const job = db.prepare('SELECT * FROM render_jobs WHERE id=?').get(req.params.id)
+  if (!job) return res.status(404).json({ error: 'Not found' })
+  if (job.user_id !== req.user.id) return res.status(403).json({ error: 'Access denied' })
+  if (job.status !== 'queued') return res.status(409).json({ error: `Cannot cancel job in state: ${job.status}` })
+  db.prepare(`UPDATE render_jobs SET status='cancelled' WHERE id=?`).run(job.id)
+  res.json({ ok: true })
+})
+
+/**
+ * Simulates the render pipeline until a real Blender GPU worker is wired up.
+ * In Phase 2: replace this with a call to the BullMQ job queue which dispatches
+ * to a Blender headless container (glTF → Cycles → PNG → CDN upload → webhook).
+ */
+function simulateRender(jobId, estSeconds) {
+  // queued → rendering after 2s
+  setTimeout(() => {
+    db.prepare(`UPDATE render_jobs SET status='rendering', started_at=datetime('now') WHERE id=?`).run(jobId)
+  }, 2000)
+
+  // rendering → done after estSeconds (placeholder: use a fixed preview image)
+  setTimeout(() => {
+    const placeholderUrl = 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1920&q=80'
+    db.prepare(
+      `UPDATE render_jobs SET status='done', result_url=?, finished_at=datetime('now') WHERE id=?`
+    ).run(placeholderUrl, jobId)
+  }, Math.min(estSeconds * 1000, 8000)) // cap demo at 8s
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CATALOG API  (serves furniture catalog to the frontend)
+// ═══════════════════════════════════════════════════════════════
+
+// Static catalog endpoint — Phase 4: replace with DB-backed catalog + CDN assets
+app.get('/api/catalog', (req, res) => {
+  const { category, q, limit = 50 } = req.query
+  // The actual catalog data lives in src/data/furnitureCatalog.js (client bundle).
+  // This endpoint exists for future server-side catalog with 1M+ items.
+  // For now, return a minimal stub so the frontend API can be wired early.
+  res.json({
+    total: 0,
+    items: [],
+    message: 'Full catalog served from client bundle. Server catalog available in Phase 4.',
+  })
+})
+
 // ── START ─────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`\n🏠 El Shaddai API running on http://localhost:${PORT}`)
   console.log(`   Auth:      POST /api/auth/register  |  POST /api/auth/login`)
-  console.log(`   Dashboard: GET  /api/dashboard/summary`)
-  console.log(`   Projects:  GET  /api/projects\n`)
+  console.log(`   Scenes:    GET/POST/PUT/DELETE /api/scenes`)
+  console.log(`   Render:    POST /api/render/jobs  |  GET /api/render/jobs/:id`)
+  console.log(`   Catalog:   GET  /api/catalog\n`)
 })

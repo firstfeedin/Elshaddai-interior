@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback, useState } from 'react'
 import * as THREE from 'three'
 import { GLTFLoader }    from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { useScene }      from '../../store/sceneStore'
 
 /* ─── Constants ─── */
 const GOLD  = '#c9a227'
@@ -154,7 +155,7 @@ function Wall2D({ pts }) {
 /* ════════════════════════════════════════════════════════════
    Main Component
    ════════════════════════════════════════════════════════════ */
-export default function ThreeViewport({ step = 1, mode = '3d', addedItems = [], appliedTemplate = null, onSelectFurniture }) {
+export default function ThreeViewport({ step = 1, mode = '3d', addedItems = [], appliedTemplate = null, activeView = 'Front', activeMaterial = null, onSelectFurniture, uploadedPlan = null, aiAnalysis = null }) {
   const mountRef    = useRef(null)
   const rendRef     = useRef(null)
   const sceneRef    = useRef(null)
@@ -172,6 +173,8 @@ export default function ThreeViewport({ step = 1, mode = '3d', addedItems = [], 
   const [drawMode, setDrawMode] = useState(false) // step 1 drawing active
   const [wallCount, setWallCount] = useState(0)
   const [hint, setHint] = useState('')
+
+  const { activeFloor } = useScene()
 
   /* ── init renderer + scene (once) ── */
   useEffect(() => {
@@ -269,26 +272,26 @@ export default function ThreeViewport({ step = 1, mode = '3d', addedItems = [], 
     }
   }, [])
 
-  /* ── Step camera presets ── */
+  /* ── Step + mode camera presets ── */
   useEffect(() => {
     const cam = camRef.current
     const ctrl = ctrlRef.current
     const scene = sceneRef.current
     if (!cam || !ctrl || !scene) return
 
-    // Show/hide grid based on step
+    // Show/hide grid
     const room = scene.getObjectByName('room')
     const grid = room?.getObjectByName('grid')
-    if (grid) grid.visible = (step === 1)
+    if (grid) grid.visible = (step === 1 || mode === '2d')
 
-    if (step === 1) {
+    if (step === 1 || mode === '2d') {
       // Top-down 2D view
       cam.position.set(0, 9, 0.01)
       ctrl.target.set(0, 0, 0)
       ctrl.maxPolarAngle = 0.15
       ctrl.minDistance = 3
       ctrl.maxDistance = 14
-      setHint('Click on floor to draw walls  ·  Right-click to finish room')
+      setHint(step === 1 ? 'Click on floor to draw walls  ·  Right-click to finish room' : '2D Top View  ·  Switch to 3D to orbit the room')
     } else if (step === 2) {
       // 3D perspective
       cam.position.set(4, 3.5, 5)
@@ -306,7 +309,7 @@ export default function ThreeViewport({ step = 1, mode = '3d', addedItems = [], 
       setHint('Render preview  ·  Choose camera angle then export')
     }
     ctrl.update()
-  }, [step])
+  }, [step, mode])
 
   /* ── Render-quality lighting for Step 3 ── */
   useEffect(() => {
@@ -383,6 +386,157 @@ export default function ThreeViewport({ step = 1, mode = '3d', addedItems = [], 
 
     prevItemsRef.current = addedItems
   }, [addedItems])
+
+  /* ── activeView camera preset (Step 3 view buttons) ── */
+  useEffect(() => {
+    const cam = camRef.current, ctrl = ctrlRef.current
+    if (!cam || !ctrl || step !== 3) return
+    const presets = {
+      Front:  { pos: [3.5, 2.2, 4],    target: [-0.5, 1.2, 0] },
+      Left:   { pos: [-5,  2.0, 0],    target: [0,    1.0, 0] },
+      Right:  { pos: [5,   2.0, 0],    target: [0,    1.0, 0] },
+      Top:    { pos: [0,   9,   0.01], target: [0,    0,   0] },
+      Aerial: { pos: [5,   5,   5],    target: [0,    0.5, 0] },
+    }
+    const p = presets[activeView]
+    if (!p) return
+    cam.position.set(...p.pos)
+    ctrl.target.set(...p.target)
+    ctrl.update()
+  }, [activeView, step])
+
+  /* ── activeMaterial → apply color to walls/floor ── */
+  useEffect(() => {
+    const scene = sceneRef.current
+    if (!scene || !activeMaterial?.code) return
+    const room = scene.getObjectByName('room')
+    if (!room) return
+    const hex = parseInt(activeMaterial.code.replace('#', ''), 16)
+    room.traverse(c => {
+      if (!c.isMesh || c.name === 'grid') return
+      c.material = c.material.clone()
+      c.material.color.setHex(hex)
+    })
+  }, [activeMaterial])
+
+  /* ── uploadedPlan → project floor plan as texture on 3D floor ── */
+  useEffect(() => {
+    const scene = sceneRef.current
+    if (!scene || !uploadedPlan || uploadedPlan === 'pdf') return
+    const floorMesh = scene.getObjectByName('floor')
+    if (!floorMesh) return
+
+    const loader = new THREE.TextureLoader()
+    loader.load(uploadedPlan, (tex) => {
+      tex.colorSpace = THREE.SRGBColorSpace
+      tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping
+      floorMesh.material = new THREE.MeshStandardMaterial({
+        map: tex,
+        roughness: 0.75,
+        metalness: 0.0,
+      })
+    })
+  }, [uploadedPlan])
+
+  /* ── activeFloor.walls → rebuild 3D room geometry from scene model ── */
+  useEffect(() => {
+    const threeScene = sceneRef.current
+    if (!threeScene || !activeFloor?.walls?.length) return
+
+    // Remove previously generated scene-model room
+    const prev = threeScene.getObjectByName('room-scene')
+    if (prev) threeScene.remove(prev)
+
+    const group = new THREE.Group()
+    group.name = 'room-scene'
+
+    const wallMat  = new THREE.MeshStandardMaterial({ color: WALL_COLOR,  roughness: 0.9  })
+    const floorMat = new THREE.MeshStandardMaterial({ color: FLOOR_COLOR, roughness: 0.85 })
+    const ceilMat  = new THREE.MeshStandardMaterial({ color: CEIL_COLOR,  roughness: 1.0  })
+
+    // Compute AABB of all wall endpoints to derive room bounds
+    let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity
+    activeFloor.walls.forEach(w => {
+      minX = Math.min(minX, w.start.x, w.end.x)
+      maxX = Math.max(maxX, w.start.x, w.end.x)
+      minZ = Math.min(minZ, w.start.z, w.end.z)
+      maxZ = Math.max(maxZ, w.start.z, w.end.z)
+    })
+    const rw = Math.max(maxX - minX, 0.5)
+    const rd = Math.max(maxZ - minZ, 0.5)
+    const cx = (minX + maxX) / 2
+    const cz = (minZ + maxZ) / 2
+
+    // Floor
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(rw, rd), floorMat)
+    floor.rotation.x = -Math.PI / 2
+    floor.position.set(cx, 0, cz)
+    floor.receiveShadow = true
+    floor.name = 'floor'
+    group.add(floor)
+
+    // Ceiling
+    const h = activeFloor.walls[0]?.height ?? 2.8
+    const ceil = new THREE.Mesh(new THREE.PlaneGeometry(rw, rd), ceilMat)
+    ceil.rotation.x = Math.PI / 2
+    ceil.position.set(cx, h, cz)
+    group.add(ceil)
+
+    // Build wall segments from scene model
+    activeFloor.walls.forEach(w => {
+      const dx = w.end.x - w.start.x
+      const dz = w.end.z - w.start.z
+      const len = Math.sqrt(dx * dx + dz * dz)
+      if (len < 0.01) return
+      const thickness = w.thickness ?? 0.15
+      const wh = w.height ?? h
+      const geo = new THREE.BoxGeometry(len, wh, thickness)
+      const mesh = new THREE.Mesh(geo, wallMat.clone())
+      const mx = (w.start.x + w.end.x) / 2
+      const mz = (w.start.z + w.end.z) / 2
+      mesh.position.set(mx, wh / 2, mz)
+      mesh.rotation.y = -Math.atan2(dz, dx)
+      mesh.receiveShadow = true
+      mesh.castShadow = true
+      group.add(mesh)
+    })
+
+    // Grid on floor
+    const grid = new THREE.GridHelper(Math.max(rw, rd) + 2, Math.floor((Math.max(rw, rd) + 2) * 5), 0xaaaaaa, 0xdddddd)
+    grid.position.set(cx, 0.002, cz)
+    grid.name = 'grid'
+    group.add(grid)
+
+    threeScene.add(group)
+  }, [activeFloor?.walls])
+
+  /* ── activeFloor.furniture → sync scene-model furniture positions ── */
+  useEffect(() => {
+    const threeScene = sceneRef.current
+    if (!threeScene || !activeFloor?.furniture) return
+    activeFloor.furniture.forEach(item => {
+      const existing = threeScene.getObjectByName(`furniture_${item.id}`)
+      if (existing) {
+        existing.position.set(item.position.x, existing.position.y, item.position.z)
+        existing.rotation.y = item.rotation ?? 0
+      } else {
+        placeFurniture(threeScene, { ...item, id: item.id }, { x: item.position.x, z: item.position.z })
+      }
+    })
+  }, [activeFloor?.furniture])
+
+  /* ── aiAnalysis → resize room to match floor plan total area ── */
+  useEffect(() => {
+    const scene = sceneRef.current
+    if (!scene || !aiAnalysis?.totalArea) return
+    // Rebuild room scaled to actual floor plan area (sq ft → metres)
+    const oldRoom = scene.getObjectByName('room')
+    if (oldRoom) scene.remove(oldRoom)
+    const areaM = aiAnalysis.totalArea * 0.0929
+    const w = Math.min(Math.max(Math.sqrt(areaM * 1.2), 5), 14)
+    const d = Math.min(Math.max(areaM / w, 4), 12)
+    buildRoom(scene, { w, d, h: 3 })
+  }, [aiAnalysis])
 
   /* ── 2D wall drawing: click on floor to add point ── */
   const onFloorClick = useCallback((e) => {

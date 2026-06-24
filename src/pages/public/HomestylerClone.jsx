@@ -251,13 +251,21 @@ function ContactForm() {
     if (!form.name || !form.email || !form.message) return
     setStatus('sending'); setError('')
     try {
-      const apiBase = import.meta.env.VITE_API_URL || '/api'
-      const res = await fetch(`${apiBase}/contact`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(form),
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method:'POST',
+        headers:{'Content-Type':'application/json', Accept:'application/json'},
+        body: JSON.stringify({
+          access_key: '20e5a729-9a98-4234-b88a-470634b6d474',
+          subject: `New Project Enquiry from ${form.name} — El Shaddai`,
+          from_name: 'El Shaddai Website',
+          reply_to: form.email,
+          name: form.name,
+          email: form.email,
+          message: form.message,
+        }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to send')
+      if (!data.success) throw new Error(data.message || 'Failed to send')
       setStatus('sent')
     } catch(err) {
       setError(err.message)
@@ -605,13 +613,15 @@ export default function HomePage() {
 
   return (
     <div style={{ fontFamily:SS, background:CREAM, overflowX:'hidden' }}>
+      {/* Cinematic scan-line overlay */}
+      <div className="scan-line" style={{ background:'rgba(255,255,255,0.025)', zIndex:99998 }} />
       <Cursor />
       <Navbar />
 
       {/* ══════════════════════════════════════════════════════════════════
           I. CINEMATIC HERO — 2D → 3D → Final Design
       ══════════════════════════════════════════════════════════════════ */}
-      <section style={{ position:'relative', height:'100svh', minHeight:700, overflow:'hidden', background:'#0a0a0a' }}>
+      <section className="letterbox cinematic-vignette" style={{ position:'relative', height:'100svh', minHeight:700, overflow:'hidden', background:'#0a0a0a' }}>
 
         {/* ── Stage images — cycle 2D → 3D → Final ── */}
         {HERO_STAGES.map((s, i) => (
@@ -640,9 +650,8 @@ export default function HomePage() {
               textTransform:'uppercase', color:GOLD }}>El Shaddai Interior Studio</span>
           </div>
 
-          <h1 style={{ fontFamily:SF, fontWeight:300, fontSize:'clamp(40px,6vw,100px)',
-            color:WHITE, lineHeight:1.0, letterSpacing:'-0.02em', marginBottom:0,
-            animation:'titleIn 1.2s ease 0.4s both' }}>
+          <h1 className="cin-appear" style={{ fontFamily:SF, fontWeight:300, fontSize:'clamp(40px,6vw,100px)',
+            color:WHITE, lineHeight:1.0, letterSpacing:'-0.02em', marginBottom:0 }}>
             Design your dream<br />
             <em style={{ fontStyle:'italic', color:GOLD }}>home in 3D. Free.</em>
           </h1>
@@ -727,6 +736,65 @@ export default function HomePage() {
                 {num === 'Free' ? <span style={{ color:GOLD }}>Free</span> : num}
               </div>
               <div style={{ fontFamily:SS, fontSize:10, fontWeight:500, letterSpacing:'0.16em', textTransform:'uppercase', color:'rgba(255,255,255,0.35)' }}>{label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          I-C. TECHNOLOGY BAR
+      ══════════════════════════════════════════════════════════════════ */}
+      <section style={{ background:'#111', borderTop:'1px solid rgba(255,255,255,0.05)', padding:'0 clamp(40px,8vw,160px)' }}>
+        <div style={{ maxWidth:1200, margin:'0 auto', display:'flex', alignItems:'stretch', flexWrap:'wrap', gap:0 }}>
+          {[
+            {
+              icon: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <rect x="2" y="3" width="20" height="14" rx="1" stroke={GOLD} strokeWidth="1.5"/>
+                  <path d="M8 21h8M12 17v4" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round"/>
+                  <path d="M7 10l3 3 7-7" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              ),
+              tag: 'WebGL Engine',
+              title: 'Real-Time 3D in the Browser',
+              desc: 'Proprietary WebGL renderer — no download, no VR headset, no plugin. Your design loads instantly on any modern browser.',
+            },
+            {
+              icon: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="9" stroke={GOLD} strokeWidth="1.5"/>
+                  <path d="M12 3C12 3 16 7 16 12C16 17 12 21 12 21" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round"/>
+                  <path d="M12 3C12 3 8 7 8 12C8 17 12 21 12 21" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round"/>
+                  <path d="M3 12h18" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round"/>
+                  <circle cx="12" cy="12" r="2" fill={GOLD}/>
+                </svg>
+              ),
+              tag: 'PBR Rendering',
+              title: 'Physically Based Materials',
+              desc: 'Physically Based Rendering (PBR) on WebGL delivers true-to-life material textures — marble, wood, fabric — exactly as they look in your home.',
+            },
+            {
+              icon: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <polyline points="16,18 22,12 16,6" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <polyline points="8,6 2,12 8,18" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <line x1="12" y1="2" x2="12" y2="22" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" opacity="0.45"/>
+                </svg>
+              ),
+              tag: 'Web-Native',
+              title: 'Built on Open Web Standards',
+              desc: 'Pure HTML, CSS and JavaScript — no proprietary formats, no lock-in. Works on Windows, Mac, Linux and mobile without any installation.',
+            },
+          ].map((item, i) => (
+            <div key={i} style={{ flex:'1 1 300px', padding:'44px 40px', borderRight: i < 2 ? '1px solid rgba(255,255,255,0.06)' : 'none', display:'flex', gap:20, alignItems:'flex-start' }}>
+              <div style={{ width:46, height:46, background:'rgba(201,162,39,0.08)', border:'1px solid rgba(201,162,39,0.2)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                {item.icon}
+              </div>
+              <div>
+                <div style={{ fontFamily:SS, fontSize:9, fontWeight:700, letterSpacing:'0.22em', textTransform:'uppercase', color:GOLD, marginBottom:6 }}>{item.tag}</div>
+                <div style={{ fontFamily:SF, fontSize:17, fontWeight:300, color:WHITE, lineHeight:1.3, marginBottom:8 }}>{item.title}</div>
+                <div style={{ fontFamily:SS, fontSize:12, fontWeight:300, color:'rgba(255,255,255,0.4)', lineHeight:1.75 }}>{item.desc}</div>
+              </div>
             </div>
           ))}
         </div>

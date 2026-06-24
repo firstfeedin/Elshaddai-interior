@@ -16,6 +16,7 @@ function seed() {
     { name:'Deepa Nair',       email:'deepa.nair@gmail.com',    password:'Client@123',  role:'CLIENT',         phone:'9876543220', city:'Chennai' },
     { name:'Vinay Kapoor',     email:'vinay.kapoor@gmail.com',  password:'Client@123',  role:'CLIENT',         phone:'9876543221', city:'Bangalore' },
     { name:'Anil Mehta',       email:'anil.mehta@gmail.com',    password:'Client@123',  role:'CLIENT',         phone:'9876543222', city:'Mumbai' },
+
   ]
 
   const insertUser = db.prepare(`

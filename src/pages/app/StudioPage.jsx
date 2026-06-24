@@ -1,9 +1,9 @@
-import { useState, useRef, useCallback, Suspense, lazy } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import WebGPUViewport from '../../features/designer/WebGPUViewport'
 import ThreeViewport from '../../features/designer/ThreeViewport'
-
-const supportsWebGPU = typeof navigator !== 'undefined' && !!navigator.gpu
+import FloorPlan2D from '../../features/designer/FloorPlan2D'
+import { SceneProvider, useScene } from '../../store/sceneStore'
+import { exportSceneDescriptor, submitRenderJob, pollRenderJob } from '../../lib/gltfExport'
 
 const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY || ''
 
@@ -170,6 +170,79 @@ const CATALOG_ITEMS = [
   { id:30, name:'Porcelain Teapot',      sku:'DEC-006', cat:'decor',    price:3500,
     img:'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=300&q=70',
     glb:null, dims:{w:0.2,h:0.18,d:0.14}, color:'#e8e0d4', match:['dining','living'] },
+  /* ─ More Seating ─ */
+  { id:31, name:'L-Shape Sectional',     sku:'SOF-004', cat:'seating',  price:72000,
+    img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:2.8,h:0.85,d:1.8}, color:'#8a7a6a', match:['living'] },
+  { id:32, name:'Recliner Sofa',         sku:'SOF-005', cat:'seating',  price:55000,
+    img:'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.1,h:1.0,d:0.95}, color:'#4a3c30', match:['living','bedroom'] },
+  { id:33, name:'Ottoman Pouf Large',    sku:'SOF-006', cat:'seating',  price:8500,
+    img:'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.7,h:0.42,d:0.7}, color:'#c9a882', match:['living','bedroom'] },
+  { id:34, name:'Swing Chair Hanging',   sku:'SOF-007', cat:'seating',  price:18000,
+    img:'https://images.unsplash.com/photo-1544782720-75d5e8a18c21?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.9,h:1.8,d:0.9}, color:'#d4b896', match:['living','kids','outdoor'] },
+  /* ─ More Bedroom ─ */
+  { id:35, name:'Dressing Table Mirror', sku:'BED-004', cat:'bedroom',  price:22000,
+    img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.0,h:1.5,d:0.4}, color:'#d4b896', match:['bedroom'] },
+  { id:36, name:'Chest of Drawers 5D',   sku:'BED-005', cat:'bedroom',  price:28000,
+    img:'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.8,h:1.0,d:0.45}, color:'#e8ddd2', match:['bedroom'] },
+  { id:37, name:'Kids Bunk Bed',         sku:'BED-006', cat:'bedroom',  price:35000,
+    img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.0,h:1.8,d:2.1}, color:'#3a7bd5', match:['kids','bedroom'] },
+  /* ─ More Dining ─ */
+  { id:38, name:'Round Dining Table 4S', sku:'DIN-004', cat:'dining',   price:28000,
+    img:'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.2,h:0.76,d:1.2}, color:'#7a5c3a', match:['dining','kitchen'] },
+  { id:39, name:'Buffet Sideboard',      sku:'DIN-005', cat:'dining',   price:42000,
+    img:'https://images.unsplash.com/photo-1549488344-cbb6c34184c8?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.6,h:0.85,d:0.45}, color:'#5a3e28', match:['dining','living'] },
+  /* ─ More Storage ─ */
+  { id:40, name:'Shoe Rack Tall',        sku:'STR-004', cat:'storage',  price:12000,
+    img:'https://images.unsplash.com/photo-1558997519-83ea9252eeb8?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.8,h:1.5,d:0.3}, color:'#c8c0b8', match:['bedroom','living'] },
+  { id:41, name:'Filing Cabinet 3D',     sku:'STR-005', cat:'storage',  price:16000,
+    img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.46,h:1.05,d:0.62}, color:'#808080', match:['office'] },
+  { id:42, name:'Display Cabinet Glass', sku:'STR-006', cat:'storage',  price:32000,
+    img:'https://images.unsplash.com/photo-1593642634315-48f5414c3ad9?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.9,h:1.9,d:0.35}, color:'#e8e8e8', match:['living','dining'] },
+  /* ─ Outdoor ─ */
+  { id:43, name:'Garden Lounge Set',     sku:'OUT-001', cat:'outdoor',  price:48000,
+    img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:2.2,h:0.75,d:1.4}, color:'#5a8a5a', match:['outdoor'] },
+  { id:44, name:'Outdoor Dining Set',    sku:'OUT-002', cat:'outdoor',  price:36000,
+    img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.6,h:0.76,d:0.9}, color:'#3a3a3a', match:['outdoor'] },
+  { id:45, name:'Hammock with Stand',    sku:'OUT-003', cat:'outdoor',  price:12000,
+    img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:1.0,h:0.9,d:3.0}, color:'#c8a870', match:['outdoor'] },
+  { id:46, name:'Planter Box Teak',      sku:'OUT-004', cat:'outdoor',  price:6500,
+    img:'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.6,h:0.45,d:0.3}, color:'#8b6a3a', match:['outdoor','living'] },
+  /* ─ More Lighting ─ */
+  { id:47, name:'Chandelier 8-Arm',      sku:'LIT-004', cat:'lighting', price:35000,
+    img:'https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.9,h:0.6,d:0.9}, color:'#c9a227', match:['dining','living'] },
+  { id:48, name:'Track Light 3-Spot',    sku:'LIT-005', cat:'lighting', price:8000,
+    img:'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.6,h:0.12,d:0.08}, color:'#2c2c2c', match:['kitchen','office','living'] },
+  { id:49, name:'Table Lamp Marble',     sku:'LIT-006', cat:'lighting', price:5500,
+    img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.25,h:0.45,d:0.25}, color:'#f0ede8', match:['bedroom','living','office'] },
+  /* ─ More Decor ─ */
+  { id:50, name:'Bookend Set Brass',     sku:'DEC-007', cat:'decor',    price:3200,
+    img:'https://images.unsplash.com/photo-1463320726281-696a485928c7?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.1,h:0.18,d:0.1}, color:'#c9a227', match:['office','living'] },
+  { id:51, name:'Indoor Plant Fiddle',   sku:'DEC-008', cat:'decor',    price:2800,
+    img:'https://images.unsplash.com/photo-1549887534-1541e9326578?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.5,h:1.4,d:0.5}, color:'#3a7a3a', match:['living','office','bedroom'] },
+  { id:52, name:'Wall Clock Wooden',     sku:'DEC-009', cat:'decor',    price:4500,
+    img:'https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=300&q=70',
+    glb:null, dims:{w:0.5,h:0.5,d:0.05}, color:'#8b6a3a', match:['living','kitchen','office'] },
 ]
 
 const MATERIALS_CATALOG = [
@@ -290,8 +363,8 @@ function StudioLanding({ onStart, fileInputRef, onUpload }) {
   const [tab, setTab] = useState('Project')
   const filtered = LANDING_TEMPLATES.filter(t => t.type === tab)
   const actions = [
-    { label:'Import Image', desc:'Upload a floor plan photo',   onClick: () => fileInputRef.current?.click() },
-    { label:'Import CAD',   desc:'Import .dwg or .dxf file',   onClick: () => alert('CAD import supports .dwg and .dxf files. Feature available in Studio Pro — contact us at contactus@divinemercyitsol.com to enable.') },
+    { label:'Import Plan',  desc:'JPG, PNG, PDF, SVG, DWG, DXF', onClick: () => fileInputRef.current?.click() },
+    { label:'Import CAD',   desc:'DWG · DXF · RVT · SKP · IFC', onClick: () => fileInputRef.current?.click() },
     { label:'New Design',   desc:'Start with a blank canvas',   onClick: () => onStart('new') },
     { label:'My Designs',   desc:'Continue a saved design',     onClick: () => onStart('my') },
     { label:'AI Planner',   desc:'Let AI plan your room',       isNew:true, onClick: () => onStart('ai') },
@@ -373,12 +446,12 @@ function StudioLanding({ onStart, fileInputRef, onUpload }) {
 }
 
 /* ─── Top Bar ─── */
-function TopBar({ onSave, onExport, onClose, mode, setMode, onUndo, onClear, onFile, onSwitchTab, onTriggerRender }) {
+function TopBar({ onSave, onExport, onClose, mode, setMode, onUndo, onRedo, onClear, onFile, onSwitchTab, onTriggerRender }) {
   const TOOLS = [
     { label:'File',         icon:'📄', onClick: onFile },
     { label:'Save',         icon:'💾', onClick: onSave },
     { label:'Undo',         icon:'↩',  onClick: onUndo },
-    { label:'Redo',         icon:'↪',  onClick: () => {} },
+    { label:'Redo',         icon:'↪',  onClick: onRedo },
     { label:'Clear',        icon:'🗑',  onClick: onClear },
     null,
     { label:'Construction', icon:'🔧', onClick: () => onSwitchTab('build') },
@@ -445,102 +518,184 @@ function TopBar({ onSave, onExport, onClose, mode, setMode, onUndo, onClear, onF
   )
 }
 
-/* ─── Step 1: Draw Panel ─── */
-function DrawPanel({ onSelectRoom, uploadedPlan, onUpload, aiAnalysis, analyzing }) {
-  const [activeTool, setActiveTool] = useState(null)
-  const fileRef = useRef()
+/* ─── Homestyler-style Draw Panel ─── */
+const HS = { bg:'#fff', bg2:'#f5f6f8', border:'#e8eaed', text:'#1a1a2e', muted:'#888', accent:'#2563eb', gold:'#c9a227' }
+
+function HSSection({ title, children }) {
   return (
-    <div style={{ height:'100%', overflowY:'auto', padding:'16px 12px', display:'flex', flexDirection:'column', gap:16 }}>
-      {/* Upload floor plan */}
-      <div>
-        <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Upload 2D Floor Plan</p>
-        <div
-          onClick={() => fileRef.current?.click()}
-          style={{ border:`2px dashed ${uploadedPlan ? C.gold : C.border}`, borderRadius:8, padding:'20px 12px', textAlign:'center', cursor:'pointer', background: uploadedPlan ? 'rgba(201,162,39,0.05)' : C.bg, transition:'all 0.2s' }}>
-          {uploadedPlan ? (
-            <>
-              <img src={uploadedPlan} alt="plan" style={{ width:'100%', maxHeight:120, objectFit:'contain', borderRadius:4, marginBottom:8 }} />
-              <p style={{ color:C.gold, fontSize:10, margin:0, fontWeight:600 }}>✓ Plan uploaded</p>
-            </>
-          ) : (
-            <>
-              <div style={{ fontSize:28, marginBottom:8 }}>📐</div>
-              <p style={{ color:C.text, fontSize:11, margin:'0 0 4px', fontWeight:600 }}>Upload Floor Plan</p>
-              <p style={{ color:C.muted, fontSize:9, margin:0 }}>JPG, PNG, PDF · AI will analyze it</p>
-            </>
-          )}
+    <div style={{ borderTop:`1px solid ${HS.border}`, paddingTop:12, marginTop:4 }}>
+      <p style={{ fontSize:12, fontWeight:700, color:HS.text, margin:'0 0 10px 14px' }}>{title}</p>
+      <div style={{ padding:'0 12px 4px' }}>{children}</div>
+    </div>
+  )
+}
+
+function HSTool({ svg, label, isNew, active, onClick }) {
+  return (
+    <button onClick={onClick} style={{ background: active ? '#e8f0ff' : HS.bg2, border:`1.5px solid ${active ? HS.accent : HS.border}`, borderRadius:10, padding:'12px 6px 8px', cursor:'pointer', textAlign:'center', transition:'all 0.15s', display:'flex', flexDirection:'column', alignItems:'center', gap:6, position:'relative' }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = HS.accent; e.currentTarget.style.background='#eef3ff' }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = active ? HS.accent : HS.border; e.currentTarget.style.background = active ? '#e8f0ff' : HS.bg2 }}>
+      {isNew && <span style={{ position:'absolute', top:4, right:4, background:'#ef4444', color:'#fff', fontSize:6, fontWeight:800, padding:'1px 4px', borderRadius:2 }}>NEW</span>}
+      <div style={{ width:36, height:36, display:'flex', alignItems:'center', justifyContent:'center' }}>{svg}</div>
+      <span style={{ fontSize:9, fontWeight:600, color: active ? HS.accent : HS.text, lineHeight:1.3, textAlign:'center' }}>{label}</span>
+    </button>
+  )
+}
+
+function DrawPanel({ onSelectRoom, uploadedPlan, onUpload, aiAnalysis, analyzing, setSideTab, fileInputRef, onAIPlanner, activeTool, setActiveTool }) {
+  const tool = (id) => ({ active: activeTool===id, onClick: () => setActiveTool(t => t===id ? null : id) })
+
+  return (
+    <div style={{ height:'100%', overflowY:'auto', background:HS.bg, fontFamily:"'DM Sans',system-ui,sans-serif" }}>
+
+      {/* Create Room */}
+      <div style={{ padding:'16px 12px 0' }}>
+        <p style={{ fontSize:14, fontWeight:800, color:HS.text, margin:'0 0 12px' }}>Create Room</p>
+
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:10 }}>
+          {/* Select Templates */}
+          <button onClick={() => setSideTab('templates')} style={{ background:HS.bg2, border:`1.5px solid ${HS.border}`, borderRadius:10, padding:'12px 10px 10px', cursor:'pointer', textAlign:'left', transition:'all 0.15s' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor=HS.accent}
+            onMouseLeave={e => e.currentTarget.style.borderColor=HS.border}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:2 }}>
+              <span style={{ fontSize:12, fontWeight:700, color:HS.text }}>Select</span>
+              <span style={{ color:HS.muted, fontSize:12 }}>›</span>
+            </div>
+            <div style={{ fontSize:10, color:HS.muted, marginBottom:10 }}>Templates</div>
+            <svg width="60" height="44" viewBox="0 0 60 44">
+              <rect x="4" y="10" width="24" height="30" fill="#e8eaed" stroke="#bbb" strokeWidth="1.5" rx="1"/>
+              <rect x="32" y="4" width="24" height="18" fill="#dde3ea" stroke="#bbb" strokeWidth="1.5" rx="1"/>
+              <rect x="32" y="26" width="24" height="14" fill="#e8eaed" stroke="#bbb" strokeWidth="1.5" rx="1"/>
+            </svg>
+          </button>
+
+          {/* Import Floor Plan */}
+          <button onClick={() => fileInputRef?.current?.click()} style={{ background:HS.bg2, border:`1.5px solid ${uploadedPlan ? '#22c55e' : HS.border}`, borderRadius:10, padding:'12px 10px 10px', cursor:'pointer', textAlign:'left', transition:'all 0.15s' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor=HS.accent}
+            onMouseLeave={e => e.currentTarget.style.borderColor= uploadedPlan ? '#22c55e' : HS.border}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:2 }}>
+              <span style={{ fontSize:12, fontWeight:700, color:HS.text }}>Import</span>
+              <span style={{ color:HS.muted, fontSize:12 }}>›</span>
+            </div>
+            <div style={{ fontSize:10, color:uploadedPlan ? '#22c55e' : HS.muted, marginBottom:10 }}>{uploadedPlan ? '✓ Plan loaded' : 'Floor Plan'}</div>
+            <svg width="60" height="44" viewBox="0 0 60 44">
+              <rect x="8" y="2" width="44" height="40" fill="#e8eaed" stroke="#bbb" strokeWidth="1.5" rx="2"/>
+              <line x1="14" y1="12" x2="46" y2="12" stroke="#aaa" strokeWidth="1"/>
+              <line x1="14" y1="18" x2="46" y2="18" stroke="#aaa" strokeWidth="1"/>
+              <line x1="14" y1="24" x2="36" y2="24" stroke="#aaa" strokeWidth="1"/>
+              <path d="M 14 30 A 10 10 0 0 1 28 30" fill="none" stroke={HS.accent} strokeWidth="1.5"/>
+              <line x1="14" y1="30" x2="28" y2="30" stroke={HS.accent} strokeWidth="1.5"/>
+            </svg>
+          </button>
         </div>
-        <input ref={fileRef} type="file" accept="image/*" style={{ display:'none' }} onChange={onUpload} />
-        {analyzing && (
-          <div style={{ marginTop:8, display:'flex', alignItems:'center', gap:8, padding:'8px 10px', background:'rgba(201,162,39,0.1)', borderRadius:6 }}>
-            <div style={{ width:14, height:14, border:`2px solid ${C.gold}`, borderTopColor:'transparent', borderRadius:'50%', animation:'spin 0.8s linear infinite', flexShrink:0 }} />
-            <p style={{ color:C.gold, fontSize:10, margin:0, fontWeight:600 }}>AI analyzing floor plan…</p>
-          </div>
-        )}
+
+        {/* AI Planner */}
+        <button onClick={() => setSideTab('ai')} style={{ width:'100%', background:HS.text, color:'#fff', border:'none', borderRadius:8, padding:'11px 16px', fontSize:13, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', gap:8, justifyContent:'center', marginBottom:4 }}
+          onMouseEnter={e => e.currentTarget.style.background='#2d2d3f'}
+          onMouseLeave={e => e.currentTarget.style.background=HS.text}>
+          <span style={{ fontSize:15 }}>✨</span>
+          Ai Planner
+          <span style={{ background:'#ef4444', color:'#fff', fontSize:8, fontWeight:800, padding:'2px 5px', borderRadius:3, letterSpacing:'0.05em' }}>NEW</span>
+          <span style={{ marginLeft:'auto', opacity:0.6 }}>›</span>
+        </button>
       </div>
 
-      {/* AI Analysis result */}
+      {/* AI Analysis */}
       {aiAnalysis && (
-        <div style={{ background:'rgba(37,99,235,0.1)', border:'1px solid rgba(37,99,235,0.3)', borderRadius:8, padding:12 }}>
-          <p style={{ color:'#60a5fa', fontSize:10, fontWeight:700, margin:'0 0 8px', letterSpacing:'0.1em' }}>🤖 AI ANALYSIS</p>
-          <p style={{ color:C.text, fontSize:11, margin:'0 0 6px' }}>Total Area: <strong>{aiAnalysis.totalArea} sq ft</strong></p>
-          <p style={{ color:C.text, fontSize:11, margin:'0 0 6px' }}>Style: <strong>{aiAnalysis.style}</strong></p>
-          <p style={{ color:C.text, fontSize:11, margin:'0 0 8px' }}>Est. Cost: <strong>{aiAnalysis.estimatedCost}</strong></p>
-          <p style={{ color:C.muted, fontSize:9, fontWeight:700, textTransform:'uppercase', margin:'0 0 6px' }}>Rooms Detected</p>
-          {aiAnalysis.rooms?.map((r, i) => (
-            <div key={i} style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
-              <span style={{ color:C.text, fontSize:10 }}>{r.name}</span>
-              <span style={{ color:C.muted, fontSize:10 }}>{r.area} sq ft</span>
-            </div>
-          ))}
+        <div style={{ margin:'10px 12px 0', background:'#f0f7ff', border:'1px solid #bfdbfe', borderRadius:8, padding:'10px 12px' }}>
+          <p style={{ color:HS.accent, fontSize:10, fontWeight:700, margin:'0 0 6px', letterSpacing:'0.08em' }}>🤖 AI ANALYSIS</p>
+          <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
+            <span style={{ fontSize:11, color:HS.text }}><strong>{aiAnalysis.totalArea}</strong> sq ft</span>
+            <span style={{ fontSize:11, color:HS.text }}><strong>{aiAnalysis.rooms?.length}</strong> rooms</span>
+            <span style={{ fontSize:11, color:'#c9a227', fontWeight:600 }}>{aiAnalysis.style}</span>
+          </div>
+          {aiAnalysis.estimatedCost && <p style={{ fontSize:10, color:'#16a34a', margin:'4px 0 4px', fontWeight:600 }}>{aiAnalysis.estimatedCost}</p>}
+        </div>
+      )}
+      {analyzing && (
+        <div style={{ margin:'8px 12px 0', display:'flex', alignItems:'center', gap:8, padding:'8px 10px', background:'#fffbeb', border:'1px solid #fde68a', borderRadius:6 }}>
+          <div style={{ width:12, height:12, border:'2px solid #f59e0b', borderTopColor:'transparent', borderRadius:'50%', animation:'spin 0.8s linear infinite', flexShrink:0 }}/>
+          <span style={{ color:'#92400e', fontSize:10, fontWeight:600 }}>AI analysing your floor plan…</span>
         </div>
       )}
 
-      <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:14 }}>
-        <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 10px' }}>Start From Room Type</p>
+      {/* Draw Walls */}
+      <HSSection title="Draw Walls">
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8 }}>
+          <HSTool {...tool('wall')} label="Draw Straight Walls" svg={
+            <svg width="32" height="32" viewBox="0 0 32 32"><rect x="4" y="14" width="24" height="4" fill="none" stroke="#2563eb" strokeWidth="2"/><rect x="4" y="14" width="24" height="4" fill="#dde3ea"/></svg>
+          }/>
+          <HSTool {...tool('room')} label="Draw Rooms" svg={
+            <svg width="32" height="32" viewBox="0 0 32 32"><rect x="4" y="4" width="24" height="24" fill="none" stroke="#2563eb" strokeWidth="2"/><rect x="6" y="6" width="20" height="20" fill="#eef3ff" opacity="0.6"/></svg>
+          }/>
+          <HSTool {...tool('outside')} isNew label="Outside Area" svg={
+            <svg width="32" height="32" viewBox="0 0 32 32"><rect x="4" y="4" width="24" height="24" fill="none" stroke="#2563eb" strokeWidth="2" strokeDasharray="3,2"/></svg>
+          }/>
+        </div>
+      </HSSection>
+
+      {/* Door and Window */}
+      <HSSection title="Door and Window">
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8 }}>
+          <HSTool {...tool('door')} label="Single Door" svg={
+            <svg width="32" height="32" viewBox="0 0 32 32"><line x1="8" y1="8" x2="8" y2="24" stroke="#2563eb" strokeWidth="2"/><line x1="24" y1="8" x2="24" y2="24" stroke="#2563eb" strokeWidth="2"/><path d="M 8 8 A 16 16 0 0 1 24 8" fill="none" stroke="#2563eb" strokeWidth="1.5" strokeDasharray="3,2"/><line x1="8" y1="8" x2="24" y2="8" stroke="#2563eb" strokeWidth="1.5"/></svg>
+          }/>
+          <HSTool {...tool('window')} label="Window" svg={
+            <svg width="32" height="32" viewBox="0 0 32 32"><line x1="4" y1="16" x2="28" y2="16" stroke="#2563eb" strokeWidth="2"/><line x1="4" y1="13" x2="28" y2="13" stroke="#2563eb" strokeWidth="1"/><line x1="4" y1="19" x2="28" y2="19" stroke="#2563eb" strokeWidth="1"/></svg>
+          }/>
+          <HSTool {...tool('baywin')} label="Corner Bay Window" svg={
+            <svg width="32" height="32" viewBox="0 0 32 32"><polyline points="4,24 16,10 28,24" fill="none" stroke="#2563eb" strokeWidth="2"/><line x1="4" y1="21" x2="16" y2="7" stroke="#2563eb" strokeWidth="1" opacity="0.5"/><line x1="28" y1="21" x2="16" y2="7" stroke="#2563eb" strokeWidth="1" opacity="0.5"/></svg>
+          }/>
+        </div>
+      </HSSection>
+
+      {/* Structure */}
+      <HSSection title="Structure">
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8 }}>
+          {[
+            { id:'stairs', label:'Staircase', svg:<svg width="32" height="32" viewBox="0 0 32 32"><path d="M4 28 L4 22 L10 22 L10 16 L16 16 L16 10 L22 10 L22 4 L28 4" fill="none" stroke="#2563eb" strokeWidth="2"/></svg> },
+            { id:'column', label:'Column', svg:<svg width="32" height="32" viewBox="0 0 32 32"><rect x="12" y="4" width="8" height="24" fill="#dde3ea" stroke="#2563eb" strokeWidth="1.5"/></svg> },
+            { id:'beam',   label:'Beam',   svg:<svg width="32" height="32" viewBox="0 0 32 32"><rect x="4" y="14" width="24" height="4" fill="#dde3ea" stroke="#2563eb" strokeWidth="1.5"/></svg> },
+          ].map(t => <HSTool key={t.id} {...tool(t.id)} label={t.label} svg={t.svg}/>)}
+        </div>
+      </HSSection>
+
+      {/* Room Types */}
+      <HSSection title="Start from Room Type">
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:6 }}>
           {ROOM_TEMPLATES.map(r => (
-            <button key={r.id} onClick={() => onSelectRoom(r)} style={{
-              padding:'10px 6px', background:C.bg, border:`1px solid ${C.border}`, borderRadius:6,
-              cursor:'pointer', textAlign:'center', transition:'all 0.15s', display:'flex', flexDirection:'column', alignItems:'center', gap:4,
-            }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = r.color; e.currentTarget.style.background = `${r.color}10` }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.background = C.bg }}>
-              <span style={{ fontSize:18 }}>{r.icon}</span>
-              <span style={{ color:C.text, fontSize:9, fontWeight:600 }}>{r.label}</span>
-              <span style={{ color:C.muted, fontSize:8 }}>{r.area}</span>
+            <button key={r.id} onClick={() => onSelectRoom(r)}
+              style={{ padding:'9px 8px', background:HS.bg2, border:`1.5px solid ${HS.border}`, borderRadius:8, cursor:'pointer', display:'flex', alignItems:'center', gap:8, transition:'all 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor=r.color; e.currentTarget.style.background=`${r.color}12` }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor=HS.border; e.currentTarget.style.background=HS.bg2 }}>
+              <span style={{ fontSize:16 }}>{r.icon}</span>
+              <div style={{ textAlign:'left' }}>
+                <div style={{ fontSize:10, fontWeight:700, color:HS.text }}>{r.label}</div>
+                <div style={{ fontSize:9, color:HS.muted }}>{r.area}</div>
+              </div>
             </button>
           ))}
         </div>
-      </div>
-
-      <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:14 }}>
-        <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 10px' }}>Drawing Tools</p>
-        {[
-          { icon:'⬜', label:'Wall' }, { icon:'🚪', label:'Door' },
-          { icon:'🪟', label:'Window' }, { icon:'⬛', label:'Room' },
-          { icon:'📐', label:'Measure' }, { icon:'🗑', label:'Erase' },
-        ].map(t => (
-          <button key={t.label} onClick={() => setActiveTool(at => at===t.label ? null : t.label)} style={{
-            width:'100%', display:'flex', alignItems:'center', gap:8, padding:'7px 10px',
-            background: activeTool===t.label ? `rgba(201,162,39,0.18)` : 'transparent',
-            border: activeTool===t.label ? `1px solid ${C.gold}` : '1px solid transparent',
-            color: activeTool===t.label ? C.gold : C.text,
-            cursor:'pointer', borderRadius:4, fontSize:11, marginBottom:2, transition:'all 0.15s',
-          }}>
-            <span style={{ fontSize:14 }}>{t.icon}</span> {t.label}
-            {activeTool===t.label && <span style={{ marginLeft:'auto', fontSize:8, color:C.gold, fontWeight:700 }}>ACTIVE</span>}
-          </button>
-        ))}
-      </div>
+      </HSSection>
+      <div style={{ height:20 }}/>
     </div>
   )
 }
 
 /* ─── Catalog Item Card ─── */
 function CatalogCard({ item, onAdd, added }) {
+  const handleDragStart = (e) => {
+    e.dataTransfer.setData('application/x-furniture', JSON.stringify(item))
+    e.dataTransfer.effectAllowed = 'copy'
+  }
+
   return (
-    <div style={{ background:C.bg, border:`1px solid ${added ? C.gold : C.border}`, borderRadius:6, overflow:'hidden', transition:'border-color 0.2s' }}>
+    <div
+      draggable
+      onDragStart={handleDragStart}
+      title="Drag onto floor plan to place"
+      style={{ background:C.bg, border:`1px solid ${added ? C.gold : C.border}`, borderRadius:6, overflow:'hidden', transition:'border-color 0.2s', cursor:'grab' }}
+    >
       <div style={{ position:'relative', height:90, overflow:'hidden' }}>
         <img src={item.img} alt={item.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
         {added && (
@@ -566,9 +721,14 @@ function CatalogCard({ item, onAdd, added }) {
 }
 
 /* ─── Step 2: Decorate Panel ─── */
-function DecoratePanel({ templateScope, setTemplateScope, onApplyTemplate, activeCat, setActiveCat, aiCatalog, catalogLoading, addedItems, onAddItem }) {
+function DecoratePanel({ sideTab, templateScope, setTemplateScope, onApplyTemplate, activeCat, setActiveCat, aiCatalog, catalogLoading, addedItems, onAddItem, onUseMaterial }) {
   const [search, setSearch] = useState('')
-  const [subTab, setSubTab] = useState('templates') // 'templates' | 'catalog' | 'materials'
+  const [subTab, setSubTab] = useState(sideTab === 'ai' ? 'catalog' : 'templates')
+
+  useEffect(() => {
+    if (sideTab === 'ai') setSubTab('catalog')
+    else if (sideTab === 'templates') setSubTab('templates')
+  }, [sideTab])
 
   const filtered = AI_TEMPLATES.filter(t =>
     t.label.toLowerCase().includes(search.toLowerCase()) ||
@@ -697,7 +857,9 @@ function DecoratePanel({ templateScope, setTemplateScope, onApplyTemplate, activ
                   <p style={{ color:C.text, fontSize:10, fontWeight:600, margin:0 }}>{m.name}</p>
                   <p style={{ color:C.muted, fontSize:8, margin:0 }}>{m.type} · ₹{m.price}/{m.unit}</p>
                 </div>
-                <button style={{ padding:'3px 8px', background:'transparent', border:`1px solid ${C.border}`, color:C.text, borderRadius:3, cursor:'pointer', fontSize:8, fontWeight:700, flexShrink:0 }}>+ Use</button>
+                <button onClick={() => onUseMaterial?.(m)} style={{ padding:'3px 8px', background:'transparent', border:`1px solid ${C.border}`, color:C.text, borderRadius:3, cursor:'pointer', fontSize:8, fontWeight:700, flexShrink:0, transition:'all 0.15s' }}
+                  onMouseEnter={e=>{e.currentTarget.style.borderColor=C.gold;e.currentTarget.style.color=C.gold}}
+                  onMouseLeave={e=>{e.currentTarget.style.borderColor=C.border;e.currentTarget.style.color=C.text}}>+ Use</button>
               </div>
             ))}
             {!aiCatalog?.materials && (
@@ -724,7 +886,7 @@ function DecoratePanel({ templateScope, setTemplateScope, onApplyTemplate, activ
 }
 
 /* ─── Step 3: Render Panel ─── */
-function RenderPanel({ settings, setSettings, onRender, rendering, renderProgress }) {
+function RenderPanel({ settings, setSettings, onRender, rendering, renderProgress, addedItems, aiAnalysis }) {
   return (
     <div style={{ height:'100%', overflowY:'auto', padding:'16px 12px', display:'flex', flexDirection:'column', gap:14 }}>
       <div>
@@ -805,20 +967,51 @@ function RenderPanel({ settings, setSettings, onRender, rendering, renderProgres
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:6, marginTop:8 }}>
           {[
             { label:'Export Image', icon:'🖼', action: () => {
-              const canvas = document.querySelector('canvas')
-              if (canvas) { const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='elshaddai-render.png'; a.click() }
-              else alert('Render your scene first, then export.')
+              const canvases = document.querySelectorAll('canvas')
+              const canvas = Array.from(canvases).find(c => c.width > 100) || canvases[0]
+              if (canvas) {
+                const a = document.createElement('a')
+                a.href = canvas.toDataURL('image/png')
+                a.download = `elshaddai-render-${Date.now()}.png`
+                a.click()
+              } else {
+                const el = document.createElement('div')
+                el.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#1c1917;color:#fff;padding:20px 28px;border-radius:8px;border:1px solid #c9a227;z-index:99999;font-family:DM Sans,sans-serif;font-size:13px;text-align:center'
+                el.innerHTML = '⚠️ No canvas found.<br><small style="color:#9a8a82">Switch to 3D mode and try again.</small>'
+                document.body.appendChild(el)
+                setTimeout(() => el.remove(), 2800)
+              }
             }},
-            { label:'Construction Drawings', icon:'📐', action: () => alert('Construction PDF will be available in the Studio Pro plan. Contact us to upgrade.') },
-            { label:'Bill of Quantities', icon:'📋', action: () => {
+            { label:'Construction Drawings', icon:'📐', action: () => {
               const items = JSON.parse(localStorage.getItem('elshaddai_studio_design') || '{}')?.addedItems || []
-              if (!items.length) return alert('Add furniture to your design first.')
-              const lines = items.map(i=>`${i.name} (${i.sku}) — ₹${i.price.toLocaleString()}`).join('\n')
+              const lines = ['# El Shaddai — Construction Drawings', `Generated: ${new Date().toLocaleDateString('en-IN')}`, '', '## Room Layout', `Total Area: ${aiAnalysis?.totalArea || 560} sq ft`, `Rooms: ${aiAnalysis?.rooms?.map(r=>r.name).join(', ') || 'Living Room, Bedroom, Kitchen, Bathroom'}`, '', '## Furniture Schedule', ...items.map((i,n)=>`${n+1}. ${i.name} (${i.sku}) — ${i.dims?.w}m × ${i.dims?.d}m × ${i.dims?.h}m`), '', '## Notes', '- All dimensions in metres unless stated otherwise', '- Verify on site before fabrication', '', 'Contact: contactus@elshaddai.in']
+              const blob = new Blob([lines.join('\n')], { type: 'text/plain' })
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a'); a.href = url; a.download = 'elshaddai-construction-notes.txt'; a.click()
+              URL.revokeObjectURL(url)
+            }},
+            { label:'Bill of Quantities', icon:'📋', action: () => {
+              const items = JSON.parse(localStorage.getItem('elshaddai_studio_design') || '{}')?.addedItems || addedItems
+              if (!items.length) {
+                const el = document.createElement('div')
+                el.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#1c1917;color:#fff;padding:20px 28px;border-radius:8px;border:1px solid #c9a227;z-index:99999;font-family:DM Sans,sans-serif;font-size:13px;text-align:center'
+                el.innerHTML = 'ℹ️ Add furniture to your design first.'
+                document.body.appendChild(el); setTimeout(() => el.remove(), 2500); return
+              }
               const total = items.reduce((s,i)=>s+i.price,0)
-              alert(`Bill of Quantities:\n\n${lines}\n\nTotal: ₹${total.toLocaleString()}`)
+              const csv = ['Item,SKU,Category,Price (₹)', ...items.map(i=>`"${i.name}","${i.sku}","${i.cat}","${i.price.toLocaleString()}"`), `"TOTAL","","","${total.toLocaleString()}"`].join('\n')
+              const blob = new Blob([csv], { type: 'text/csv' })
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a'); a.href = url; a.download = 'elshaddai-BOQ.csv'; a.click()
+              URL.revokeObjectURL(url)
             }},
             { label:'Share Design', icon:'🔗', action: () => {
-              navigator.clipboard.writeText(window.location.href).then(()=>alert('Studio link copied to clipboard!'))
+              navigator.clipboard.writeText(window.location.href).then(() => {
+                const el = document.createElement('div')
+                el.style.cssText = 'position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;padding:10px 22px;border-radius:6px;z-index:99999;font-family:DM Sans,sans-serif;font-size:12px;font-weight:700'
+                el.textContent = '✓ Studio link copied!'
+                document.body.appendChild(el); setTimeout(() => el.remove(), 2200)
+              })
             }},
           ].map(a => (
             <button key={a.label} onClick={a.action} style={{
@@ -901,34 +1094,267 @@ function StepBar({ step, setSideTab }) {
 }
 
 /* ─── Main Canvas Area ─── */
-function MainCanvas({ step, mode, uploadedPlan, addedItems, appliedTemplate, onSelectFurniture }) {
+async function renderPDFToDataURL(file) {
+  if (!window.pdfjsLib) {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script')
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'
+      s.onload = resolve; s.onerror = reject
+      document.head.appendChild(s)
+    })
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+  }
+  const ab = await file.arrayBuffer()
+  const pdf = await window.pdfjsLib.getDocument({ data: ab }).promise
+  const page = await pdf.getPage(1)
+  const vp = page.getViewport({ scale: 2 })
+  const canvas = document.createElement('canvas')
+  canvas.width = vp.width; canvas.height = vp.height
+  await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise
+  return canvas.toDataURL('image/png')
+}
+
+function MainCanvas({ step, mode, setMode, activeTool, uploadedPlan, aiAnalysis, addedItems, appliedTemplate, activeView, activeMaterial, onSelectFurniture, onUpload, fileInputRef }) {
   return (
-    <div style={{ flex:1, minWidth:0, overflow:'hidden', position:'relative', display:'flex', flexDirection:'column' }}>
-      {/* 3D viewport — WebGPU when available, Three.js fallback */}
-      <div style={{ flex:1, minHeight:0, width:'100%', position:'relative' }}>
-        {supportsWebGPU ? (
-          <WebGPUViewport
-            step={step}
-            addedItems={addedItems}
-            appliedTemplate={appliedTemplate}
-            onSelectFurniture={onSelectFurniture}
-          />
-        ) : (
+    <div style={{ flex:1, minWidth:0, overflow:'hidden', position:'relative', display:'flex', flexDirection:'column', background:C.bg }}>
+
+      {/* 2D / 3D toggle bar — light Homestyler-style */}
+      <div style={{ height:44, background:'#fff', borderBottom:'1px solid #e8eaed', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, zIndex:20, gap:12 }}>
+        <div style={{ display:'flex', background:'#f0f2f5', borderRadius:8, padding:3, gap:2 }}>
+          {[['2D', '2d', '2D Floor Plan'], ['3D', '3d', '3D View']].map(([, val, title]) => (
+            <button key={val} onClick={() => setMode(val)}
+              style={{ padding:'6px 24px', background: mode===val ? '#fff' : 'transparent',
+                color: mode===val ? '#1a1a2e' : '#6b7280', border:'none', cursor:'pointer',
+                borderRadius:6, fontSize:12, fontWeight:700, transition:'all 0.15s',
+                boxShadow: mode===val ? '0 1px 4px rgba(0,0,0,0.1)' : 'none' }}>
+              {title}
+            </button>
+          ))}
+        </div>
+        {uploadedPlan && <span style={{ fontSize:9, color:'#22c55e', fontWeight:700, letterSpacing:'0.08em', background:'#f0fdf4', border:'1px solid #bbf7d0', padding:'2px 8px', borderRadius:4 }}>✓ FLOOR PLAN LOADED</span>}
+      </div>
+
+      {/* Viewport area */}
+      <div style={{ flex:1, minHeight:0, position:'relative' }}>
+
+        {/* ── 3D — always mounted so WebGL context never dies ── */}
+        <div style={{ position:'absolute', inset:0, opacity: mode==='3d' ? 1 : 0, pointerEvents: mode==='3d' ? 'auto' : 'none', transition:'opacity 0.3s' }}>
           <ThreeViewport
-            step={step}
-            addedItems={addedItems}
-            appliedTemplate={appliedTemplate}
+            step={step} mode={mode}
+            addedItems={addedItems} appliedTemplate={appliedTemplate}
+            activeView={activeView} activeMaterial={activeMaterial}
             onSelectFurniture={onSelectFurniture}
+            uploadedPlan={uploadedPlan} aiAnalysis={aiAnalysis}
           />
+        </div>
+
+        {/* ── 2D — your actual floor plan ── */}
+        <div style={{ position:'absolute', inset:0, opacity: mode==='2d' ? 1 : 0, pointerEvents: mode==='2d' ? 'auto' : 'none', transition:'opacity 0.3s', zIndex:5 }}>
+          {uploadedPlan && uploadedPlan !== 'pdf' ? (
+            /* Uploaded plan — show on light canvas like Homestyler */
+            <div style={{ width:'100%', height:'100%', background:'#f8f9fb', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden', position:'relative' }}>
+              {/* Light grid */}
+              <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none' }}>
+                <defs>
+                  <pattern id="g2dm" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="#c8d4e0" strokeWidth="0.5"/></pattern>
+                  <pattern id="g2dM" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(#g2dm)"/><path d="M 100 0 L 0 0 0 100" fill="none" stroke="#a8b8c8" strokeWidth="1"/></pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#g2dM)"/>
+              </svg>
+              {/* North arrow */}
+              <div style={{ position:'absolute', top:12, left:12, display:'flex', flexDirection:'column', alignItems:'center', gap:1, zIndex:2 }}>
+                <svg width="20" height="20" viewBox="0 0 24 24"><polygon points="12,2 15,10 12,8 9,10" fill="#2563eb"/><polygon points="12,22 9,14 12,16 15,14" fill="#aab"/></svg>
+                <span style={{ fontSize:8, fontWeight:800, color:'#2563eb' }}>N</span>
+              </div>
+              <img src={uploadedPlan} alt="Floor Plan"
+                style={{ maxWidth:'82%', maxHeight:'82%', objectFit:'contain', borderRadius:4,
+                  boxShadow:'0 4px 24px rgba(0,0,0,0.12), 0 0 0 1px rgba(168,184,200,0.4)', background:'#fff', padding:8 }}/>
+              {/* Top bar */}
+              <div style={{ position:'absolute', top:0, left:0, right:0, padding:'8px 16px', background:'rgba(248,249,251,0.9)', borderBottom:'1px solid #e8eaed', display:'flex', alignItems:'center', gap:10 }}>
+                <span style={{ background:'#2563eb', color:'#fff', fontSize:8, fontWeight:800, padding:'3px 8px', borderRadius:3, letterSpacing:'0.1em' }}>2D FLOOR PLAN</span>
+                {aiAnalysis && <>
+                  <span style={{ color:'#9ca3af', fontSize:10 }}>·</span>
+                  <span style={{ color:'#1a1a2e', fontSize:10, fontWeight:600 }}>{aiAnalysis.totalArea} sq ft</span>
+                  <span style={{ color:'#9ca3af', fontSize:10 }}>·</span>
+                  <span style={{ color:'#c9a227', fontSize:10, fontWeight:600 }}>{aiAnalysis.style}</span>
+                  <span style={{ color:'#9ca3af', fontSize:10 }}>·</span>
+                  <span style={{ color:'#22c55e', fontSize:10 }}>{aiAnalysis.estimatedCost}</span>
+                </>}
+              </div>
+              {/* Switch to 3D hint */}
+              <div style={{ position:'absolute', bottom:16, left:'50%', transform:'translateX(-50%)', background:'#fff', border:'1px solid #e8eaed', borderRadius:20, padding:'6px 18px', cursor:'pointer', boxShadow:'0 2px 8px rgba(0,0,0,0.08)' }}
+                onClick={() => setMode('3d')}>
+                <span style={{ color:'#2563eb', fontSize:10, fontWeight:700 }}>Switch to 3D View →</span>
+              </div>
+            </div>
+          ) : (
+            /* 2D Floor Plan Engine — draw walls, doors, windows */
+            <FloorPlan2D
+              activeTool={activeTool ?? 'select'}
+              style={{ width:'100%', height:'100%' }}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ─── Building Assembly Loading Screen ─── */
+function StudioLoader({ onDone }) {
+  const [phase, setPhase] = useState(0)
+  const [progress, setProgress] = useState(0)
+
+  const PHASES = [
+    { label: 'Laying foundation…',     icon: '▭', color: '#a07850' },
+    { label: 'Raising walls…',         icon: '▯', color: '#c9a227' },
+    { label: 'Installing windows…',    icon: '⊞', color: '#60c0f0' },
+    { label: 'Fitting doors…',         icon: '⊓', color: '#e8c84e' },
+    { label: 'Adding roof…',           icon: '⌂', color: '#c9a227' },
+    { label: 'Furnishing rooms…',      icon: '⊡', color: '#10b981' },
+    { label: 'Studio ready!',          icon: '✦', color: '#c9a227' },
+  ]
+
+  useEffect(() => {
+    let p = 0
+    const iv = setInterval(() => {
+      p += 1.4
+      setProgress(Math.min(p, 100))
+      setPhase(Math.min(Math.floor(p / (100 / PHASES.length)), PHASES.length - 1))
+      if (p >= 100) { clearInterval(iv); setTimeout(onDone, 600) }
+    }, 40)
+    return () => clearInterval(iv)
+  }, [onDone])
+
+  const ph = PHASES[phase]
+
+  return (
+    <div style={{ position:'fixed', inset:0, background:C.bg, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', zIndex:9999, fontFamily:"'DM Sans',system-ui,sans-serif" }}>
+      <style>{`
+        @keyframes floatIn  { from { opacity:0; transform:translateY(30px) } to { opacity:1; transform:translateY(0) } }
+        @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        @keyframes slideUp  { from{transform:scaleY(0);transform-origin:bottom} to{transform:scaleY(1);transform-origin:bottom} }
+        @keyframes roofDrop { from{transform:translateY(-40px);opacity:0} to{transform:translateY(0);opacity:1} }
+        @keyframes winFade  { from{opacity:0;transform:scale(0.5)} to{opacity:1;transform:scale(1)} }
+        @keyframes glow     { 0%,100%{box-shadow:0 0 20px rgba(201,162,39,0.3)} 50%{box-shadow:0 0 40px rgba(201,162,39,0.7)} }
+      `}</style>
+
+      {/* Blueprint grid bg */}
+      <div style={{ position:'absolute', inset:0, opacity:0.06 }}>
+        <svg width="100%" height="100%">
+          <defs>
+            <pattern id="bp" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke={C.gold} strokeWidth="0.8"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#bp)"/>
+        </svg>
+      </div>
+
+      {/* Building SVG animation */}
+      <svg width="200" height="220" viewBox="0 0 200 220" style={{ marginBottom:32 }}>
+        {/* Ground line */}
+        <line x1="20" y1="190" x2="180" y2="190" stroke={C.border} strokeWidth="2"/>
+
+        {/* Foundation */}
+        <rect x="35" y="180" width="130" height="12"
+          fill="#a07850" opacity={phase >= 0 ? 1 : 0}
+          style={{ animation: phase >= 0 ? 'floatIn 0.5s ease' : 'none' }}/>
+
+        {/* Left wall */}
+        <rect x="35" y="90" width="18" height="90"
+          fill={C.panel2} stroke={C.border} strokeWidth="1"
+          opacity={phase >= 1 ? 1 : 0}
+          style={{ animation: phase >= 1 ? 'slideUp 0.5s ease' : 'none', transformOrigin:'bottom' }}/>
+
+        {/* Right wall */}
+        <rect x="147" y="90" width="18" height="90"
+          fill={C.panel2} stroke={C.border} strokeWidth="1"
+          opacity={phase >= 1 ? 1 : 0}
+          style={{ animation: phase >= 1 ? 'slideUp 0.5s ease 0.1s both' : 'none' }}/>
+
+        {/* Middle floors */}
+        <rect x="35" y="135" width="130" height="8"
+          fill={C.border} opacity={phase >= 1 ? 1 : 0}
+          style={{ animation: phase >= 1 ? 'floatIn 0.4s ease 0.2s both' : 'none' }}/>
+        <rect x="35" y="88" width="130" height="8"
+          fill={C.border} opacity={phase >= 1 ? 1 : 0}
+          style={{ animation: phase >= 1 ? 'floatIn 0.4s ease 0.3s both' : 'none' }}/>
+
+        {/* Windows ground floor */}
+        {phase >= 2 && [60, 100, 125].map((x, i) => (
+          <rect key={i} x={x} y="155" width="20" height="22"
+            fill="#60c0f0" opacity="0.7" stroke={C.border} strokeWidth="1"
+            style={{ animation: `winFade 0.3s ease ${i * 0.1}s both` }}/>
+        ))}
+
+        {/* Windows upper floor */}
+        {phase >= 2 && [55, 95, 130].map((x, i) => (
+          <rect key={i} x={x} y="103" width="18" height="18"
+            fill="#60c0f0" opacity="0.6" stroke={C.border} strokeWidth="1"
+            style={{ animation: `winFade 0.3s ease ${0.3 + i * 0.1}s both` }}/>
+        ))}
+
+        {/* Door */}
+        {phase >= 3 && (
+          <g style={{ animation:'floatIn 0.4s ease' }}>
+            <rect x="88" y="158" width="24" height="32" fill={C.gold} opacity="0.8" rx="2"/>
+            <circle cx="108" cy="174" r="2" fill="#000"/>
+          </g>
         )}
 
-        {/* Reference plan overlay */}
-        {uploadedPlan && step === 1 && (
-          <div style={{ position:'absolute', bottom:48, right:12, width:150, background:'rgba(8,7,10,0.92)', border:`1px solid ${C.gold}`, padding:8, zIndex:30, pointerEvents:'none' }}>
-            <p style={{ color:C.gold, fontSize:9, fontWeight:700, margin:'0 0 6px', textTransform:'uppercase', letterSpacing:'0.18em' }}>📐 Reference Plan</p>
-            <img src={uploadedPlan} alt="reference" style={{ width:'100%', display:'block', opacity:0.85 }} />
-          </div>
+        {/* Roof */}
+        {phase >= 4 && (
+          <polygon points="100,40 22,92 178,92"
+            fill={C.gold} stroke="#a07820" strokeWidth="2"
+            style={{ animation:'roofDrop 0.5s cubic-bezier(0.34,1.56,0.64,1)' }}/>
         )}
+
+        {/* Chimney */}
+        {phase >= 4 && (
+          <rect x="140" y="50" width="12" height="30" fill={C.panel2} stroke={C.border} strokeWidth="1"
+            style={{ animation:'slideUp 0.4s ease 0.2s both' }}/>
+        )}
+
+        {/* Stars/sparkles when ready */}
+        {phase >= 6 && [
+          [30,30],[170,25],[15,110],[185,115],[100,15],
+        ].map(([x,y],i) => (
+          <text key={i} x={x} y={y} fill={C.gold} fontSize="10"
+            style={{ animation:`pulse 1s ease ${i*0.15}s infinite` }}>✦</text>
+        ))}
+
+        {/* Glow ring on done */}
+        {phase >= 6 && (
+          <circle cx="100" cy="120" r="90" fill="none" stroke={C.gold} strokeWidth="1" opacity="0.2"
+            style={{ animation:'glow 1.5s ease infinite' }}/>
+        )}
+      </svg>
+
+      {/* Phase label */}
+      <div style={{ animation:'floatIn 0.3s ease', textAlign:'center' }}>
+        <div style={{ fontSize:28, marginBottom:8, transition:'all 0.3s' }}>{ph.icon}</div>
+        <p style={{ color:ph.color, fontSize:15, fontWeight:700, margin:'0 0 6px', letterSpacing:'0.02em', transition:'color 0.3s' }}>
+          {ph.label}
+        </p>
+        <p style={{ color:C.muted, fontSize:11, margin:'0 0 28px' }}>El Shaddai Design Studio</p>
+      </div>
+
+      {/* Progress bar */}
+      <div style={{ width:280, height:4, background:'rgba(255,255,255,0.08)', borderRadius:4, overflow:'hidden' }}>
+        <div style={{ height:'100%', width:`${progress}%`, background:`linear-gradient(90deg, ${C.gold}, #e8c84e)`, borderRadius:4, transition:'width 0.08s linear', boxShadow:`0 0 10px ${C.gold}` }}/>
+      </div>
+      <p style={{ color:C.muted, fontSize:10, marginTop:8 }}>{Math.round(progress)}%</p>
+
+      {/* Parts list */}
+      <div style={{ display:'flex', gap:16, marginTop:24, flexWrap:'wrap', justifyContent:'center', maxWidth:400 }}>
+        {PHASES.slice(0, -1).map((p2, i) => (
+          <div key={i} style={{ display:'flex', alignItems:'center', gap:4, opacity: phase > i ? 1 : 0.25, transition:'opacity 0.3s' }}>
+            <div style={{ width:6, height:6, borderRadius:'50%', background: phase > i ? '#22c55e' : C.border, transition:'background 0.3s' }}/>
+            <span style={{ fontSize:9, color: phase > i ? C.text : C.muted }}>{p2.label.replace('…','')}</span>
+          </div>
+        ))}
       </div>
     </div>
   )
@@ -946,37 +1372,97 @@ function Loading({ label, sub }) {
 }
 
 /* ─── Right Properties Panel ─── */
-function RightPanel({ step, selectedRoom, appliedTemplate, addedItems = [] }) {
+function RightPanel({ step, selectedRoom, appliedTemplate, addedItems = [], selectedFurnitureItem, activeView, setActiveView, onUseMaterial }) {
   const [wallsLocked, setWallsLocked] = useState(false)
-  const [activeView, setActiveView] = useState('Front')
 
   if (step === 1) return (
-    <div style={{ width:220, background:C.panel, borderLeft:`1px solid ${C.border}`, padding:16, overflowY:'auto' }}>
-      <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 12px' }}>Layer Settings</p>
-      {selectedRoom && (
-        <div style={{ background:C.bg, border:`1px solid ${C.border}`, borderRadius:6, padding:12, marginBottom:12 }}>
-          <p style={{ color:C.text, fontSize:12, fontWeight:700, margin:'0 0 8px' }}>{selectedRoom.icon} {selectedRoom.label}</p>
-          <p style={{ color:C.muted, fontSize:10, margin:'0 0 4px' }}>Area: {selectedRoom.area}</p>
+    <div style={{ width:220, background:'#fff', borderLeft:`1px solid #e8eaed`, overflowY:'auto', fontFamily:"'DM Sans',system-ui,sans-serif" }}>
+
+      {/* Mini 3D Preview */}
+      <div style={{ background:'#1a1a2e', margin:'12px 12px 0', borderRadius:8, overflow:'hidden', position:'relative', height:96 }}>
+        <svg viewBox="0 0 200 100" width="100%" height="100%" style={{ display:'block' }}>
+          <defs>
+            <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#1a1a3e"/>
+              <stop offset="100%" stopColor="#2d2d5e"/>
+            </linearGradient>
+          </defs>
+          <rect width="200" height="100" fill="url(#skyG)"/>
+          {/* floor */}
+          <polygon points="20,80 180,80 160,65 40,65" fill="#2a2a4a"/>
+          {/* back wall */}
+          <rect x="40" y="20" width="120" height="45" fill="#333366"/>
+          {/* left wall */}
+          <polygon points="20,80 40,65 40,20 20,32" fill="#2b2b55"/>
+          {/* ceiling */}
+          <polygon points="20,32 40,20 160,20 180,28" fill="#3a3a66"/>
+          {/* window */}
+          <rect x="60" y="28" width="30" height="24" fill="#4a6fa5" opacity="0.7"/>
+          <line x1="75" y1="28" x2="75" y2="52" stroke="#fff" strokeWidth="0.8" opacity="0.5"/>
+          <line x1="60" y1="40" x2="90" y2="40" stroke="#fff" strokeWidth="0.8" opacity="0.5"/>
+          {/* sofa hint */}
+          <rect x="55" y="58" width="50" height="7" rx="2" fill="#c9a227" opacity="0.8"/>
+          <rect x="55" y="54" width="8" height="11" rx="2" fill="#b08e20" opacity="0.8"/>
+          <rect x="97" y="54" width="8" height="11" rx="2" fill="#b08e20" opacity="0.8"/>
+        </svg>
+        <div style={{ position:'absolute', bottom:6, left:8, fontSize:8, color:'rgba(255,255,255,0.5)', fontWeight:600 }}>3D PREVIEW</div>
+      </div>
+
+      {/* Layer Settings */}
+      <div style={{ borderBottom:'1px solid #e8eaed', padding:'12px 12px 10px' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+          <span style={{ fontSize:11, fontWeight:700, color:'#1a1a2e' }}>Layer Settings</span>
+          <span style={{ fontSize:10, color:'#2563eb', cursor:'pointer' }}>›</span>
         </div>
-      )}
-      <div style={{ marginBottom:16 }}>
-        <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Basic Parameters</p>
-        {[['Wall Height','9\' 0"'],['Wall Thickness','0.5 in'],['Total Building','560 ft²']].map(([k,v]) => (
-          <div key={k} style={{ display:'flex', justifyContent:'space-between', marginBottom:8 }}>
-            <span style={{ color:C.muted, fontSize:10 }}>{k}</span>
-            <span style={{ color:C.text, fontSize:10, fontWeight:600 }}>{v}</span>
+        {[
+          { label:'Ground', color:'#6b7280', visible:true },
+          { label:'Floor 1', color:'#2563eb', visible:true },
+          { label:'Ceiling', color:'#9ca3af', visible:false },
+        ].map(l => (
+          <div key={l.label} style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
+            <div style={{ width:10, height:10, borderRadius:2, background: l.visible ? l.color : '#e5e7eb', flexShrink:0 }}/>
+            <span style={{ fontSize:11, color:'#1a1a2e', flex:1 }}>{l.label}</span>
+            <span style={{ fontSize:10, color: l.visible ? '#1a1a2e' : '#9ca3af' }}>{l.visible ? '●' : '○'}</span>
+          </div>
+        ))}
+        {selectedRoom && (
+          <div style={{ marginTop:6, padding:'6px 8px', background:'#f0f7ff', borderRadius:6, border:'1px solid #bfdbfe' }}>
+            <span style={{ fontSize:10, color:'#2563eb', fontWeight:600 }}>{selectedRoom.icon} {selectedRoom.label}</span>
+            <span style={{ fontSize:9, color:'#6b7280', marginLeft:6 }}>{selectedRoom.area}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Basic Parameters */}
+      <div style={{ borderBottom:'1px solid #e8eaed', padding:'12px 12px 10px' }}>
+        <p style={{ fontSize:11, fontWeight:700, color:'#1a1a2e', margin:'0 0 10px' }}>Basic Parameters</p>
+        {[
+          ['Total Building', '0.00 ft²'],
+          ['Floors', '1'],
+        ].map(([k,v]) => (
+          <div key={k} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+            <span style={{ fontSize:11, color:'#6b7280' }}>{k}</span>
+            <span style={{ fontSize:11, color:'#1a1a2e', fontWeight:600 }}>{v}</span>
           </div>
         ))}
       </div>
-      <div>
-        <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Wall Settings</p>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
-          <span style={{ color:C.muted, fontSize:10 }}>Lock Walls</span>
+
+      {/* Wall Settings */}
+      <div style={{ padding:'12px 12px 16px' }}>
+        <p style={{ fontSize:11, fontWeight:700, color:'#1a1a2e', margin:'0 0 10px' }}>Wall Settings</p>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+          <span style={{ fontSize:11, color:'#6b7280' }}>Lock Walls</span>
           <div onClick={() => setWallsLocked(v=>!v)}
-            style={{ width:28, height:16, background: wallsLocked ? C.gold : C.border, borderRadius:8, cursor:'pointer', transition:'background 0.2s', position:'relative' }}>
-            <div style={{ width:12, height:12, borderRadius:'50%', background:'#fff', position:'absolute', top:2, transition:'left 0.2s', left: wallsLocked ? 14 : 2 }} />
+            style={{ width:32, height:18, background: wallsLocked ? '#2563eb' : '#d1d5db', borderRadius:9, cursor:'pointer', transition:'background 0.2s', position:'relative' }}>
+            <div style={{ width:14, height:14, borderRadius:'50%', background:'#fff', position:'absolute', top:2, transition:'left 0.2s', left: wallsLocked ? 16 : 2, boxShadow:'0 1px 3px rgba(0,0,0,0.2)' }} />
           </div>
         </div>
+        {[['Size', '–'],['Wall Height', "9' 2\""],['Wall Thickness', '0.45 in']].map(([k,v]) => (
+          <div key={k} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+            <span style={{ fontSize:11, color:'#6b7280' }}>{k}</span>
+            <span style={{ fontSize:11, color:'#1a1a2e', fontWeight:600 }}>{v}</span>
+          </div>
+        ))}
       </div>
     </div>
   )
@@ -991,13 +1477,44 @@ function RightPanel({ step, selectedRoom, appliedTemplate, addedItems = [] }) {
           <p style={{ color:C.muted, fontSize:9, margin:'2px 0 0' }}>{appliedTemplate.style}</p>
         </div>
       )}
+      {selectedFurnitureItem && (
+        <div style={{ background:'rgba(201,162,39,0.08)', border:`1px solid ${C.gold}`, borderRadius:6, padding:10, marginBottom:12 }}>
+          <p style={{ color:C.gold, fontSize:9, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', margin:'0 0 6px' }}>Selected Item</p>
+          <img src={selectedFurnitureItem.img} alt={selectedFurnitureItem.name} style={{ width:'100%', height:70, objectFit:'cover', borderRadius:4, marginBottom:6 }} />
+          <p style={{ color:C.text, fontSize:11, fontWeight:700, margin:'0 0 2px' }}>{selectedFurnitureItem.name}</p>
+          <p style={{ color:C.muted, fontSize:9, margin:'0 0 6px', fontFamily:'monospace' }}>{selectedFurnitureItem.sku}</p>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+            <span style={{ color:C.gold, fontSize:12, fontWeight:700 }}>₹{selectedFurnitureItem.price.toLocaleString()}</span>
+            <span style={{ color:C.muted, fontSize:8 }}>{selectedFurnitureItem.cat}</span>
+          </div>
+          {selectedFurnitureItem.dims && (
+            <p style={{ color:C.muted, fontSize:8, margin:'4px 0 0' }}>
+              {selectedFurnitureItem.dims.w}m × {selectedFurnitureItem.dims.h}m × {selectedFurnitureItem.dims.d}m
+            </p>
+          )}
+        </div>
+      )}
       <div style={{ marginBottom:14 }}>
-        <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Materials</p>
+        <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Wall & Floor Colors</p>
         <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>
-          {['#8B7355','#F5F0E8','#C0C0C0','#4A3728','#2C5F2E','#1B2A4A'].map(color => (
-            <button key={color} style={{ width:28, height:28, background:color, borderRadius:4, border:`2px solid ${C.border}`, cursor:'pointer' }} />
+          {[
+            { code:'#F5F0E8', name:'Warm White' },
+            { code:'#E8E0D4', name:'Cream' },
+            { code:'#C8B89A', name:'Sandstone' },
+            { code:'#8B7355', name:'Walnut' },
+            { code:'#4A3728', name:'Dark Oak' },
+            { code:'#2C5F2E', name:'Forest' },
+            { code:'#1B2A4A', name:'Navy' },
+            { code:'#6A6A6A', name:'Concrete' },
+          ].map(m => (
+            <button key={m.code} title={m.name}
+              onClick={() => onUseMaterial?.({ name: m.name, code: m.code, type: 'Wall/Floor' })}
+              style={{ width:28, height:28, background:m.code, borderRadius:4, border:`2px solid ${C.border}`, cursor:'pointer', transition:'transform 0.1s' }}
+              onMouseEnter={e => e.currentTarget.style.transform='scale(1.2)'}
+              onMouseLeave={e => e.currentTarget.style.transform='scale(1)'} />
           ))}
         </div>
+        <p style={{ color:C.muted, fontSize:8, margin:'6px 0 0' }}>Click a color to apply to room walls</p>
       </div>
       <div>
         <p style={{ color:C.muted, fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Room Stats</p>
@@ -1069,7 +1586,12 @@ const SIDEBAR_TABS = [
 
 /* ─── Main Export ─── */
 export default function StudioPage() {
+  return <SceneProvider><StudioPageInner /></SceneProvider>
+}
+
+function StudioPageInner() {
   const navigate                              = useNavigate()
+  const [studioReady, setStudioReady]         = useState(false)
   const [showLanding, setShowLanding]         = useState(true)
   const [sideTab, setSideTab]                 = useState('build')
   const [mode, setMode]                       = useState('3d')
@@ -1085,38 +1607,96 @@ export default function StudioPage() {
   const [renderSettings, setRenderSettings]   = useState({
     camera:'Normal', style:'Photorealistic', resolution:'4K (2160p)', lighting:'Daylight',
   })
+  const [activeTool, setActiveTool]           = useState('select') // 'select'|'wall'|'door'|'window'|'room'|'outside'
   const [aiCatalog, setAiCatalog]             = useState(null)
   const [catalogLoading, setCatalogLoading]   = useState(false)
   const [addedItems, setAddedItems]           = useState([])
+  const [undoStack, setUndoStack]             = useState([])
+  const [redoStack, setRedoStack]             = useState([])
   const [savedToast, setSavedToast]           = useState(false)
+  const [toastMsg, setToastMsg]               = useState('')
   const [selectedFurnitureItem, setSelectedFurnitureItem] = useState(null)
+  const [activeView, setActiveView]           = useState('Front')
+  const [activeMaterial, setActiveMaterial]   = useState(null)
   const fileInputRef                          = useRef()
 
   // Map sidebar tab → step
-  const step = sideTab === 'build' || sideTab === 'templates' || sideTab === 'mine' ? 1
-    : sideTab === 'decorate' || sideTab === 'ai' || sideTab === 'my' ? 2
+  const step = sideTab === 'build' || sideTab === 'mine' ? 1
+    : sideTab === 'decorate' || sideTab === 'ai' || sideTab === 'templates' || sideTab === 'my' ? 2
     : 3
+
+  const showToast = useCallback((msg, color = '#22c55e') => {
+    setToastMsg({ msg, color })
+    setSavedToast(true)
+    setTimeout(() => setSavedToast(false), 2500)
+  }, [])
 
   const handleUpload = useCallback(async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
+    // Reset input so the same file can be re-selected
+    e.target.value = ''
     setShowLanding(false)
+    setSideTab('build')
+
+    const ext = file.name.split('.').pop().toLowerCase()
+    const isImage = file.type.startsWith('image/')
+    const isPDF   = file.type === 'application/pdf' || ext === 'pdf'
+    const isCAD   = ['dwg','dxf','rvt','skp','ifc'].includes(ext)
+    const isSVG   = ext === 'svg' || file.type === 'image/svg+xml'
+
+    // For CAD / non-readable formats: skip preview, run AI with placeholder
+    if (isCAD) {
+      setUploadedPlan(null)
+      setAnalyzing(true)
+      setAiAnalysis({
+        rooms:[{name:'Living Room',area:320},{name:'Bedroom',area:200},{name:'Kitchen',area:150},{name:'Bathroom',area:80}],
+        totalArea:1100, style:'Modern Indian', estimatedCost:'₹8–12 Lakhs',
+        note: `${file.name} uploaded. CAD files cannot be previewed in browser — AI analysis used default layout.`,
+      })
+      setAnalyzing(false)
+      showToast(`${file.name} loaded — AI layout applied`, C.gold)
+      return
+    }
+
     const reader = new FileReader()
     reader.onload = async (ev) => {
       const dataUrl = ev.target.result
+
+      if (isPDF) {
+        setAnalyzing(true)
+        // Render PDF page 1 to PNG for display, and send base64 to Gemini in parallel
+        const base64 = dataUrl.split(',')[1]
+        const [pngUrl, result] = await Promise.all([
+          renderPDFToDataURL(file).catch(() => null),
+          analyzeFloorPlan(base64, 'application/pdf').catch(() => null),
+        ])
+        setUploadedPlan(pngUrl || null)
+        setAiAnalysis(result || {
+          rooms:[{name:'Living Room',area:320},{name:'Bedroom',area:200},{name:'Kitchen',area:150},{name:'Bathroom',area:80}],
+          totalArea:1100, style:'Modern Indian', estimatedCost:'₹8–12 Lakhs',
+        })
+        setMode('2d')
+        setAnalyzing(false)
+        showToast(`${file.name} analysed — viewing 2D plan`, C.gold)
+        return
+      }
+
+      // Image / SVG — show preview + run AI
       setUploadedPlan(dataUrl)
       setAnalyzing(true)
       const base64 = dataUrl.split(',')[1]
-      const mimeType = file.type || 'image/jpeg'
+      const mimeType = isImage ? (file.type || 'image/jpeg') : 'image/png'
       const result = await analyzeFloorPlan(base64, mimeType)
       setAiAnalysis(result || {
         rooms:[{name:'Living Room',area:320},{name:'Bedroom',area:200},{name:'Kitchen',area:150},{name:'Bathroom',area:80}],
         totalArea:1100, style:'Modern Indian', estimatedCost:'₹8–12 Lakhs',
       })
       setAnalyzing(false)
+      showToast(`Floor plan analysed!`)
     }
     reader.readAsDataURL(file)
-  }, [])
+  }, [showToast])
 
   const handleRender = useCallback(() => {
     setRendering(true); setRenderProgress(0)
@@ -1127,15 +1707,38 @@ export default function StudioPage() {
   }, [])
 
   const handleAddItem = useCallback((item) => {
-    setAddedItems(prev => prev.some(a=>a.id===item.id) ? prev.filter(a=>a.id!==item.id) : [...prev,item])
+    setAddedItems(prev => {
+      const exists = prev.some(a => a.id === item.id)
+      const next = exists ? prev.filter(a => a.id !== item.id) : [...prev, item]
+      setUndoStack(u => [...u, prev])
+      setRedoStack([])
+      return next
+    })
   }, [])
 
-  const handleSave = useCallback(() => {
+  // Scene store — read the structured scene for save/export
+  const { scene, exportJSON, canUndo: sceneCanUndo, canRedo: sceneCanRedo, undo: sceneUndo, redo: sceneRedo } = useScene()
+
+  const handleSave = useCallback(async () => {
+    // 1. Save furniture/template (legacy)
     const design = { addedItems, appliedTemplate, selectedRoom, savedAt: new Date().toISOString() }
     localStorage.setItem('elshaddai_studio_design', JSON.stringify(design))
-    setSavedToast(true)
-    setTimeout(() => setSavedToast(false), 2500)
-  }, [addedItems, appliedTemplate, selectedRoom])
+    // 2. Save scene data model
+    const sceneJson = exportJSON()
+    localStorage.setItem('elshaddai_scene_v1', sceneJson)
+    // 3. Persist to backend if logged in
+    try {
+      const token = localStorage.getItem('es_token')
+      if (token) {
+        await fetch(`/api/scenes/${scene.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ name: scene.metadata.name, scene_json: sceneJson }),
+        })
+      }
+    } catch { /* offline — local save is enough */ }
+    showToast('Design saved!')
+  }, [addedItems, appliedTemplate, selectedRoom, scene, exportJSON, showToast])
 
   const handleExport = useCallback(() => {
     const design = { addedItems, appliedTemplate, selectedRoom, exportedAt: new Date().toISOString() }
@@ -1144,11 +1747,28 @@ export default function StudioPage() {
     const a = document.createElement('a')
     a.href = url; a.download = 'elshaddai-design.json'; a.click()
     URL.revokeObjectURL(url)
-  }, [addedItems, appliedTemplate, selectedRoom])
+    showToast('Design exported!')
+  }, [addedItems, appliedTemplate, selectedRoom, showToast])
 
   const handleUndo = useCallback(() => {
-    setAddedItems(prev => prev.slice(0, -1))
-  }, [])
+    setUndoStack(u => {
+      if (!u.length) return u
+      const prev = u[u.length - 1]
+      setRedoStack(r => [...r, addedItems])
+      setAddedItems(prev)
+      return u.slice(0, -1)
+    })
+  }, [addedItems])
+
+  const handleRedo = useCallback(() => {
+    setRedoStack(r => {
+      if (!r.length) return r
+      const next = r[r.length - 1]
+      setUndoStack(u => [...u, addedItems])
+      setAddedItems(next)
+      return r.slice(0, -1)
+    })
+  }, [addedItems])
 
   const handleClear = useCallback(() => {
     if (addedItems.length === 0) return
@@ -1176,6 +1796,8 @@ export default function StudioPage() {
     if (type === 'my') setSideTab('mine')
   }, [handleApplyTemplate])
 
+  if (!studioReady) return <StudioLoader onDone={() => setStudioReady(true)} />
+
   if (showLanding) return (
     <div style={{ height:'100vh', display:'flex', flexDirection:'column', overflow:'hidden', fontFamily:"'DM Sans',system-ui,sans-serif" }}>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
@@ -1195,7 +1817,7 @@ export default function StudioPage() {
           ✕ Exit Studio
         </button>
       </div>
-      <input ref={fileInputRef} type="file" accept="image/*" style={{ display:'none' }} onChange={handleUpload} />
+      <input ref={fileInputRef} type="file" accept="image/*,.pdf,.svg,.dwg,.dxf,.rvt,.skp,.ifc" style={{ display:'none' }} onChange={handleUpload} />
       <StudioLanding onStart={handleLandingStart} fileInputRef={fileInputRef} onUpload={handleUpload} />
     </div>
   )
@@ -1203,11 +1825,11 @@ export default function StudioPage() {
   return (
     <div style={{ height:'100vh', display:'flex', flexDirection:'column', overflow:'hidden', background:C.bg, fontFamily:"'DM Sans',system-ui,sans-serif" }}>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-      <input ref={fileInputRef} type="file" accept="image/*" style={{ display:'none' }} onChange={handleUpload} />
+      <input ref={fileInputRef} type="file" accept="image/*,.pdf,.svg,.dwg,.dxf,.rvt,.skp,.ifc" style={{ display:'none' }} onChange={handleUpload} />
 
       {savedToast && (
-        <div style={{ position:'fixed', top:64, right:24, zIndex:9999, background:'#22c55e', color:'#fff', padding:'10px 20px', borderRadius:6, fontWeight:700, fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.3)' }}>
-          ✓ Design saved!
+        <div style={{ position:'fixed', top:64, right:24, zIndex:9999, background: toastMsg?.color || '#22c55e', color:'#fff', padding:'10px 20px', borderRadius:6, fontWeight:700, fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.3)' }}>
+          ✓ {toastMsg?.msg || 'Saved!'}
         </div>
       )}
       <TopBar
@@ -1216,6 +1838,7 @@ export default function StudioPage() {
         onExport={handleExport}
         onClose={() => setShowLanding(true)}
         onUndo={handleUndo}
+        onRedo={handleRedo}
         onClear={handleClear}
         onFile={() => fileInputRef.current?.click()}
         onSwitchTab={setSideTab}
@@ -1241,17 +1864,22 @@ export default function StudioPage() {
 
         {/* Panel */}
         <div style={{ width:252, background:C.panel, borderRight:`1px solid ${C.border}`, flexShrink:0, overflow:'hidden', display:'flex', flexDirection:'column' }}>
-          {(sideTab==='build'||sideTab==='templates'||sideTab==='mine') && (
+          {(sideTab==='build'||sideTab==='mine') && (
             <DrawPanel
               onSelectRoom={handleSelectRoom}
               uploadedPlan={uploadedPlan}
               onUpload={handleUpload}
               aiAnalysis={aiAnalysis}
               analyzing={analyzing}
+              setSideTab={setSideTab}
+              fileInputRef={fileInputRef}
+              activeTool={activeTool}
+              setActiveTool={setActiveTool}
             />
           )}
-          {(sideTab==='decorate'||sideTab==='ai'||sideTab==='my') && (
+          {(sideTab==='decorate'||sideTab==='ai'||sideTab==='templates'||sideTab==='my') && (
             <DecoratePanel
+              sideTab={sideTab}
               templateScope={templateScope}
               setTemplateScope={setTemplateScope}
               onApplyTemplate={handleApplyTemplate}
@@ -1261,6 +1889,7 @@ export default function StudioPage() {
               catalogLoading={catalogLoading}
               addedItems={addedItems}
               onAddItem={handleAddItem}
+              onUseMaterial={(m) => { setActiveMaterial(m); showToast(`${m.name} applied to room`) }}
             />
           )}
           {sideTab==='render' && (
@@ -1270,18 +1899,27 @@ export default function StudioPage() {
               onRender={handleRender}
               rendering={rendering}
               renderProgress={renderProgress}
+              addedItems={addedItems}
+              aiAnalysis={aiAnalysis}
             />
           )}
         </div>
 
-        {/* Main Canvas — Three.js WebGL */}
+        {/* Main Canvas — Three.js WebGL + 2D FloorPlan */}
         <MainCanvas
           step={step}
           mode={mode}
+          setMode={setMode}
+          activeTool={activeTool}
           uploadedPlan={uploadedPlan}
+          aiAnalysis={aiAnalysis}
           addedItems={addedItems}
           appliedTemplate={appliedTemplate}
-          onSelectFurniture={(item) => item && setSelectedFurnitureItem(item)}
+          activeView={activeView}
+          activeMaterial={activeMaterial}
+          onSelectFurniture={(item) => { setSelectedFurnitureItem(item || null) }}
+          fileInputRef={fileInputRef}
+          onUpload={handleUpload}
         />
 
         {/* Right Panel */}
@@ -1290,6 +1928,10 @@ export default function StudioPage() {
           selectedRoom={selectedRoom}
           appliedTemplate={appliedTemplate}
           addedItems={addedItems}
+          selectedFurnitureItem={selectedFurnitureItem}
+          activeView={activeView}
+          setActiveView={setActiveView}
+          onUseMaterial={(m) => { setActiveMaterial(m); showToast(`${m.name} applied to room`) }}
         />
       </div>
 
@@ -1299,7 +1941,7 @@ export default function StudioPage() {
           { label:'Walls', val:'8' },
           { label:'Rooms', val: aiAnalysis ? aiAnalysis.rooms?.length||4 : '4' },
           { label:'Area', val: aiAnalysis ? `${aiAnalysis.totalArea} ft²` : '560 ft²' },
-          { label:'Furniture', val: addedItems.length||'12' },
+          { label:'Furniture', val: addedItems.length },
         ].map(({ label, val }) => (
           <div key={label} style={{ display:'flex', gap:4 }}>
             <span style={{ color:C.muted, fontSize:9, textTransform:'uppercase', letterSpacing:'0.1em' }}>{label}:</span>

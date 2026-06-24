@@ -56,6 +56,7 @@ const ProjectHealthPage  = lazy(() => import('./pages/app/ProjectHealthPage'))
 const MaterialSpecPage   = lazy(() => import('./pages/app/MaterialSpecPage'))
 const NotFoundPage       = lazy(() => import('./pages/public/NotFoundPage'))
 const StudioPage         = lazy(() => import('./pages/app/StudioPage'))
+const ProjectHQPage      = lazy(() => import('./pages/app/ProjectHQPage'))
 const GalleryPage        = lazy(() => import('./pages/public/GalleryPage'))
 const MyDesignPage       = lazy(() => import('./pages/public/MyDesignPage'))
 const AboutPage          = lazy(() => import('./pages/public/AboutPage'))
@@ -166,7 +167,8 @@ export default function App() {
             <Route path="/material-spec"    element={<P><MaterialSpecPage /></P>} />
 
             {/* ── Admin only ── */}
-            <Route path="/audit-log" element={<P roles={['ADMIN','SUPER_ADMIN']}><AuditLogPage /></P>} />
+            <Route path="/audit-log"    element={<P roles={['ADMIN','SUPER_ADMIN']}><AuditLogPage /></P>} />
+            <Route path="/project-hq"   element={<P roles={['ADMIN','SUPER_ADMIN']}><ProjectHQPage /></P>} />
 
             {/* ── 404 ── */}
             <Route path="*" element={<NotFoundPage />} />
